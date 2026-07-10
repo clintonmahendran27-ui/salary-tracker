@@ -367,6 +367,12 @@ tr:hover td { background: var(--page); }
       </div>
     </div>
     <div class="header-month" id="headerMonth"></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="exportData()" style="height:32px;padding:0 14px;background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" title="Export data as JSON file">⬇ Export</button>
+      <label style="height:32px;padding:0 14px;background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;" title="Import data from JSON file">
+        ⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
+      </label>
+    </div>
   </div>
 </header>
 
@@ -589,17 +595,54 @@ CATS.forEach(c => {
   chipWrap.appendChild(el);
 });
 
-// Load saved
-const saved = localStorage.getItem('sns_v2');
+// Load saved — try localStorage first, fall back to sessionStorage
+const saved = localStorage.getItem('sns_v2') || sessionStorage.getItem('sns_v2');
 if (saved) {
-  const d = JSON.parse(saved);
-  if (d.salary)  { salary = d.salary; dailyBdgt = d.dailyBdgt; applySetup(); }
-  if (d.days)    { days = d.days; }
-  render();
+  try {
+    const d = JSON.parse(saved);
+    if (d.salary)  { salary = d.salary; dailyBdgt = d.dailyBdgt; applySetup(); }
+    if (d.days)    { days = d.days; }
+    render();
+  } catch(e) { console.warn('Failed to load saved data', e); }
 }
 
 function persist() {
-  localStorage.setItem('sns_v2', JSON.stringify({ salary, dailyBdgt, days }));
+  const payload = JSON.stringify({ salary, dailyBdgt, days });
+  try { localStorage.setItem('sns_v2', payload); } catch(e) {}
+  try { sessionStorage.setItem('sns_v2', payload); } catch(e) {}
+}
+
+// ── Export / Import ───────────────────────────────────────
+function exportData() {
+  const payload = JSON.stringify({ salary, dailyBdgt, days }, null, 2);
+  const blob    = new Blob([payload], { type: 'application/json' });
+  const url     = URL.createObjectURL(blob);
+  const a       = document.createElement('a');
+  a.href        = url;
+  a.download    = 'salary-spend-data.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (!d.salary || !d.days) { alert('Invalid data file.'); return; }
+      salary    = d.salary;
+      dailyBdgt = d.dailyBdgt;
+      days      = d.days;
+      applySetup();
+      persist();
+      render();
+      alert('Data imported successfully!');
+    } catch(err) { alert('Failed to import: invalid JSON file.'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 }
 
 // ── Salary ────────────────────────────────────────────────
