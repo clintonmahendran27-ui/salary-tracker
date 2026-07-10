@@ -378,24 +378,49 @@ document.getElementById('dayPicker').value = TODAY;
 updateDateLabel();
 
 // ── Storage ────────────────────────────────────────────────────────
+const STORE_KEY = 'sns_v3';
+
 function loadStore(){
-  const raw = localStorage.getItem('sns_v3') || sessionStorage.getItem('sns_v3');
-  if(raw){ try{ store = JSON.parse(raw); }catch(e){} }
-  // Migrate old sns_v2 data into current month
-  const old = localStorage.getItem('sns_v2');
-  if(old && !store.months[CURRENT_MK]){
+  // Try localStorage first, then sessionStorage
+  let raw = null;
+  try{ raw = localStorage.getItem(STORE_KEY); }catch(e){}
+  if(!raw){ try{ raw = sessionStorage.getItem(STORE_KEY); }catch(e){} }
+  if(raw){
+    try{ store = JSON.parse(raw); }catch(e){ store = { months:{} }; }
+  }
+  // Migrate old sns_v2 data into current month if no v3 data yet
+  if(!store.months[CURRENT_MK] || !store.months[CURRENT_MK].salary){
     try{
-      const d = JSON.parse(old);
-      if(d.salary) store.months[CURRENT_MK] = { salary:d.salary, dailyBdgt:d.dailyBdgt, days:d.days||{} };
-      persist();
+      const old = localStorage.getItem('sns_v2');
+      if(old){
+        const d = JSON.parse(old);
+        if(d.salary){
+          store.months[CURRENT_MK] = { salary:d.salary, dailyBdgt:d.dailyBdgt, days:d.days||{} };
+          persist();
+        }
+      }
     }catch(e){}
   }
 }
+
 function persist(){
   const payload = JSON.stringify(store);
-  try{ localStorage.setItem('sns_v3', payload); }catch(e){}
-  try{ sessionStorage.setItem('sns_v3', payload); }catch(e){}
+  let savedOk = false;
+  try{ localStorage.setItem(STORE_KEY, payload); savedOk = true; }catch(e){}
+  try{ sessionStorage.setItem(STORE_KEY, payload); }catch(e){}
+  // Cookie fallback for small data (salary only, not entries)
+  try{
+    const mini = JSON.stringify({ months: Object.fromEntries(
+      Object.entries(store.months).map(([k,v])=>([k,{salary:v.salary,dailyBdgt:v.dailyBdgt}]))
+    )});
+    document.cookie = `sns_meta=${encodeURIComponent(mini)};max-age=31536000;path=/`;
+  }catch(e){}
+  return savedOk;
 }
+
+// Save on page hide / tab switch to prevent data loss
+window.addEventListener('beforeunload', persist);
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') persist(); });
 function curMonth(){ return store.months[viewMK] || {}; }
 function curDays(){  return (store.months[viewMK]||{}).days || {}; }
 function curSalary(){ return (store.months[viewMK]||{}).salary || 0; }
@@ -426,7 +451,9 @@ function confirmNewMonth(){
   const v = parseFloat(document.getElementById('modalSalaryInput').value);
   if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
   const DIM = daysInMonth(CURRENT_MK);
-  store.months[CURRENT_MK] = { salary:v, dailyBdgt:v/DIM, days:{} };
+  // Preserve existing days if already present — never wipe entries
+  const existingDays = (store.months[CURRENT_MK]||{}).days || {};
+  store.months[CURRENT_MK] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
   persist();
   document.getElementById('newMonthModal').classList.add('hidden');
   populateMonthSwitcher();
@@ -472,9 +499,9 @@ function setSalary(){
   const v = parseFloat(document.getElementById('salaryInput').value);
   if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
   const DIM = daysInMonth(CURRENT_MK);
-  if(!store.months[CURRENT_MK]) store.months[CURRENT_MK] = { days:{} };
-  store.months[CURRENT_MK].salary    = v;
-  store.months[CURRENT_MK].dailyBdgt = v/DIM;
+  // Preserve existing days — never overwrite
+  const existingDays = (store.months[CURRENT_MK]||{}).days || {};
+  store.months[CURRENT_MK] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
   persist();
   populateMonthSwitcher();
   render();
