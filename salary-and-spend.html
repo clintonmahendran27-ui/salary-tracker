@@ -358,69 +358,71 @@ function formatDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateSt
 function catColor(k){ return (CATS.find(c=>c.key===k)||CATS[6]).color; }
 function catLabel(k){ return (CATS.find(c=>c.key===k)||CATS[6]).label; }
 
-// ── State ──────────────────────────────────────────────────────────
-// Storage structure: { months: { "YYYY-MM": { salary, dailyBdgt, days:{} } } }
-let store = { months: {} };
-const now  = new Date();
-const CURRENT_MK = monthKey(now);
-const TODAY      = toDateStr(now);
-let viewMK       = CURRENT_MK;   // which month we're viewing
-let selCat       = 'grocery';
-let selDate      = TODAY;
+// ── Storage key — declared FIRST before any function uses it ───────
+const STORE_KEY = 'sns_v4';
 
-// ── Boot ───────────────────────────────────────────────────────────
-buildCatChips();
-loadStore();
-populateMonthSwitcher();
-checkNewMonth();
-switchMonth(CURRENT_MK, false);
-document.getElementById('dayPicker').value = TODAY;
-updateDateLabel();
-
-// ── Storage ────────────────────────────────────────────────────────
-const STORE_KEY = 'sns_v3';
+// ── Persist & Load — declared BEFORE boot calls them ──────────────
+function persist(){
+  const payload = JSON.stringify(store);
+  try{ localStorage.setItem(STORE_KEY, payload); }catch(e){}
+  try{ sessionStorage.setItem(STORE_KEY, payload); }catch(e){}
+}
 
 function loadStore(){
-  // Try localStorage first, then sessionStorage
   let raw = null;
   try{ raw = localStorage.getItem(STORE_KEY); }catch(e){}
   if(!raw){ try{ raw = sessionStorage.getItem(STORE_KEY); }catch(e){} }
   if(raw){
-    try{ store = JSON.parse(raw); }catch(e){ store = { months:{} }; }
-  }
-  // Migrate old sns_v2 data into current month if no v3 data yet
-  if(!store.months[CURRENT_MK] || !store.months[CURRENT_MK].salary){
     try{
-      const old = localStorage.getItem('sns_v2');
-      if(old){
-        const d = JSON.parse(old);
-        if(d.salary){
-          store.months[CURRENT_MK] = { salary:d.salary, dailyBdgt:d.dailyBdgt, days:d.days||{} };
-          persist();
-        }
+      const parsed = JSON.parse(raw);
+      // Validate structure before accepting
+      if(parsed && typeof parsed === 'object' && parsed.months){
+        store = parsed;
       }
-    }catch(e){}
+    }catch(e){ store = { months:{} }; }
+  }
+  // Migrate old sns_v3 data
+  if(!store.months[CURRENT_MK] || !store.months[CURRENT_MK].salary){
+    ['sns_v3','sns_v2'].forEach(oldKey => {
+      try{
+        const old = localStorage.getItem(oldKey);
+        if(old){
+          const d = JSON.parse(old);
+          if(d.months){ Object.assign(store.months, d.months); persist(); }
+          else if(d.salary && !store.months[CURRENT_MK]){
+            store.months[CURRENT_MK] = { salary:d.salary, dailyBdgt:d.dailyBdgt, days:d.days||{} };
+            persist();
+          }
+        }
+      }catch(e){}
+    });
   }
 }
 
-function persist(){
-  const payload = JSON.stringify(store);
-  let savedOk = false;
-  try{ localStorage.setItem(STORE_KEY, payload); savedOk = true; }catch(e){}
-  try{ sessionStorage.setItem(STORE_KEY, payload); }catch(e){}
-  // Cookie fallback for small data (salary only, not entries)
-  try{
-    const mini = JSON.stringify({ months: Object.fromEntries(
-      Object.entries(store.months).map(([k,v])=>([k,{salary:v.salary,dailyBdgt:v.dailyBdgt}]))
-    )});
-    document.cookie = `sns_meta=${encodeURIComponent(mini)};max-age=31536000;path=/`;
-  }catch(e){}
-  return savedOk;
-}
+// ── State ──────────────────────────────────────────────────────────
+let store        = { months: {} };
+const now        = new Date();
+const CURRENT_MK = monthKey(now);
+const TODAY      = toDateStr(now);
+let viewMK       = CURRENT_MK;
+let selCat       = 'grocery';
+let selDate      = TODAY;
 
-// Save on page hide / tab switch to prevent data loss
+// ── Boot — runs after all functions are defined ────────────────────
+window.addEventListener('DOMContentLoaded', function(){
+  loadStore();                              // load first — STORE_KEY now in scope
+  buildCatChips();
+  populateMonthSwitcher();
+  checkNewMonth();
+  switchMonth(CURRENT_MK, false);
+  document.getElementById('dayPicker').value = TODAY;
+  updateDateLabel();
+  render();
+});
+
+// Save immediately on any page exit / tab switch
 window.addEventListener('beforeunload', persist);
-document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') persist(); });
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') persist(); });
 function curMonth(){ return store.months[viewMK] || {}; }
 function curDays(){  return (store.months[viewMK]||{}).days || {}; }
 function curSalary(){ return (store.months[viewMK]||{}).salary || 0; }
