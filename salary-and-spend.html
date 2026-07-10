@@ -6,355 +6,201 @@
 <title>Salary & Spend</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --surf:       #fcfcfb;
-  --page:       #f0ede8;
-  --card:       #ffffff;
-  --border:     rgba(11,11,11,0.09);
-  --ink:        #0b0b0b;
-  --ink2:       #52514e;
-  --muted:      #898781;
-  --grid:       #e1e0d9;
-  --base:       #c3c2b7;
-  --c1:         #2a78d6;
-  --c1l:        #dceeff;
-  --c2:         #1baf7a;
-  --c2l:        #d2f4e8;
-  --c3:         #eda100;
-  --c3l:        #fff1cc;
-  --c4:         #e34948;
-  --c4l:        #fde8e8;
-  --c5:         #4a3aa7;
-  --c5l:        #eceafb;
-  --good:       #0ca30c;
-  --goodbg:     #e4f7e4;
-  --danger:     #d03b3b;
-  --dangerbg:   #fdeaea;
-  --warn:       #c98500;
-  --warnbg:     #fff4d6;
-  --radius:     14px;
-  --shadow:     0 2px 12px rgba(11,11,11,0.07);
+  --surf:#fcfcfb; --page:#f0ede8; --card:#ffffff;
+  --border:rgba(11,11,11,0.09); --ink:#0b0b0b; --ink2:#52514e;
+  --muted:#898781; --grid:#e1e0d9; --base:#c3c2b7;
+  --c1:#2a78d6; --c1l:#dceeff; --c2:#1baf7a; --c2l:#d2f4e8;
+  --c3:#eda100; --c3l:#fff1cc; --c4:#e34948; --c4l:#fde8e8;
+  --c5:#4a3aa7; --c5l:#eceafb;
+  --good:#0ca30c; --goodbg:#e4f7e4;
+  --danger:#d03b3b; --dangerbg:#fdeaea;
+  --warn:#c98500; --warnbg:#fff4d6;
+  --radius:14px; --shadow:0 2px 12px rgba(11,11,11,0.07);
 }
+body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--page); color:var(--ink); min-height:100vh; }
 
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: var(--page);
-  color: var(--ink);
-  min-height: 100vh;
-}
+/* Header */
+.app-header { background:linear-gradient(135deg,#1a1463 0%,#2a78d6 60%,#1baf7a 100%); padding:0 24px; position:sticky; top:0; z-index:200; box-shadow:0 2px 16px rgba(0,0,0,0.18); }
+.header-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; gap:12px; flex-wrap:wrap; }
+.app-logo { display:flex; align-items:center; gap:10px; }
+.app-logo .logo-icon { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.app-logo h1 { font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.5px; }
+.app-logo span { font-size:11px; color:rgba(255,255,255,0.65); font-weight:500; }
+.hdr-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.month-sel { height:32px; padding:0 10px; background:rgba(255,255,255,0.15); color:#fff; border:1.5px solid rgba(255,255,255,0.3); border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; outline:none; }
+.month-sel option { color:#0b0b0b; background:#fff; }
+.hdr-btn { height:32px; padding:0 14px; background:rgba(255,255,255,0.15); color:#fff; border:1.5px solid rgba(255,255,255,0.3); border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+.hdr-btn:hover { background:rgba(255,255,255,0.25); }
 
-/* ── Header ── */
-.app-header {
-  background: linear-gradient(135deg, #1a1463 0%, #2a78d6 60%, #1baf7a 100%);
-  padding: 0 24px;
-  position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
-}
-.header-inner {
-  max-width: 1050px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 60px; gap: 12px;
-}
-.app-logo { display: flex; align-items: center; gap: 10px; }
-.app-logo .logo-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: rgba(255,255,255,0.18);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
-}
-.app-logo h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-.app-logo span { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 500; }
-.header-month {
-  font-size: 13px; font-weight: 700; color: #fff;
-  background: rgba(255,255,255,0.15);
-  padding: 5px 14px; border-radius: 20px;
-  backdrop-filter: blur(4px);
-}
+/* Modal */
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:500; display:flex; align-items:center; justify-content:center; padding:16px; }
+.modal-bg.hidden { display:none; }
+.modal-box { background:var(--card); border-radius:20px; padding:32px 28px; max-width:420px; width:100%; box-shadow:0 8px 40px rgba(0,0,0,0.25); }
+.modal-icon { font-size:48px; text-align:center; margin-bottom:12px; }
+.modal-title { font-size:22px; font-weight:800; color:var(--ink); text-align:center; margin-bottom:6px; }
+.modal-sub { font-size:14px; color:var(--muted); text-align:center; margin-bottom:24px; }
+.modal-field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+.modal-field label { font-size:12px; font-weight:700; color:var(--ink2); text-transform:uppercase; letter-spacing:0.5px; }
+.modal-field input { height:44px; padding:0 14px; border:2px solid var(--base); border-radius:10px; font-size:16px; font-weight:700; background:var(--surf); color:var(--ink); outline:none; }
+.modal-field input:focus { border-color:var(--c1); }
+.modal-prev { background:var(--page); border-radius:10px; padding:12px 14px; margin-bottom:20px; font-size:13px; color:var(--ink2); }
+.modal-prev strong { color:var(--ink); }
+.btn-modal-primary { width:100%; height:46px; background:linear-gradient(90deg,#1a1463,#2a78d6); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:800; cursor:pointer; transition:opacity 0.15s; }
+.btn-modal-primary:hover { opacity:0.9; }
 
-/* ── Layout ── */
-.wrap { max-width: 1050px; margin: 0 auto; padding: 24px 16px 48px; }
+/* Layout */
+.wrap { max-width:1100px; margin:0 auto; padding:24px 16px 48px; }
 
-/* ── Hero Banner ── */
-.hero-banner {
-  border-radius: var(--radius);
-  background: linear-gradient(120deg, #1a1463 0%, #2a78d6 50%, #0e9b6b 100%);
-  padding: 28px 28px 20px;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.hero-banner::before {
-  content: '💰';
-  position: absolute; right: -10px; top: -10px;
-  font-size: 120px; opacity: 0.08; pointer-events: none;
-}
-.hero-banner::after {
-  content: '📊';
-  position: absolute; right: 90px; bottom: -15px;
-  font-size: 90px; opacity: 0.07; pointer-events: none;
-}
-.hero-top { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-.hero-left { flex: 1; min-width: 180px; }
-.hero-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-.hero-value { font-size: 42px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1; }
-.hero-sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
-.hero-divider { width: 1px; background: rgba(255,255,255,0.2); align-self: stretch; margin: 4px 0; }
-.hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
-.hero-stat { }
-.hero-stat .hs-val { font-size: 24px; font-weight: 700; color: #fff; }
-.hero-stat .hs-lbl { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+/* Viewing banner */
+.viewing-banner { background:linear-gradient(90deg,#4a3aa7,#2a78d6); border-radius:var(--radius); padding:14px 20px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.viewing-banner.hidden { display:none; }
+.vb-text { color:#fff; font-size:14px; font-weight:700; }
+.vb-text span { opacity:0.7; font-weight:500; }
+.btn-back { height:32px; padding:0 14px; background:#fff; color:#1a1463; border:none; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; }
 
-/* Salary input row */
-.salary-row {
-  display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px; padding: 14px 16px;
-}
-.salary-row .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
-.salary-row label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.5px; }
-.salary-row input {
-  height: 38px; padding: 0 12px;
-  background: rgba(255,255,255,0.15);
-  border: 1.5px solid rgba(255,255,255,0.25);
-  border-radius: 8px; color: #fff;
-  font-size: 15px; font-weight: 600; outline: none;
-  transition: border-color 0.15s;
-}
-.salary-row input::placeholder { color: rgba(255,255,255,0.4); }
-.salary-row input:focus { border-color: rgba(255,255,255,0.7); }
-.btn-set {
-  height: 38px; padding: 0 20px;
-  background: #fff; color: #1a1463;
-  border: none; border-radius: 8px;
-  font-size: 13px; font-weight: 800;
-  cursor: pointer; white-space: nowrap;
-  transition: opacity 0.15s, transform 0.1s;
-}
-.btn-set:hover { opacity: 0.9; transform: translateY(-1px); }
+/* Hero */
+.hero-banner { border-radius:var(--radius); background:linear-gradient(120deg,#1a1463 0%,#2a78d6 50%,#0e9b6b 100%); padding:24px 28px 20px; margin-bottom:20px; position:relative; overflow:hidden; box-shadow:var(--shadow); }
+.hero-banner::before { content:'💰'; position:absolute; right:-10px; top:-10px; font-size:120px; opacity:0.08; pointer-events:none; }
+.hero-banner::after  { content:'📊'; position:absolute; right:90px; bottom:-15px; font-size:90px; opacity:0.07; pointer-events:none; }
+.hero-top { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+.hero-left { flex:1; min-width:160px; }
+.hero-label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+.hero-value { font-size:38px; font-weight:800; color:#fff; letter-spacing:-1px; line-height:1; }
+.hero-sub { font-size:13px; color:rgba(255,255,255,0.65); margin-top:4px; }
+.hero-divider { width:1px; background:rgba(255,255,255,0.2); align-self:stretch; }
+.hero-stats { display:flex; gap:20px; flex-wrap:wrap; }
+.hs-val { font-size:22px; font-weight:700; color:#fff; }
+.hs-lbl { font-size:11px; color:rgba(255,255,255,0.6); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+.salary-row { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; background:rgba(255,255,255,0.1); border-radius:10px; padding:14px 16px; }
+.salary-row .field { display:flex; flex-direction:column; gap:4px; flex:1; min-width:140px; }
+.salary-row label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.65); text-transform:uppercase; letter-spacing:0.5px; }
+.salary-row input { height:38px; padding:0 12px; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.25); border-radius:8px; color:#fff; font-size:15px; font-weight:600; outline:none; }
+.salary-row input::placeholder { color:rgba(255,255,255,0.4); }
+.salary-row input:focus { border-color:rgba(255,255,255,0.7); }
+.salary-row input[readonly] { opacity:0.7; cursor:default; }
+.btn-set { height:38px; padding:0 20px; background:#fff; color:#1a1463; border:none; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
+.btn-set:hover { opacity:0.9; }
 
-/* ── KPI Row ── */
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px; margin-bottom: 20px;
-}
-.kpi-tile {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 18px;
-  box-shadow: var(--shadow);
-  position: relative; overflow: hidden;
-}
-.kpi-tile::before {
-  content: attr(data-icon);
-  position: absolute; right: 10px; top: 8px;
-  font-size: 28px; opacity: 0.12; pointer-events: none;
-}
-.kpi-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.kpi-value { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.5px; }
-.kpi-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
-.kpi-tile.good .kpi-value { color: var(--good); }
-.kpi-tile.danger .kpi-value { color: var(--danger); }
+/* KPI */
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:12px; margin-bottom:20px; }
+.kpi-tile { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+.kpi-tile::before { content:attr(data-icon); position:absolute; right:10px; top:8px; font-size:28px; opacity:0.12; pointer-events:none; }
+.kpi-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+.kpi-value { font-size:21px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; }
+.kpi-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+.kpi-tile.good .kpi-value { color:var(--good); }
+.kpi-tile.danger .kpi-value { color:var(--danger); }
 
-/* ── Two-col layout ── */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+/* Two-col */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+@media(max-width:700px){ .two-col { grid-template-columns:1fr; } }
 
-/* ── Cards ── */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 20px;
-  box-shadow: var(--shadow);
-}
-.card-title {
-  font-size: 13px; font-weight: 800; color: var(--ink2);
-  text-transform: uppercase; letter-spacing: 0.5px;
-  margin-bottom: 14px;
-  display: flex; align-items: center; gap: 6px;
-}
-.card-title span { font-size: 16px; }
+/* Cards */
+.card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); }
+.card-title { font-size:13px; font-weight:800; color:var(--ink2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+.card-title span { font-size:16px; }
 
-/* ── Day Log ── */
-.day-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 10px;
-}
-.day-date { font-size: 13px; font-weight: 700; color: var(--ink); }
-.day-picker {
-  height: 34px; padding: 0 10px;
-  border: 1.5px solid var(--base);
-  border-radius: 8px; font-size: 13px;
-  font-weight: 600; background: var(--surf);
-  color: var(--ink); outline: none;
-}
-.day-picker:focus { border-color: var(--c1); }
+/* Day log */
+.day-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.day-date { font-size:13px; font-weight:700; color:var(--ink); }
+.day-picker { height:34px; padding:0 10px; border:1.5px solid var(--base); border-radius:8px; font-size:13px; font-weight:600; background:var(--surf); color:var(--ink); outline:none; }
+.day-picker:focus { border-color:var(--c1); }
+.cat-section { margin-bottom:12px; }
+.cat-label-sm { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.cat-chips { display:flex; gap:6px; flex-wrap:wrap; }
+.cat-chip { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:700; border:2px solid transparent; cursor:pointer; transition:all 0.15s; user-select:none; }
+.cat-chip.selected { border-color:currentColor; }
+.entry-input-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+.entry-input-row input[type=number] { height:38px; padding:0 12px; flex:1; min-width:100px; border:1.5px solid var(--base); border-radius:8px; font-size:14px; font-weight:700; background:var(--surf); color:var(--ink); outline:none; }
+.entry-input-row input[type=text]   { height:38px; padding:0 12px; flex:2; min-width:100px; border:1.5px solid var(--base); border-radius:8px; font-size:13px; background:var(--surf); color:var(--ink); outline:none; }
+.entry-input-row input:focus { border-color:var(--c1); }
+.btn-add    { height:38px; padding:0 16px; background:var(--c1); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
+.btn-add:hover { opacity:0.88; }
+.btn-reduce { height:38px; padding:0 14px; background:var(--dangerbg); color:var(--danger); border:1.5px solid var(--danger); border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
+.entries-list { margin-top:8px; display:flex; flex-direction:column; gap:6px; }
+.entry-item { display:flex; align-items:center; gap:8px; background:var(--page); border-radius:8px; padding:8px 10px; font-size:13px; }
+.entry-cat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.entry-name { flex:1; color:var(--ink2); font-weight:600; }
+.entry-amt { font-weight:800; font-variant-numeric:tabular-nums; }
+.btn-edit-entry,.btn-del-entry { background:none; border:none; cursor:pointer; font-size:14px; color:var(--muted); padding:2px 4px; border-radius:4px; }
+.btn-edit-entry:hover { color:var(--c1); }
+.btn-del-entry:hover  { color:var(--danger); }
+.entry-edit-inp { height:30px; width:90px; padding:0 8px; border:1.5px solid var(--c1); border-radius:6px; font-size:13px; font-weight:700; background:var(--surf); color:var(--ink); outline:none; }
+.btn-save-entry { height:30px; padding:0 10px; background:var(--c1); color:#fff; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; }
+.day-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; background:var(--page); border-radius:10px; padding:10px 14px; margin-top:10px; }
+.ds-item { display:flex; flex-direction:column; align-items:center; gap:1px; }
+.ds-val { font-size:16px; font-weight:800; }
+.ds-lbl { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; }
+.progress-wrap { margin-top:14px; }
+.progress-label { display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; }
+.progress-track { height:10px; border-radius:5px; background:var(--grid); overflow:hidden; }
+.progress-fill  { height:100%; border-radius:5px; transition:width 0.4s ease; }
 
-/* Category chips */
-.cat-section { margin-bottom: 12px; }
-.cat-label-sm { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.cat-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.cat-chip {
-  display: flex; align-items: center; gap: 4px;
-  padding: 5px 10px; border-radius: 20px;
-  font-size: 12px; font-weight: 700;
-  border: 2px solid transparent;
-  cursor: pointer; transition: all 0.15s;
-  user-select: none;
-}
-.cat-chip.selected { border-color: currentColor; }
+/* Chart */
+.chart-area { position:relative; width:100%; margin-top:6px; }
+svg.cs { overflow:visible; display:block; width:100%; }
+.leg { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+.leg-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--ink2); }
+.leg-dot  { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
 
-/* Entry input row */
-.entry-input-row {
-  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-.entry-input-row input[type=number] {
-  height: 38px; padding: 0 12px; flex: 1; min-width: 100px;
-  border: 1.5px solid var(--base);
-  border-radius: 8px; font-size: 14px; font-weight: 700;
-  background: var(--surf); color: var(--ink); outline: none;
-}
-.entry-input-row input:focus { border-color: var(--c1); }
-.entry-input-row input[type=text] {
-  height: 38px; padding: 0 12px; flex: 2; min-width: 100px;
-  border: 1.5px solid var(--base);
-  border-radius: 8px; font-size: 13px;
-  background: var(--surf); color: var(--ink); outline: none;
-}
-.btn-add {
-  height: 38px; padding: 0 16px;
-  background: var(--c1); color: #fff;
-  border: none; border-radius: 8px;
-  font-size: 13px; font-weight: 700;
-  cursor: pointer; white-space: nowrap;
-  transition: opacity 0.15s, transform 0.1s;
-}
-.btn-add:hover { opacity: 0.88; transform: translateY(-1px); }
-.btn-reduce {
-  height: 38px; padding: 0 14px;
-  background: var(--dangerbg); color: var(--danger);
-  border: 1.5px solid var(--danger);
-  border-radius: 8px; font-size: 13px; font-weight: 700;
-  cursor: pointer; white-space: nowrap;
-  transition: opacity 0.15s;
-}
-.btn-reduce:hover { opacity: 0.8; }
+/* Cat breakdown */
+.cat-breakdown { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+.cb-row { display:flex; align-items:center; gap:10px; }
+.cb-label { font-size:12px; font-weight:700; color:var(--ink2); width:96px; flex-shrink:0; display:flex; align-items:center; gap:4px; }
+.cb-track { flex:1; height:10px; background:var(--grid); border-radius:5px; overflow:hidden; }
+.cb-fill  { height:100%; border-radius:5px; transition:width 0.4s; }
+.cb-amt   { font-size:12px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; width:68px; text-align:right; }
 
-/* Day entries list */
-.entries-list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
-.entry-item {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--page); border-radius: 8px; padding: 8px 10px;
-  font-size: 13px;
-}
-.entry-cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.entry-name { flex: 1; color: var(--ink2); font-weight: 600; }
-.entry-amt { font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
-.btn-edit-entry, .btn-del-entry {
-  background: none; border: none; cursor: pointer;
-  font-size: 14px; color: var(--muted); padding: 2px 4px;
-  border-radius: 4px; transition: color 0.12s;
-}
-.btn-edit-entry:hover { color: var(--c1); }
-.btn-del-entry:hover  { color: var(--danger); }
-.entry-edit-row { display: flex; gap: 6px; align-items: center; flex: 1; }
-.entry-edit-inp {
-  height: 30px; width: 90px; padding: 0 8px;
-  border: 1.5px solid var(--c1);
-  border-radius: 6px; font-size: 13px; font-weight: 700;
-  background: var(--surf); color: var(--ink); outline: none;
-}
-.btn-save-entry {
-  height: 30px; padding: 0 10px;
-  background: var(--c1); color: #fff;
-  border: none; border-radius: 6px; font-size: 12px; font-weight: 700;
-  cursor: pointer;
-}
+/* Table */
+.tbl-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; padding:8px 10px; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; border-bottom:1.5px solid var(--grid); }
+td { padding:10px 10px; border-bottom:1px solid var(--grid); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--page); }
+.tag { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+.tag.good   { background:var(--goodbg);   color:var(--good); }
+.tag.danger { background:var(--dangerbg); color:var(--danger); }
+.tag.neutral{ background:var(--c1l);      color:var(--c1); }
 
-/* Day summary bar */
-.day-summary {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px;
-  background: var(--page); border-radius: 10px;
-  padding: 10px 14px; margin-top: 10px;
-}
-.ds-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-.ds-val { font-size: 16px; font-weight: 800; }
-.ds-lbl { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+/* Previous Months */
+.prev-months-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:4px; }
+.pm-card { border:1px solid var(--border); border-radius:12px; padding:16px; cursor:pointer; transition:box-shadow 0.15s,transform 0.1s; background:var(--surf); }
+.pm-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.1); transform:translateY(-2px); }
+.pm-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.pm-month-name { font-size:14px; font-weight:800; color:var(--ink); }
+.pm-salary { font-size:12px; color:var(--muted); font-weight:600; }
+.pm-stats { display:flex; gap:12px; flex-wrap:wrap; }
+.pm-stat .psv { font-size:16px; font-weight:800; }
+.pm-stat .psl { font-size:10px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.4px; }
 
-/* ── Progress bar ── */
-.progress-wrap { margin-top: 14px; }
-.progress-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
-.progress-track {
-  height: 10px; border-radius: 5px;
-  background: var(--grid); overflow: hidden;
-}
-.progress-fill {
-  height: 100%; border-radius: 5px;
-  transition: width 0.4s ease;
-}
+/* Tooltip */
+.tip { position:fixed; pointer-events:none; background:#1a1a19; color:#fff; font-size:12px; font-weight:600; padding:7px 11px; border-radius:8px; white-space:nowrap; z-index:999; opacity:0; transition:opacity 0.1s; box-shadow:0 4px 16px rgba(0,0,0,0.25); }
 
-/* ── Chart ── */
-.chart-area { position: relative; width: 100%; margin-top: 6px; }
-svg.cs { overflow: visible; display: block; width: 100%; }
+/* Empty */
+.empty { text-align:center; padding:32px 16px; color:var(--muted); font-size:14px; }
+.empty .ei { font-size:40px; margin-bottom:8px; }
 
-/* Legend */
-.leg { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
-.leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink2); }
-.leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-
-/* ── Category breakdown ── */
-.cat-breakdown { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-.cb-row { display: flex; align-items: center; gap: 10px; }
-.cb-label { font-size: 12px; font-weight: 700; color: var(--ink2); width: 100px; flex-shrink: 0; display: flex; align-items: center; gap: 5px; }
-.cb-track { flex: 1; height: 10px; background: var(--grid); border-radius: 5px; overflow: hidden; }
-.cb-fill  { height: 100%; border-radius: 5px; transition: width 0.4s; }
-.cb-amt   { font-size: 12px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; width: 70px; text-align: right; }
-
-/* ── Table ── */
-.tbl-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1.5px solid var(--grid); }
-td { padding: 10px 10px; border-bottom: 1px solid var(--grid); }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--page); }
-.tag {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 700;
-  padding: 3px 9px; border-radius: 20px;
-}
-.tag.good    { background: var(--goodbg);   color: var(--good);   }
-.tag.danger  { background: var(--dangerbg); color: var(--danger); }
-.tag.neutral { background: var(--c1l);      color: var(--c1);     }
-
-/* ── Tooltip ── */
-.tip {
-  position: fixed; pointer-events: none;
-  background: #1a1a19; color: #fff;
-  font-size: 12px; font-weight: 600;
-  padding: 7px 11px; border-radius: 8px;
-  white-space: nowrap; z-index: 999;
-  opacity: 0; transition: opacity 0.1s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-}
-
-/* ── Empty state ── */
-.empty { text-align: center; padding: 32px 16px; color: var(--muted); font-size: 14px; }
-.empty .ei { font-size: 40px; margin-bottom: 8px; }
-
-/* ── Responsive ── */
-@media (max-width: 600px) {
-  .hero-value { font-size: 32px; }
-  .hero-divider { display: none; }
-}
+@media(max-width:600px){ .hero-value{font-size:30px;} .hero-divider{display:none;} }
 </style>
 </head>
 <body>
+
+<!-- New Month Modal -->
+<div class="modal-bg" id="newMonthModal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title" id="modalTitle">New Month!</div>
+    <div class="modal-sub" id="modalSub">Set your salary for this month to continue tracking.</div>
+    <div class="modal-prev" id="modalPrev" style="display:none"></div>
+    <div class="modal-field">
+      <label>Monthly Salary (₹)</label>
+      <input type="number" id="modalSalaryInput" placeholder="e.g. 35000" min="1"/>
+    </div>
+    <button class="btn-modal-primary" onclick="confirmNewMonth()">✓ Start This Month</button>
+  </div>
+</div>
 
 <!-- Header -->
 <header class="app-header">
@@ -366,10 +212,10 @@ tr:hover td { background: var(--page); }
         <span>Smart Daily Budget Tracker</span>
       </div>
     </div>
-    <div class="header-month" id="headerMonth"></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="exportData()" style="height:32px;padding:0 14px;background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" title="Export data as JSON file">⬇ Export</button>
-      <label style="height:32px;padding:0 14px;background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;" title="Import data from JSON file">
+    <div class="hdr-right">
+      <select class="month-sel" id="monthSwitcher" onchange="switchMonth(this.value)" title="View a month"></select>
+      <button class="hdr-btn" onclick="exportData()">⬇ Export</button>
+      <label class="hdr-btn" style="display:flex;align-items:center;cursor:pointer;">
         ⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
       </label>
     </div>
@@ -378,341 +224,307 @@ tr:hover td { background: var(--page); }
 
 <div class="wrap">
 
-  <!-- Hero Banner -->
+  <!-- Viewing past month banner -->
+  <div class="viewing-banner hidden" id="viewingBanner">
+    <div class="vb-text">👁 Viewing: <span id="viewingMonthName"></span></div>
+    <button class="btn-back" onclick="switchMonth(CURRENT_MK)">← Back to Current Month</button>
+  </div>
+
+  <!-- Hero -->
   <div class="hero-banner">
     <div class="hero-top">
       <div class="hero-left">
         <div class="hero-label">Monthly Salary</div>
         <div class="hero-value" id="heroSalary">₹ —</div>
-        <div class="hero-sub" id="heroSub">Set your salary to get started</div>
+        <div class="hero-sub"  id="heroSub">Set your salary to get started</div>
       </div>
       <div class="hero-divider"></div>
       <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hs-lbl">Daily Budget</div>
-          <div class="hs-val" id="heroDailyBudget">₹ —</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hs-lbl">Days in Month</div>
-          <div class="hs-val" id="heroDays">—</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hs-lbl">Net Savings</div>
-          <div class="hs-val" id="heroSavings" style="color:#6ee26e">₹ 0</div>
-        </div>
+        <div class="hero-stat"><div class="hs-lbl">Daily Budget</div><div class="hs-val" id="heroDailyBudget">₹ —</div></div>
+        <div class="hero-stat"><div class="hs-lbl">Days in Month</div><div class="hs-val" id="heroDays">—</div></div>
+        <div class="hero-stat"><div class="hs-lbl">Net Savings</div><div class="hs-val" id="heroSavings" style="color:#6ee26e">₹ 0</div></div>
       </div>
     </div>
-    <div class="salary-row">
+    <div class="salary-row" id="salaryRowWrap">
       <div class="field">
-        <label>Enter Monthly Salary (₹)</label>
+        <label>Monthly Salary (₹)</label>
         <input type="number" id="salaryInput" placeholder="e.g. 30000" min="1"/>
       </div>
       <div class="field">
         <label>Month</label>
-        <input type="text" id="monthDisp" readonly style="cursor:default"/>
+        <input type="text" id="monthDisp" readonly/>
       </div>
-      <button class="btn-set" onclick="setSalary()">✓ Set Salary</button>
+      <button class="btn-set" id="btnSetSalary" onclick="setSalary()">✓ Set Salary</button>
     </div>
   </div>
 
-  <!-- KPI Row -->
+  <!-- KPI -->
   <div class="kpi-row">
-    <div class="kpi-tile" data-icon="💰" id="kpiSalaryTile">
-      <div class="kpi-label">Monthly Salary</div>
-      <div class="kpi-value" id="kpiSalary">₹ —</div>
-      <div class="kpi-sub" id="kpiSalarySub">Not set yet</div>
-    </div>
-    <div class="kpi-tile" data-icon="📅" id="kpiBudgetTile">
-      <div class="kpi-label">Daily Budget</div>
-      <div class="kpi-value" id="kpiBudget">₹ —</div>
-      <div class="kpi-sub">Per day allowance</div>
-    </div>
-    <div class="kpi-tile" data-icon="🛒" id="kpiSpentTile">
-      <div class="kpi-label">Total Spent</div>
-      <div class="kpi-value" id="kpiSpent">₹ 0</div>
-      <div class="kpi-sub" id="kpiSpentSub">0 days logged</div>
-    </div>
-    <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile">
-      <div class="kpi-label">Net Savings</div>
-      <div class="kpi-value" id="kpiSavings">₹ 0</div>
-      <div class="kpi-sub" id="kpiSavingsSub">Running balance</div>
-    </div>
-    <div class="kpi-tile" data-icon="📆">
-      <div class="kpi-label">Days Logged</div>
-      <div class="kpi-value" id="kpiDays">0</div>
-      <div class="kpi-sub" id="kpiDaysSub">of <span id="kpiDaysTotal">—</span> days</div>
-    </div>
+    <div class="kpi-tile" data-icon="💰"><div class="kpi-label">Monthly Salary</div><div class="kpi-value" id="kpiSalary">₹ —</div><div class="kpi-sub" id="kpiSalarySub">Not set</div></div>
+    <div class="kpi-tile" data-icon="📅"><div class="kpi-label">Daily Budget</div><div class="kpi-value" id="kpiBudget">₹ —</div><div class="kpi-sub">Per day</div></div>
+    <div class="kpi-tile" data-icon="🛒"><div class="kpi-label">Total Spent</div><div class="kpi-value" id="kpiSpent">₹ 0</div><div class="kpi-sub" id="kpiSpentSub">0 days</div></div>
+    <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile"><div class="kpi-label">Net Savings</div><div class="kpi-value" id="kpiSavings">₹ 0</div><div class="kpi-sub" id="kpiSavingsSub">Running</div></div>
+    <div class="kpi-tile" data-icon="📆"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpiDays">0</div><div class="kpi-sub">of <span id="kpiDaysTotal">—</span></div></div>
   </div>
 
   <!-- Main Grid -->
   <div class="two-col">
-
-    <!-- Left: Add Today's Spending -->
+    <!-- Add Spending -->
     <div class="card">
       <div class="card-title"><span>➕</span> Add Spending</div>
-
-      <!-- Date picker -->
       <div class="day-header">
         <div class="day-date" id="selectedDateLabel">Select a date to log</div>
         <input type="date" class="day-picker" id="dayPicker" onchange="onDateChange()"/>
       </div>
-
-      <!-- Categories -->
       <div class="cat-section">
         <div class="cat-label-sm">Category</div>
         <div class="cat-chips" id="catChips"></div>
       </div>
-
-      <!-- Amount input -->
       <div class="entry-input-row">
-        <input type="number" id="entryAmt" placeholder="₹ Amount" min="0" step="0.01"/>
+        <input type="number" id="entryAmt"  placeholder="₹ Amount" min="0" step="0.01"/>
         <input type="text"   id="entryNote" placeholder="Note (optional)"/>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="addBtns">
         <button class="btn-add"    onclick="addEntry(false)">＋ Add</button>
         <button class="btn-reduce" onclick="addEntry(true)">－ Reduce</button>
       </div>
-
-      <!-- Today's entries -->
       <div class="entries-list" id="entriesList"></div>
-
-      <!-- Day Summary -->
       <div class="day-summary" id="daySummary" style="display:none">
-        <div class="ds-item">
-          <div class="ds-val" id="dsBudget" style="color:var(--c1)">₹0</div>
-          <div class="ds-lbl">Budget</div>
-        </div>
-        <div class="ds-item">
-          <div class="ds-val" id="dsSpent" style="color:var(--ink)">₹0</div>
-          <div class="ds-lbl">Spent</div>
-        </div>
-        <div class="ds-item">
-          <div class="ds-val" id="dsDiff">₹0</div>
-          <div class="ds-lbl" id="dsDiffLbl">Saved</div>
-        </div>
+        <div class="ds-item"><div class="ds-val" id="dsBudget" style="color:var(--c1)">₹0</div><div class="ds-lbl">Budget</div></div>
+        <div class="ds-item"><div class="ds-val" id="dsSpent"  style="color:var(--ink)">₹0</div><div class="ds-lbl">Spent</div></div>
+        <div class="ds-item"><div class="ds-val" id="dsDiff">₹0</div><div class="ds-lbl" id="dsDiffLbl">Saved</div></div>
       </div>
-
-      <!-- Progress -->
       <div class="progress-wrap" id="progressWrap" style="display:none">
-        <div class="progress-label">
-          <span id="progLabel">0%</span>
-          <span id="progRight">of daily budget</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progressFill" style="width:0%"></div>
-        </div>
+        <div class="progress-label"><span id="progLabel">0%</span><span id="progRight">of daily budget</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       </div>
     </div>
-
-    <!-- Right: Category Breakdown -->
+    <!-- Category Breakdown -->
     <div class="card">
       <div class="card-title"><span>🍕</span> Category Breakdown</div>
-      <div id="catBreakdown">
-        <div class="empty"><div class="ei">📊</div>No spending logged yet</div>
-      </div>
-      <!-- Donut mini chart -->
+      <div id="catBreakdown"><div class="empty"><div class="ei">📊</div>No spending yet</div></div>
       <div style="display:flex;justify-content:center;margin-top:16px">
         <svg id="donutSvg" width="160" height="160" viewBox="0 0 160 160"></svg>
       </div>
     </div>
-
   </div>
 
   <!-- Chart -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title"><span>📈</span> Daily Spending vs Budget</div>
-    <div class="leg" id="chartLeg">
-      <div class="leg-item"><div class="leg-dot" style="background:var(--c1)"></div>Spent (under budget)</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--c4)"></div>Spent (over budget)</div>
+    <div class="leg">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--c1)"></div>Under budget</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--c4)"></div>Over budget</div>
       <div class="leg-item"><div class="leg-dot" style="background:var(--c3);opacity:0.7"></div>Budget line</div>
     </div>
-    <div class="chart-area">
-      <svg class="cs" id="barChart" style="height:240px"></svg>
-    </div>
+    <div class="chart-area"><svg class="cs" id="barChart" style="height:240px"></svg></div>
   </div>
 
-  <!-- Spending Log Table -->
-  <div class="card">
+  <!-- Spending Log -->
+  <div class="card" style="margin-bottom:20px">
     <div class="card-title"><span>📋</span> Spending Log</div>
-    <div class="tbl-wrap" id="tableWrap">
-      <div class="empty"><div class="ei">📋</div>No entries yet</div>
-    </div>
+    <div id="tableWrap"><div class="empty"><div class="ei">📋</div>No entries yet</div></div>
+  </div>
+
+  <!-- Previous Months -->
+  <div class="card" id="prevMonthsSection">
+    <div class="card-title"><span>🗂</span> Previous Months</div>
+    <div id="prevMonthsGrid"><div class="empty"><div class="ei">📅</div>No previous months yet</div></div>
   </div>
 
 </div>
-
 <div class="tip" id="tip"></div>
 
 <script>
-// ── Categories ────────────────────────────────────────────
+// ── Categories ─────────────────────────────────────────────────────
 const CATS = [
-  { key:'grocery',    label:'🛒 Grocery',    color:'#2a78d6', bg:'#dceeff' },
-  { key:'food',       label:'🍱 Food',        color:'#1baf7a', bg:'#d2f4e8' },
-  { key:'transport',  label:'🚌 Transport',   color:'#eda100', bg:'#fff1cc' },
-  { key:'medical',    label:'💊 Medical',     color:'#e34948', bg:'#fde8e8' },
-  { key:'bills',      label:'⚡ Bills',       color:'#4a3aa7', bg:'#eceafb' },
-  { key:'clothing',   label:'👗 Clothing',    color:'#e87ba4', bg:'#fde8f3' },
-  { key:'others',     label:'📦 Others',      color:'#898781', bg:'#f0ede8' },
+  {key:'grocery',   label:'🛒 Grocery',   color:'#2a78d6', bg:'#dceeff'},
+  {key:'food',      label:'🍱 Food',       color:'#1baf7a', bg:'#d2f4e8'},
+  {key:'transport', label:'🚌 Transport',  color:'#eda100', bg:'#fff1cc'},
+  {key:'medical',   label:'💊 Medical',   color:'#e34948', bg:'#fde8e8'},
+  {key:'bills',     label:'⚡ Bills',     color:'#4a3aa7', bg:'#eceafb'},
+  {key:'clothing',  label:'👗 Clothing',  color:'#e87ba4', bg:'#fde8f3'},
+  {key:'others',    label:'📦 Others',    color:'#898781', bg:'#f0ede8'},
 ];
 
-// ── State ─────────────────────────────────────────────────
-let salary     = 0;
-let dailyBdgt  = 0;
-let days       = {};   // { "2026-07-10": [ {id, cat, amt, note, reduce}, ... ] }
-let selCat     = 'grocery';
-let selDate    = '';
+// ── Helpers ────────────────────────────────────────────────────────
+function toDateStr(d){ return d.toISOString().split('T')[0]; }
+function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function daysInMonth(mk){ const [y,m]=mk.split('-').map(Number); return new Date(y,m,0).getDate(); }
+function monthName(mk){ const [y,m]=mk.split('-').map(Number); return new Date(y,m-1,1).toLocaleString('en-IN',{month:'long',year:'numeric'}); }
+function fmt(n){ return isNaN(n)?'0':Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+function fmtK(n){ return isNaN(n)?'0':Math.round(n).toLocaleString('en-IN'); }
+function formatDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+function catColor(k){ return (CATS.find(c=>c.key===k)||CATS[6]).color; }
+function catLabel(k){ return (CATS.find(c=>c.key===k)||CATS[6]).label; }
 
-const now      = new Date();
-const yr       = now.getFullYear();
-const mo       = now.getMonth();
-const DIM      = new Date(yr, mo+1, 0).getDate();
-const MNAME    = now.toLocaleString('en-IN',{month:'long',year:'numeric'});
-const TODAY    = toDateStr(now);
+// ── State ──────────────────────────────────────────────────────────
+// Storage structure: { months: { "YYYY-MM": { salary, dailyBdgt, days:{} } } }
+let store = { months: {} };
+const now  = new Date();
+const CURRENT_MK = monthKey(now);
+const TODAY      = toDateStr(now);
+let viewMK       = CURRENT_MK;   // which month we're viewing
+let selCat       = 'grocery';
+let selDate      = TODAY;
 
-// ── Boot ──────────────────────────────────────────────────
-document.getElementById('headerMonth').textContent = MNAME;
-document.getElementById('monthDisp').value = MNAME;
+// ── Boot ───────────────────────────────────────────────────────────
+buildCatChips();
+loadStore();
+populateMonthSwitcher();
+checkNewMonth();
+switchMonth(CURRENT_MK, false);
 document.getElementById('dayPicker').value = TODAY;
-document.getElementById('kpiDaysTotal').textContent = DIM;
-document.getElementById('heroDays').textContent = DIM;
-selDate = TODAY;
 updateDateLabel();
 
-// Build category chips
-const chipWrap = document.getElementById('catChips');
-CATS.forEach(c => {
-  const el = document.createElement('div');
-  el.className = 'cat-chip' + (c.key === selCat ? ' selected' : '');
-  el.style.background = c.bg;
-  el.style.color = c.color;
-  el.textContent = c.label;
-  el.dataset.key = c.key;
-  el.onclick = () => {
-    selCat = c.key;
-    document.querySelectorAll('.cat-chip').forEach(x => x.classList.remove('selected'));
-    el.classList.add('selected');
-  };
-  chipWrap.appendChild(el);
-});
-
-// Load saved — try localStorage first, fall back to sessionStorage
-const saved = localStorage.getItem('sns_v2') || sessionStorage.getItem('sns_v2');
-if (saved) {
-  try {
-    const d = JSON.parse(saved);
-    if (d.salary)  { salary = d.salary; dailyBdgt = d.dailyBdgt; applySetup(); }
-    if (d.days)    { days = d.days; }
-    render();
-  } catch(e) { console.warn('Failed to load saved data', e); }
-}
-
-function persist() {
-  const payload = JSON.stringify({ salary, dailyBdgt, days });
-  try { localStorage.setItem('sns_v2', payload); } catch(e) {}
-  try { sessionStorage.setItem('sns_v2', payload); } catch(e) {}
-}
-
-// ── Export / Import ───────────────────────────────────────
-function exportData() {
-  const payload = JSON.stringify({ salary, dailyBdgt, days }, null, 2);
-  const blob    = new Blob([payload], { type: 'application/json' });
-  const url     = URL.createObjectURL(blob);
-  const a       = document.createElement('a');
-  a.href        = url;
-  a.download    = 'salary-spend-data.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const d = JSON.parse(e.target.result);
-      if (!d.salary || !d.days) { alert('Invalid data file.'); return; }
-      salary    = d.salary;
-      dailyBdgt = d.dailyBdgt;
-      days      = d.days;
-      applySetup();
+// ── Storage ────────────────────────────────────────────────────────
+function loadStore(){
+  const raw = localStorage.getItem('sns_v3') || sessionStorage.getItem('sns_v3');
+  if(raw){ try{ store = JSON.parse(raw); }catch(e){} }
+  // Migrate old sns_v2 data into current month
+  const old = localStorage.getItem('sns_v2');
+  if(old && !store.months[CURRENT_MK]){
+    try{
+      const d = JSON.parse(old);
+      if(d.salary) store.months[CURRENT_MK] = { salary:d.salary, dailyBdgt:d.dailyBdgt, days:d.days||{} };
       persist();
-      render();
-      alert('Data imported successfully!');
-    } catch(err) { alert('Failed to import: invalid JSON file.'); }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
+    }catch(e){}
+  }
+}
+function persist(){
+  const payload = JSON.stringify(store);
+  try{ localStorage.setItem('sns_v3', payload); }catch(e){}
+  try{ sessionStorage.setItem('sns_v3', payload); }catch(e){}
+}
+function curMonth(){ return store.months[viewMK] || {}; }
+function curDays(){  return (store.months[viewMK]||{}).days || {}; }
+function curSalary(){ return (store.months[viewMK]||{}).salary || 0; }
+function curBudget(){ return (store.months[viewMK]||{}).dailyBdgt || 0; }
+function allEntries(mk){ return Object.values((store.months[mk||viewMK]||{}).days||{}).flat(); }
+
+// ── New Month Check ─────────────────────────────────────────────────
+function checkNewMonth(){
+  if(store.months[CURRENT_MK] && store.months[CURRENT_MK].salary) return;
+  // Find last month with salary
+  const prevKeys = Object.keys(store.months).filter(k=>k<CURRENT_MK && store.months[k].salary).sort();
+  const lastKey  = prevKeys[prevKeys.length-1];
+  const modal    = document.getElementById('newMonthModal');
+  document.getElementById('modalTitle').textContent = '🎉 ' + monthName(CURRENT_MK);
+  document.getElementById('modalSub').textContent   = 'Set your salary for this month to start tracking.';
+  if(lastKey){
+    const lm = store.months[lastKey];
+    const lnet = (lm.dailyBdgt * Object.keys(lm.days).length) - allEntries(lastKey).reduce((s,e)=>s+e.amt,0);
+    document.getElementById('modalPrev').style.display = 'block';
+    document.getElementById('modalPrev').innerHTML =
+      `<strong>${monthName(lastKey)}:</strong> Salary ₹${fmtK(lm.salary)} · Net savings <strong style="color:${lnet>=0?'var(--good)':'var(--danger)'}">${lnet>=0?'+':''}₹${fmtK(Math.abs(lnet))}</strong>`;
+    document.getElementById('modalSalaryInput').value = lm.salary;
+  }
+  modal.classList.remove('hidden');
 }
 
-// ── Salary ────────────────────────────────────────────────
-function setSalary() {
-  const v = parseFloat(document.getElementById('salaryInput').value);
-  if (!v || v <= 0) { alert('Please enter a valid salary.'); return; }
-  salary    = v;
-  dailyBdgt = salary / DIM;
-  applySetup();
+function confirmNewMonth(){
+  const v = parseFloat(document.getElementById('modalSalaryInput').value);
+  if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
+  const DIM = daysInMonth(CURRENT_MK);
+  store.months[CURRENT_MK] = { salary:v, dailyBdgt:v/DIM, days:{} };
   persist();
+  document.getElementById('newMonthModal').classList.add('hidden');
+  populateMonthSwitcher();
+  switchMonth(CURRENT_MK);
+}
+
+// ── Month Switcher ──────────────────────────────────────────────────
+function populateMonthSwitcher(){
+  const sel  = document.getElementById('monthSwitcher');
+  const keys = Object.keys(store.months).filter(k=>store.months[k].salary).sort().reverse();
+  if(!keys.includes(CURRENT_MK)) keys.unshift(CURRENT_MK);
+  sel.innerHTML = keys.map(k =>
+    `<option value="${k}" ${k===viewMK?'selected':''}>${monthName(k)}${k===CURRENT_MK?' (Current)':''}</option>`
+  ).join('');
+}
+
+function switchMonth(mk, doRender=true){
+  viewMK = mk;
+  const isCurrent = mk === CURRENT_MK;
+  // Banner
+  const banner = document.getElementById('viewingBanner');
+  if(isCurrent){ banner.classList.add('hidden'); }
+  else{ banner.classList.remove('hidden'); document.getElementById('viewingMonthName').textContent = monthName(mk); }
+  // Lock add buttons for past months
+  document.getElementById('addBtns').style.opacity   = isCurrent ? '1' : '0.4';
+  document.getElementById('addBtns').style.pointerEvents = isCurrent ? 'auto' : 'none';
+  document.getElementById('dayPicker').disabled      = !isCurrent;
+  // Hero month display
+  const DIM = daysInMonth(mk);
+  document.getElementById('monthDisp').value         = monthName(mk);
+  document.getElementById('kpiDaysTotal').textContent= DIM;
+  document.getElementById('heroDays').textContent    = DIM;
+  document.getElementById('salaryInput').value       = curSalary()||'';
+  document.getElementById('btnSetSalary').style.display = isCurrent ? '' : 'none';
+  // Sync switcher
+  document.getElementById('monthSwitcher').value = mk;
+  if(doRender) render();
+}
+
+// ── Salary ──────────────────────────────────────────────────────────
+function setSalary(){
+  if(viewMK !== CURRENT_MK){ alert('You can only change salary for the current month.'); return; }
+  const v = parseFloat(document.getElementById('salaryInput').value);
+  if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
+  const DIM = daysInMonth(CURRENT_MK);
+  if(!store.months[CURRENT_MK]) store.months[CURRENT_MK] = { days:{} };
+  store.months[CURRENT_MK].salary    = v;
+  store.months[CURRENT_MK].dailyBdgt = v/DIM;
+  persist();
+  populateMonthSwitcher();
   render();
 }
 
-function applySetup() {
-  document.getElementById('salaryInput').value = salary;
-  document.getElementById('heroSalary').textContent      = '₹ ' + fmtK(salary);
-  document.getElementById('heroSub').textContent         = MNAME + ' · ' + DIM + ' working days';
-  document.getElementById('heroDailyBudget').textContent = '₹ ' + fmt(dailyBdgt);
-  document.getElementById('heroDays').textContent        = DIM;
-  document.getElementById('kpiSalary').textContent  = '₹ ' + fmtK(salary);
-  document.getElementById('kpiSalarySub').textContent = MNAME;
-  document.getElementById('kpiBudget').textContent  = '₹ ' + fmt(dailyBdgt);
-}
-
-// ── Date ──────────────────────────────────────────────────
-function onDateChange() {
+// ── Date ────────────────────────────────────────────────────────────
+function onDateChange(){
   selDate = document.getElementById('dayPicker').value;
   updateDateLabel();
   renderDayEntries();
   renderDaySummary();
 }
-function updateDateLabel() {
-  if (!selDate) return;
-  const d = new Date(selDate + 'T00:00:00');
+function updateDateLabel(){
+  if(!selDate) return;
+  const d = new Date(selDate+'T00:00:00');
   document.getElementById('selectedDateLabel').textContent =
     d.toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 }
 
-// ── Add/Reduce Entry ──────────────────────────────────────
-function addEntry(reduce) {
-  if (!salary) { alert('Please set your salary first.'); return; }
+// ── Add/Reduce Entry ────────────────────────────────────────────────
+function addEntry(reduce){
+  if(viewMK!==CURRENT_MK){ alert('You can only add entries for the current month.'); return; }
+  if(!curSalary()){ alert('Please set your salary first.'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
-  if (isNaN(raw) || raw <= 0) { alert('Enter a valid amount.'); return; }
+  if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
   const note = document.getElementById('entryNote').value.trim();
   const amt  = reduce ? -Math.abs(raw) : Math.abs(raw);
-
-  if (!days[selDate]) days[selDate] = [];
-  days[selDate].push({ id: Date.now(), cat: selCat, amt, note });
-
+  if(!store.months[CURRENT_MK].days[selDate]) store.months[CURRENT_MK].days[selDate]=[];
+  store.months[CURRENT_MK].days[selDate].push({id:Date.now(),cat:selCat,amt,note});
   document.getElementById('entryAmt').value  = '';
   document.getElementById('entryNote').value = '';
   persist();
   render();
 }
 
-function deleteEntry(date, id) {
-  if (!days[date]) return;
-  days[date] = days[date].filter(e => e.id !== id);
-  if (!days[date].length) delete days[date];
-  persist();
-  render();
+function deleteEntry(date,id){
+  const days = store.months[viewMK].days;
+  if(!days[date]) return;
+  days[date] = days[date].filter(e=>e.id!==id);
+  if(!days[date].length) delete days[date];
+  persist(); render();
 }
 
-function startEdit(date, id) {
-  const row = document.getElementById('erow-' + id);
-  const e   = days[date].find(x => x.id === id);
-  if (!e || !row) return;
+function startEdit(date,id){
+  const row = document.getElementById('erow-'+id);
+  const e   = (store.months[viewMK].days[date]||[]).find(x=>x.id===id);
+  if(!e||!row) return;
   row.innerHTML = `
     <div class="entry-cat-dot" style="background:${catColor(e.cat)}"></div>
-    <div class="entry-edit-row">
+    <div style="display:flex;gap:6px;align-items:center;flex:1">
       <input class="entry-edit-inp" id="einp-${id}" type="number" value="${Math.abs(e.amt)}" step="0.01"/>
       <button class="btn-save-entry" onclick="saveEdit('${date}',${id})">Save</button>
       <button class="btn-save-entry" style="background:var(--muted)" onclick="renderDayEntries()">✕</button>
@@ -720,265 +532,278 @@ function startEdit(date, id) {
     <span style="font-size:12px;color:var(--muted)">${e.note||''}</span>`;
 }
 
-function saveEdit(date, id) {
-  const inp = document.getElementById('einp-' + id);
-  const v   = parseFloat(inp.value);
-  if (isNaN(v)) return;
-  const e = days[date].find(x => x.id === id);
-  if (!e) return;
-  e.amt = e.amt < 0 ? -Math.abs(v) : Math.abs(v);
-  persist();
-  render();
+function saveEdit(date,id){
+  const v = parseFloat(document.getElementById('einp-'+id).value);
+  if(isNaN(v)) return;
+  const e = (store.months[viewMK].days[date]||[]).find(x=>x.id===id);
+  if(!e) return;
+  e.amt = e.amt<0 ? -Math.abs(v) : Math.abs(v);
+  persist(); render();
 }
 
-// ── Render All ────────────────────────────────────────────
-function render() {
+// ── Build category chips ────────────────────────────────────────────
+function buildCatChips(){
+  const wrap = document.getElementById('catChips');
+  CATS.forEach(c=>{
+    const el = document.createElement('div');
+    el.className = 'cat-chip'+(c.key===selCat?' selected':'');
+    el.style.background = c.bg; el.style.color = c.color;
+    el.textContent = c.label; el.dataset.key = c.key;
+    el.onclick = ()=>{
+      selCat = c.key;
+      document.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+    };
+    wrap.appendChild(el);
+  });
+}
+
+// ── Render All ──────────────────────────────────────────────────────
+function render(){
+  applyHero();
   renderKPI();
   renderDayEntries();
   renderDaySummary();
   renderChart();
   renderCatBreakdown();
   renderTable();
+  renderPrevMonths();
 }
 
-function renderKPI() {
-  const totalSpent   = allEntries().reduce((s,e)=> s + e.amt, 0);
-  const daysLogged   = Object.keys(days).length;
-  const totalBudget  = dailyBdgt * daysLogged;
-  const net          = totalBudget - totalSpent;
+function applyHero(){
+  const sal  = curSalary();
+  const bdgt = curBudget();
+  const DIM  = daysInMonth(viewMK);
+  const mk   = monthName(viewMK);
+  document.getElementById('heroSalary').textContent      = sal ? '₹ '+fmtK(sal) : '₹ —';
+  document.getElementById('heroSub').textContent         = mk+' · '+DIM+' days';
+  document.getElementById('heroDailyBudget').textContent = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
+  document.getElementById('heroDays').textContent        = DIM;
+  document.getElementById('kpiSalary').textContent       = sal ? '₹ '+fmtK(sal) : '₹ —';
+  document.getElementById('kpiSalarySub').textContent    = mk;
+  document.getElementById('kpiBudget').textContent       = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
+}
 
-  document.getElementById('kpiSpent').textContent     = '₹ ' + fmtK(totalSpent);
-  document.getElementById('kpiSpentSub').textContent  = daysLogged + ' day' + (daysLogged!==1?'s':'') + ' logged';
-  document.getElementById('kpiSavings').textContent   = (net>=0?'+':'') + '₹ ' + fmtK(Math.abs(net));
-  document.getElementById('kpiSavingsSub').textContent= net>=0 ? 'Saved so far 🎉' : 'Overspent ⚠️';
-  document.getElementById('kpiDays').textContent      = daysLogged;
-  document.getElementById('heroSavings').textContent  = (net>=0?'+':'') + '₹ ' + fmtK(Math.abs(net));
-  document.getElementById('heroSavings').style.color  = net>=0 ? '#6ee26e' : '#ff8080';
-
+function renderKPI(){
+  const days       = curDays();
+  const bdgt       = curBudget();
+  const totalSpent = allEntries().reduce((s,e)=>s+e.amt,0);
+  const daysLogged = Object.keys(days).length;
+  const net        = (bdgt*daysLogged) - totalSpent;
+  document.getElementById('kpiSpent').textContent    = '₹ '+fmtK(totalSpent);
+  document.getElementById('kpiSpentSub').textContent = daysLogged+' day'+(daysLogged!==1?'s':'')+' logged';
+  document.getElementById('kpiSavings').textContent  = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
+  document.getElementById('kpiSavingsSub').textContent = net>=0?'Saved so far 🎉':'Overspent ⚠️';
+  document.getElementById('kpiDays').textContent     = daysLogged;
+  document.getElementById('heroSavings').textContent = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
+  document.getElementById('heroSavings').style.color = net>=0?'#6ee26e':'#ff8080';
   const st = document.getElementById('kpiSavingsTile');
-  st.classList.toggle('good',   net > 0);
-  st.classList.toggle('danger', net < 0);
+  st.classList.toggle('good',  net>0);
+  st.classList.toggle('danger',net<0);
 }
 
-function renderDayEntries() {
+function renderDayEntries(){
   const list = document.getElementById('entriesList');
-  const arr  = days[selDate] || [];
-  if (!arr.length) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">No entries for this day</div>';
-    return;
-  }
-  list.innerHTML = arr.map(e => `
+  const arr  = curDays()[selDate]||[];
+  const ro   = viewMK!==CURRENT_MK;
+  if(!arr.length){ list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">No entries for this day</div>'; return; }
+  list.innerHTML = arr.map(e=>`
     <div class="entry-item" id="erow-${e.id}">
       <div class="entry-cat-dot" style="background:${catColor(e.cat)}"></div>
-      <div class="entry-name">${catLabel(e.cat)}${e.note ? ' · ' + e.note : ''}</div>
-      <div class="entry-amt" style="color:${e.amt<0?'var(--danger)':'var(--ink)'}">
-        ${e.amt<0?'−':''}₹${fmt(Math.abs(e.amt))}
-      </div>
-      <button class="btn-edit-entry" onclick="startEdit('${selDate}',${e.id})" title="Edit">✏️</button>
-      <button class="btn-del-entry"  onclick="deleteEntry('${selDate}',${e.id})" title="Delete">🗑</button>
+      <div class="entry-name">${catLabel(e.cat)}${e.note?' · '+e.note:''}</div>
+      <div class="entry-amt" style="color:${e.amt<0?'var(--danger)':'var(--ink)'}">${e.amt<0?'−':''}₹${fmt(Math.abs(e.amt))}</div>
+      ${ro?'':` <button class="btn-edit-entry" onclick="startEdit('${selDate}',${e.id})">✏️</button>
+                <button class="btn-del-entry"  onclick="deleteEntry('${selDate}',${e.id})">🗑</button>`}
     </div>`).join('');
 }
 
-function renderDaySummary() {
-  const arr     = days[selDate] || [];
-  const sumEl   = document.getElementById('daySummary');
-  const progEl  = document.getElementById('progressWrap');
-  if (!arr.length || !salary) { sumEl.style.display='none'; progEl.style.display='none'; return; }
-  const spent   = arr.reduce((s,e)=> s + e.amt, 0);
-  const diff    = dailyBdgt - spent;
-  const pct     = Math.min(200, (spent / dailyBdgt) * 100);
-
-  document.getElementById('dsBudget').textContent = '₹' + fmt(dailyBdgt);
-  document.getElementById('dsSpent').textContent  = '₹' + fmt(spent);
-  document.getElementById('dsDiff').textContent   = (diff>=0?'':'−') + '₹' + fmt(Math.abs(diff));
-  document.getElementById('dsDiff').style.color   = diff>=0 ? 'var(--good)' : 'var(--danger)';
-  document.getElementById('dsDiffLbl').textContent= diff>=0 ? 'Saved' : 'Over';
-  sumEl.style.display = 'flex';
-
-  const fill   = document.getElementById('progressFill');
-  const clr    = pct <= 80 ? 'var(--good)' : pct <= 100 ? 'var(--warn)' : 'var(--danger)';
-  fill.style.width      = pct + '%';
-  fill.style.background = clr;
-  document.getElementById('progLabel').textContent = Math.round(pct) + '%';
-  document.getElementById('progRight').textContent = 'of daily budget used';
-  progEl.style.display  = 'block';
+function renderDaySummary(){
+  const arr   = curDays()[selDate]||[];
+  const sumEl = document.getElementById('daySummary');
+  const prog  = document.getElementById('progressWrap');
+  const bdgt  = curBudget();
+  if(!arr.length||!bdgt){ sumEl.style.display='none'; prog.style.display='none'; return; }
+  const spent = arr.reduce((s,e)=>s+e.amt,0);
+  const diff  = bdgt-spent;
+  const pct   = Math.min(200,(spent/bdgt)*100);
+  document.getElementById('dsBudget').textContent = '₹'+fmt(bdgt);
+  document.getElementById('dsSpent').textContent  = '₹'+fmt(spent);
+  document.getElementById('dsDiff').textContent   = (diff>=0?'':'−')+'₹'+fmt(Math.abs(diff));
+  document.getElementById('dsDiff').style.color   = diff>=0?'var(--good)':'var(--danger)';
+  document.getElementById('dsDiffLbl').textContent= diff>=0?'Saved':'Over';
+  sumEl.style.display='flex';
+  const fill = document.getElementById('progressFill');
+  fill.style.width = pct+'%';
+  fill.style.background = pct<=80?'var(--good)':pct<=100?'var(--warn)':'var(--danger)';
+  document.getElementById('progLabel').textContent = Math.round(pct)+'%';
+  prog.style.display='block';
 }
 
-function renderCatBreakdown() {
-  const all   = allEntries().filter(e => e.amt > 0);
+function renderCatBreakdown(){
+  const all   = allEntries().filter(e=>e.amt>0);
   const total = all.reduce((s,e)=>s+e.amt,0);
   const byCat = {};
-  CATS.forEach(c => byCat[c.key] = 0);
-  all.forEach(e => { if (byCat[e.cat]!==undefined) byCat[e.cat] += e.amt; });
-
+  CATS.forEach(c=>byCat[c.key]=0);
+  all.forEach(e=>{ if(byCat[e.cat]!==undefined) byCat[e.cat]+=e.amt; });
+  const active = CATS.filter(c=>byCat[c.key]>0);
   const wrap = document.getElementById('catBreakdown');
-  const active = CATS.filter(c => byCat[c.key] > 0);
-  if (!active.length) {
-    wrap.innerHTML = '<div class="empty"><div class="ei">📊</div>No spending logged yet</div>';
-    renderDonut([]);
-    return;
-  }
-  wrap.innerHTML = '<div class="cat-breakdown">' +
-    active.map(c => {
-      const pct = total > 0 ? (byCat[c.key]/total)*100 : 0;
-      return `<div class="cb-row">
-        <div class="cb-label"><span>${c.label.split(' ')[0]}</span>${c.label.split(' ').slice(1).join(' ')}</div>
-        <div class="cb-track"><div class="cb-fill" style="width:${pct}%;background:${c.color}"></div></div>
-        <div class="cb-amt">₹${fmtK(byCat[c.key])}</div>
-      </div>`;
-    }).join('') + '</div>';
-  renderDonut(active.map(c => ({ color: c.color, val: byCat[c.key] })));
+  if(!active.length){ wrap.innerHTML='<div class="empty"><div class="ei">📊</div>No spending yet</div>'; renderDonut([]); return; }
+  wrap.innerHTML='<div class="cat-breakdown">'+active.map(c=>{
+    const pct=total>0?(byCat[c.key]/total)*100:0;
+    return `<div class="cb-row"><div class="cb-label"><span>${c.label.split(' ')[0]}</span>${c.label.split(' ').slice(1).join(' ')}</div>
+    <div class="cb-track"><div class="cb-fill" style="width:${pct}%;background:${c.color}"></div></div>
+    <div class="cb-amt">₹${fmtK(byCat[c.key])}</div></div>`;
+  }).join('')+'</div>';
+  renderDonut(active.map(c=>({color:c.color,val:byCat[c.key]})));
 }
 
-function renderDonut(data) {
-  const svg = document.getElementById('donutSvg');
-  const total = data.reduce((s,d)=>s+d.val,0);
-  if (!total) { svg.innerHTML = ''; return; }
-  const cx=80, cy=80, R=68, r=44;
-  let angle = -Math.PI/2;
-  let paths = '';
-  data.forEach(d => {
-    const sweep = (d.val/total) * 2 * Math.PI;
-    const x1=cx+R*Math.cos(angle), y1=cy+R*Math.sin(angle);
-    angle += sweep;
-    const x2=cx+R*Math.cos(angle), y2=cy+R*Math.sin(angle);
-    const ix1=cx+r*Math.cos(angle-sweep), iy1=cy+r*Math.sin(angle-sweep);
-    const ix2=cx+r*Math.cos(angle), iy2=cy+r*Math.sin(angle);
-    const lg = sweep > Math.PI ? 1 : 0;
-    paths += `<path d="M${x1},${y1} A${R},${R} 0 ${lg},1 ${x2},${y2} L${ix2},${iy2} A${r},${r} 0 ${lg},0 ${ix1},${iy1} Z"
-      fill="${d.color}" opacity="0.88" stroke="#fcfcfb" stroke-width="2"/>`;
+function renderDonut(data){
+  const svg=document.getElementById('donutSvg');
+  const total=data.reduce((s,d)=>s+d.val,0);
+  if(!total){ svg.innerHTML=''; return; }
+  const cx=80,cy=80,R=68,r=44; let angle=-Math.PI/2,paths='';
+  data.forEach(d=>{
+    const sweep=(d.val/total)*2*Math.PI;
+    const x1=cx+R*Math.cos(angle),y1=cy+R*Math.sin(angle); angle+=sweep;
+    const x2=cx+R*Math.cos(angle),y2=cy+R*Math.sin(angle);
+    const ix1=cx+r*Math.cos(angle-sweep),iy1=cy+r*Math.sin(angle-sweep);
+    const ix2=cx+r*Math.cos(angle),iy2=cy+r*Math.sin(angle);
+    const lg=sweep>Math.PI?1:0;
+    paths+=`<path d="M${x1},${y1} A${R},${R} 0 ${lg},1 ${x2},${y2} L${ix2},${iy2} A${r},${r} 0 ${lg},0 ${ix1},${iy1} Z" fill="${d.color}" opacity="0.88" stroke="#fcfcfb" stroke-width="2"/>`;
   });
-  svg.innerHTML = paths +
-    `<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="11" fill="#898781" font-weight="700">TOTAL</text>
-     <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="16" fill="#0b0b0b" font-weight="800">₹${fmtK(total)}</text>`;
+  svg.innerHTML=paths+`<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="11" fill="#898781" font-weight="700">TOTAL</text>
+    <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="16" fill="#0b0b0b" font-weight="800">₹${fmtK(total)}</text>`;
 }
 
-function renderChart() {
-  const svg = document.getElementById('barChart');
-  const allDays = Object.keys(days).sort();
-  if (!allDays.length || !salary) {
-    svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#898781" font-size="13" dominant-baseline="middle">No data yet</text>';
-    return;
-  }
-  const W   = svg.parentElement.clientWidth || 700;
-  const H   = 230;
-  const PAD = { t:20, r:20, b:40, l:56 };
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  svg.style.height = H + 'px';
-
-  const spents = allDays.map(d => (days[d]||[]).reduce((s,e)=>s+e.amt,0));
-  const maxV   = Math.max(...spents, dailyBdgt) * 1.2 || 1;
-  const n      = allDays.length;
-  const slot   = (W - PAD.l - PAD.r) / n;
-  const bw     = Math.max(10, Math.min(38, slot * 0.6));
-  const scY    = v => H - PAD.b - (v / maxV) * (H - PAD.t - PAD.b);
-
-  let html = '';
-
-  // Grid
-  [0,0.25,0.5,0.75,1].forEach(f => {
-    const v = maxV * f, y = scY(v);
-    html += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${y}" y2="${y}" stroke="#e1e0d9" stroke-width="1"/>`;
-    html += `<text x="${PAD.l-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#898781" font-variant-numeric="tabular-nums">₹${fmtK(v)}</text>`;
+function renderChart(){
+  const svg=document.getElementById('barChart');
+  const allDays=Object.keys(curDays()).sort();
+  const bdgt=curBudget();
+  if(!allDays.length||!bdgt){ svg.innerHTML='<text x="50%" y="50%" text-anchor="middle" fill="#898781" font-size="13" dominant-baseline="middle">No data yet</text>'; return; }
+  const W=svg.parentElement.clientWidth||700,H=230;
+  const PAD={t:20,r:28,b:40,l:56};
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.style.height=H+'px';
+  const spents=allDays.map(d=>(curDays()[d]||[]).reduce((s,e)=>s+e.amt,0));
+  const maxV=Math.max(...spents,bdgt)*1.2||1;
+  const slot=(W-PAD.l-PAD.r)/allDays.length;
+  const bw=Math.max(10,Math.min(38,slot*0.6));
+  const scY=v=>H-PAD.b-(v/maxV)*(H-PAD.t-PAD.b);
+  let html='';
+  [0,0.25,0.5,0.75,1].forEach(f=>{ const v=maxV*f,y=scY(v);
+    html+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${y}" y2="${y}" stroke="#e1e0d9" stroke-width="1"/>`;
+    html+=`<text x="${PAD.l-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#898781" font-variant-numeric="tabular-nums">₹${fmtK(v)}</text>`;
   });
-
-  // Budget line
-  const by = scY(dailyBdgt);
-  html += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${by}" y2="${by}" stroke="#c98500" stroke-width="2" stroke-dasharray="6,4"/>`;
-  html += `<text x="${W-PAD.r+4}" y="${by+4}" font-size="10" fill="#c98500" font-weight="700">₹${fmt(dailyBdgt)}</text>`;
-
-  // Bars
-  allDays.forEach((d, i) => {
-    const spent = spents[i];
-    const over  = spent > dailyBdgt;
-    const cx    = PAD.l + slot * i + slot / 2;
-    const x     = cx - bw / 2;
-    const bh    = Math.max(2, (H - PAD.b) - scY(spent));
-    const cy    = scY(spent);
-    const clr   = over ? '#e34948' : '#2a78d6';
-    const day   = d.slice(8);
-    html += `<rect class="bbar" x="${x}" y="${cy}" width="${bw}" height="${bh}" rx="4"
-      fill="${clr}" opacity="0.85"
-      data-date="${d}" data-spent="${fmt(spent)}" data-budget="${fmt(dailyBdgt)}" data-over="${over}"
+  const by=scY(bdgt);
+  html+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${by}" y2="${by}" stroke="#c98500" stroke-width="2" stroke-dasharray="6,4"/>`;
+  html+=`<text x="${W-PAD.r+4}" y="${by+4}" font-size="10" fill="#c98500" font-weight="700">₹${fmt(bdgt)}</text>`;
+  allDays.forEach((d,i)=>{
+    const spent=spents[i],over=spent>bdgt;
+    const cx=PAD.l+slot*i+slot/2,x=cx-bw/2;
+    const bh=Math.max(2,(H-PAD.b)-scY(spent)),cy=scY(spent);
+    const clr=over?'#e34948':'#2a78d6';
+    html+=`<rect x="${x}" y="${cy}" width="${bw}" height="${bh}" rx="4" fill="${clr}" opacity="0.85"
+      data-date="${d}" data-spent="${fmt(spent)}" data-budget="${fmt(bdgt)}" data-over="${over}"
       onmouseenter="showTip(event,this)" onmouseleave="hideTip()"/>`;
-    if (!over) html += `<circle cx="${cx}" cy="${cy-5}" r="3" fill="#0ca30c"/>`;
-    html += `<text x="${cx}" y="${H-PAD.b+14}" text-anchor="middle" font-size="10" fill="#898781">${day}</text>`;
+    if(!over) html+=`<circle cx="${cx}" cy="${cy-5}" r="3" fill="#0ca30c"/>`;
+    html+=`<text x="${cx}" y="${H-PAD.b+14}" text-anchor="middle" font-size="10" fill="#898781">${d.slice(8)}</text>`;
   });
-
-  // Axis
-  html += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${H-PAD.b}" y2="${H-PAD.b}" stroke="#c3c2b7" stroke-width="1.5"/>`;
-  html += `<text x="${PAD.l+(W-PAD.l-PAD.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#898781">Day — ${MNAME}</text>`;
-  svg.innerHTML = html;
+  html+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${H-PAD.b}" y2="${H-PAD.b}" stroke="#c3c2b7" stroke-width="1.5"/>`;
+  html+=`<text x="${PAD.l+(W-PAD.l-PAD.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#898781">Day — ${monthName(viewMK)}</text>`;
+  svg.innerHTML=html;
 }
 
-function renderTable() {
-  const wrap = document.getElementById('tableWrap');
-  const allDays = Object.keys(days).sort().reverse();
-  if (!allDays.length) {
-    wrap.innerHTML = '<div class="empty"><div class="ei">📋</div>No entries yet</div>';
-    return;
-  }
-  let rows = '';
-  allDays.forEach(date => {
-    const arr   = days[date] || [];
-    const spent = arr.reduce((s,e)=>s+e.amt,0);
-    const diff  = dailyBdgt - spent;
-    const over  = diff < 0;
-    const cats  = [...new Set(arr.map(e=>e.cat))].map(k=>catLabel(k)).join(', ');
-    rows += `<tr>
+function renderTable(){
+  const wrap=document.getElementById('tableWrap');
+  const allDays=Object.keys(curDays()).sort().reverse();
+  const bdgt=curBudget();
+  if(!allDays.length){ wrap.innerHTML='<div class="empty"><div class="ei">📋</div>No entries yet</div>'; return; }
+  const ro=viewMK!==CURRENT_MK;
+  let rows='';
+  allDays.forEach(date=>{
+    const arr=curDays()[date]||[];
+    const spent=arr.reduce((s,e)=>s+e.amt,0);
+    const diff=bdgt-spent,over=diff<0;
+    const cats=[...new Set(arr.map(e=>e.cat))].map(k=>catLabel(k)).join(', ');
+    rows+=`<tr>
       <td style="font-weight:700">${formatDate(date)}</td>
       <td style="font-variant-numeric:tabular-nums">₹${fmt(spent)}</td>
-      <td style="font-variant-numeric:tabular-nums">₹${fmt(dailyBdgt)}</td>
+      <td style="font-variant-numeric:tabular-nums">₹${fmt(bdgt)}</td>
       <td><span class="tag ${over?'danger':'good'}">${over?'▲ +₹'+fmt(Math.abs(diff))+' over':'▼ ₹'+fmt(Math.abs(diff))+' saved'}</span></td>
       <td style="color:var(--muted)">${cats||'—'}</td>
       <td>${arr.length} item${arr.length!==1?'s':''}</td>
     </tr>`;
   });
-  // Footer
-  const totalSpent  = allEntries().filter(e=>e.amt>0).reduce((s,e)=>s+e.amt,0);
-  const loggedDays  = allDays.length;
-  const totalBdgt   = dailyBdgt * loggedDays;
-  const net         = totalBdgt - totalSpent;
-  rows += `<tr style="font-weight:800;background:var(--page)">
-    <td>Total (${loggedDays} days)</td>
+  const totalSpent=allEntries().filter(e=>e.amt>0).reduce((s,e)=>s+e.amt,0);
+  const net=(bdgt*allDays.length)-totalSpent;
+  rows+=`<tr style="font-weight:800;background:var(--page)">
+    <td>Total (${allDays.length} days)</td>
     <td style="font-variant-numeric:tabular-nums">₹${fmtK(totalSpent)}</td>
-    <td style="font-variant-numeric:tabular-nums">₹${fmtK(totalBdgt)}</td>
+    <td style="font-variant-numeric:tabular-nums">₹${fmtK(bdgt*allDays.length)}</td>
     <td><span class="tag ${net>=0?'good':'danger'}">${net>=0?'✓ ₹'+fmtK(net)+' saved':'✗ ₹'+fmtK(Math.abs(net))+' over'}</span></td>
-    <td colspan="2"></td>
-  </tr>`;
-  wrap.innerHTML = `<div class="tbl-wrap"><table>
+    <td colspan="2"></td></tr>`;
+  wrap.innerHTML=`<div class="tbl-wrap"><table>
     <thead><tr><th>Date</th><th>Spent</th><th>Budget</th><th>Difference</th><th>Categories</th><th>Items</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>`;
+    <tbody>${rows}</tbody></table></div>`;
 }
 
-// ── Tooltip ───────────────────────────────────────────────
-function showTip(e, el) {
-  const t   = document.getElementById('tip');
-  const ov  = el.dataset.over === 'true';
-  const diff = Math.abs(parseFloat(el.dataset.budget) - parseFloat(el.dataset.spent.replace(/,/g,'')));
-  t.textContent = `${el.dataset.date}  |  Spent ₹${el.dataset.spent}  |  Budget ₹${el.dataset.budget}  |  ${ov?'Over':'Saved'}: ₹${fmt(diff)}`;
-  t.style.opacity = 1;
-  moveTip(e);
-  el.addEventListener('mousemove', moveTip);
+function renderPrevMonths(){
+  const grid=document.getElementById('prevMonthsGrid');
+  const prevKeys=Object.keys(store.months).filter(k=>k<CURRENT_MK&&store.months[k].salary).sort().reverse();
+  if(!prevKeys.length){ grid.innerHTML='<div class="empty"><div class="ei">📅</div>No previous months yet — data will appear here as months pass.</div>'; return; }
+  grid.innerHTML='<div class="prev-months-grid">'+prevKeys.map(mk=>{
+    const m=store.months[mk];
+    const ents=allEntries(mk).filter(e=>e.amt>0);
+    const totalSpent=ents.reduce((s,e)=>s+e.amt,0);
+    const daysLogged=Object.keys(m.days||{}).length;
+    const net=(m.dailyBdgt*daysLogged)-totalSpent;
+    const pos=net>=0;
+    return `<div class="pm-card" onclick="switchMonth('${mk}')">
+      <div class="pm-card-header">
+        <div class="pm-month-name">${monthName(mk)}</div>
+        <div class="pm-salary">₹${fmtK(m.salary)}</div>
+      </div>
+      <div class="pm-stats">
+        <div class="pm-stat"><div class="psv" style="color:var(--c4)">₹${fmtK(totalSpent)}</div><div class="psl">Spent</div></div>
+        <div class="pm-stat"><div class="psv" style="color:${pos?'var(--good)':'var(--danger)'}">${pos?'+':'−'}₹${fmtK(Math.abs(net))}</div><div class="psl">Savings</div></div>
+        <div class="pm-stat"><div class="psv" style="color:var(--muted)">${daysLogged}</div><div class="psl">Days</div></div>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
 }
-function moveTip(e) {
-  const t = document.getElementById('tip');
-  t.style.left = (e.clientX + 14) + 'px';
-  t.style.top  = (e.clientY - 34) + 'px';
+
+// ── Export / Import ──────────────────────────────────────────────────
+function exportData(){
+  const blob=new Blob([JSON.stringify(store,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url; a.download='salary-spend-data.json'; a.click(); URL.revokeObjectURL(url);
 }
-function hideTip() { document.getElementById('tip').style.opacity = 0; }
+function importData(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d.months){ alert('Invalid data file.'); return; }
+      store=d; persist(); populateMonthSwitcher(); switchMonth(CURRENT_MK);
+      alert('Data imported successfully!');
+    }catch(err){ alert('Invalid JSON file.'); }
+  };
+  reader.readAsText(file); event.target.value='';
+}
 
-// ── Helpers ───────────────────────────────────────────────
-function allEntries() { return Object.values(days).flat(); }
-function catColor(k)  { return (CATS.find(c=>c.key===k)||CATS[6]).color; }
-function catLabel(k)  { return (CATS.find(c=>c.key===k)||CATS[6]).label; }
-function toDateStr(d) { return d.toISOString().split('T')[0]; }
-function fmt(n)       { return isNaN(n)?'0':Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:2}); }
-function fmtK(n)      { return isNaN(n)?'0':Math.round(n).toLocaleString('en-IN'); }
-function formatDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+// ── Tooltip ──────────────────────────────────────────────────────────
+function showTip(e,el){
+  const t=document.getElementById('tip');
+  const ov=el.dataset.over==='true';
+  const diff=Math.abs(parseFloat(el.dataset.budget)-parseFloat(el.dataset.spent.replace(/,/g,'')));
+  t.textContent=`${el.dataset.date}  |  Spent ₹${el.dataset.spent}  |  Budget ₹${el.dataset.budget}  |  ${ov?'Over':'Saved'}: ₹${fmt(diff)}`;
+  t.style.opacity=1; moveTip(e);
+  el.addEventListener('mousemove',moveTip);
+}
+function moveTip(e){ const t=document.getElementById('tip'); t.style.left=(e.clientX+14)+'px'; t.style.top=(e.clientY-34)+'px'; }
+function hideTip(){ document.getElementById('tip').style.opacity=0; }
 
-window.addEventListener('resize', renderChart);
+window.addEventListener('resize',renderChart);
 </script>
 </body>
 </html>
