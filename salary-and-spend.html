@@ -11,33 +11,127 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#1a1463"/>
+<meta name="theme-color" content="#4a3aa7"/>
 
-<!-- Inline SVG icon — Smart Wallet (purple→blue gradient) -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%234a3aa7'/%3E%3Cstop offset='100%25' stop-color='%232a78d6'/%3E%3C/linearGradient%3E%3ClinearGradient id='card' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='0.25'/%3E%3Cstop offset='100%25' stop-color='%23ffffff' stop-opacity='0.08'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='115' fill='url(%23bg)'/%3E%3Crect x='80' y='160' width='352' height='220' rx='28' fill='rgba(255,255,255,0.15)' stroke='rgba(255,255,255,0.3)' stroke-width='6'/%3E%3Crect x='80' y='160' width='352' height='68' rx='28' fill='rgba(255,255,255,0.25)'/%3E%3Crect x='80' y='200' width='352' height='28' fill='rgba(255,255,255,0.25)'/%3E%3Crect x='320' y='246' width='90' height='88' rx='20' fill='url(%23card)' stroke='rgba(255,255,255,0.4)' stroke-width='4'/%3E%3Ccircle cx='345' cy='290' r='14' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='367' cy='290' r='14' fill='rgba(255,255,255,0.25)'/%3E%3Crect x='112' y='264' width='120' height='12' rx='6' fill='rgba(255,255,255,0.6)'/%3E%3Crect x='112' y='290' width='80' height='10' rx='5' fill='rgba(255,255,255,0.35)'/%3E%3Crect x='112' y='316' width='100' height='10' rx='5' fill='rgba(255,255,255,0.35)'/%3E%3Ctext x='256' y='430' text-anchor='middle' font-family='system-ui,sans-serif' font-size='52' font-weight='900' fill='rgba(255,255,255,0.9)'%3E%E2%82%B9%3C/text%3E%3C/svg%3E"/>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%234a3aa7'/%3E%3Cstop offset='100%25' stop-color='%232a78d6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='115' fill='url(%23bg)'/%3E%3Crect x='80' y='160' width='352' height='220' rx='28' fill='rgba(255,255,255,0.15)' stroke='rgba(255,255,255,0.3)' stroke-width='6'/%3E%3Crect x='80' y='160' width='352' height='68' rx='28' fill='rgba(255,255,255,0.25)'/%3E%3Crect x='80' y='200' width='352' height='28' fill='rgba(255,255,255,0.25)'/%3E%3Crect x='320' y='246' width='90' height='88' rx='20' fill='rgba(255,255,255,0.15)' stroke='rgba(255,255,255,0.4)' stroke-width='4'/%3E%3Ccircle cx='345' cy='290' r='14' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='367' cy='290' r='14' fill='rgba(255,255,255,0.25)'/%3E%3Crect x='112' y='264' width='120' height='12' rx='6' fill='rgba(255,255,255,0.6)'/%3E%3Crect x='112' y='290' width='80' height='10' rx='5' fill='rgba(255,255,255,0.35)'/%3E%3Ctext x='256' y='430' text-anchor='middle' font-family='system-ui,sans-serif' font-size='52' font-weight='900' fill='rgba(255,255,255,0.9)'%3E%E2%82%B9%3C/text%3E%3C/svg%3E"/>
+<!-- iOS requires PNG for apple-touch-icon — generated via Canvas at runtime -->
+<link rel="apple-touch-icon" id="appleTouchIcon" sizes="180x180"/>
+<link rel="icon" type="image/png" id="faviconLink" sizes="192x192"/>
 
 <!-- PWA Manifest inline -->
 <script>
-const _manifest = {
-  name: "Salary & Spend",
-  short_name: "Salary & Spend",
-  description: "Smart Daily Budget & Salary Tracker",
-  start_url: "./salary-and-spend.html",
-  display: "standalone",
-  background_color: "#4a3aa7",
-  theme_color: "#4a3aa7",
-  orientation: "portrait",
-  icons: [{
-    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%231a1463'/%3E%3Ccircle cx='256' cy='210' r='100' fill='none' stroke='%23fff' stroke-width='28'/%3E%3Crect x='228' y='155' width='28' height='110' rx='14' fill='%23fff'/%3E%3Crect x='196' y='255' width='92' height='28' rx='14' fill='%23fff'/%3E%3C/svg%3E",
-    sizes: "512x512", type: "image/svg+xml", purpose: "any maskable"
-  }]
-};
-const _blob = new Blob([JSON.stringify(_manifest)], {type:'application/manifest+json'});
-const _murl = URL.createObjectURL(_blob);
-const _ml   = document.createElement('link');
-_ml.rel='manifest'; _ml.href=_murl;
-document.currentScript.after(_ml);
+(function(){
+  /* ── Draw icon on canvas, export as PNG, wire up links ── */
+  function makeIcon(size){
+    const c  = document.createElement('canvas');
+    c.width  = size; c.height = size;
+    const ctx = c.getContext('2d');
+    const r   = size * 0.22;            // corner radius
+
+    // Rounded rect clip
+    ctx.beginPath();
+    ctx.moveTo(r,0); ctx.lineTo(size-r,0);
+    ctx.quadraticCurveTo(size,0,size,r);
+    ctx.lineTo(size,size-r);
+    ctx.quadraticCurveTo(size,size,size-r,size);
+    ctx.lineTo(r,size);
+    ctx.quadraticCurveTo(0,size,0,size-r);
+    ctx.lineTo(0,r);
+    ctx.quadraticCurveTo(0,0,r,0);
+    ctx.closePath();
+    ctx.clip();
+
+    // Background gradient purple → blue
+    const bg = ctx.createLinearGradient(0,0,size,size);
+    bg.addColorStop(0,   '#5b2fcf');
+    bg.addColorStop(0.5, '#3a5bd9');
+    bg.addColorStop(1,   '#1baf7a');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,size,size);
+
+    // Subtle shine at top
+    const shine = ctx.createLinearGradient(0,0,0,size*0.45);
+    shine.addColorStop(0,'rgba(255,255,255,0.18)');
+    shine.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = shine;
+    ctx.fillRect(0,0,size,size);
+
+    const u = size/512;   // unit scale
+
+    // ── Wallet body ──
+    function rr(x,y,w,h,cr,fill,stroke,sw){
+      ctx.beginPath();
+      ctx.moveTo(x+cr,y); ctx.lineTo(x+w-cr,y);
+      ctx.quadraticCurveTo(x+w,y,x+w,y+cr);
+      ctx.lineTo(x+w,y+h-cr); ctx.quadraticCurveTo(x+w,y+h,x+w-cr,y+h);
+      ctx.lineTo(x+cr,y+h);   ctx.quadraticCurveTo(x,y+h,x,y+h-cr);
+      ctx.lineTo(x,y+cr);     ctx.quadraticCurveTo(x,y,x+cr,y);
+      ctx.closePath();
+      if(fill)  { ctx.fillStyle=fill; ctx.fill(); }
+      if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=sw||2; ctx.stroke(); }
+    }
+
+    // Wallet outer
+    rr(72*u,148*u,368*u,230*u,28*u,'rgba(255,255,255,0.13)','rgba(255,255,255,0.35)',5*u);
+    // Wallet top stripe
+    rr(72*u,148*u,368*u,72*u,28*u,'rgba(255,255,255,0.22)',null);
+    // Fix top-stripe bottom corners (overpaint)
+    ctx.fillStyle='rgba(255,255,255,0.22)';
+    ctx.fillRect(72*u, 190*u, 368*u, 30*u);
+
+    // Card slot (right side)
+    rr(326*u,238*u,100*u,96*u,18*u,'rgba(255,255,255,0.12)','rgba(255,255,255,0.45)',3*u);
+
+    // Two chip circles on card
+    ctx.beginPath(); ctx.arc(356*u,286*u,16*u,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(383*u,286*u,16*u,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.28)'; ctx.fill();
+
+    // Content lines on wallet
+    rr(106*u,256*u,130*u,14*u,7*u,'rgba(255,255,255,0.65)',null);
+    rr(106*u,284*u,88*u,11*u,5*u,'rgba(255,255,255,0.38)',null);
+    rr(106*u,308*u,108*u,11*u,5*u,'rgba(255,255,255,0.38)',null);
+
+    // ── ₹ symbol centered bottom ──
+    ctx.font = `900 ${Math.round(78*u)}px system-ui,sans-serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle    = 'rgba(255,255,255,0.95)';
+    ctx.fillText('₹', size/2, size*0.835);
+
+    return c.toDataURL('image/png');
+  }
+
+  window.addEventListener('DOMContentLoaded', function(){
+    const png180 = makeIcon(180);
+    const png192 = makeIcon(192);
+
+    const ati = document.getElementById('appleTouchIcon');
+    if(ati) ati.href = png180;
+    const fav = document.getElementById('faviconLink');
+    if(fav) fav.href = png192;
+
+    // Manifest with PNG icon
+    const manifest = {
+      name: "Salary & Spend",
+      short_name: "Salary & Spend",
+      description: "Smart Daily Budget & Salary Tracker",
+      start_url: "./salary-and-spend.html",
+      display: "standalone",
+      background_color: "#4a3aa7",
+      theme_color: "#4a3aa7",
+      orientation: "portrait",
+      icons: [
+        { src: png192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+        { src: makeIcon(512), sizes: "512x512", type: "image/png", purpose: "any maskable" }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+    const ml   = document.createElement('link');
+    ml.rel='manifest'; ml.href=URL.createObjectURL(blob);
+    document.head.appendChild(ml);
+  });
+})();
 </script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
