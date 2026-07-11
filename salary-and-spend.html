@@ -549,7 +549,7 @@ tr:hover td { background:var(--page); }
   <!-- Viewing past month banner -->
   <div class="viewing-banner hidden" id="viewingBanner">
     <div class="vb-text">👁 Viewing: <span id="viewingMonthName"></span></div>
-    <button class="btn-back" onclick="switchMonth(CURRENT_MK)">← Back to Current Month</button>
+    <button class="btn-back" onclick="switchMonth(CURRENT_MK())">← Back to Current Month</button>
   </div>
 
   <!-- Hero -->
@@ -718,15 +718,15 @@ function loadStore(){
     }catch(e){ store = { months:{} }; }
   }
   // Migrate old sns_v3 data
-  if(!store.months[CURRENT_MK] || !store.months[CURRENT_MK].salary){
+  if(!store.months[CURRENT_MK()] || !store.months[CURRENT_MK()].salary){
     ['sns_v3','sns_v2'].forEach(oldKey => {
       try{
         const old = localStorage.getItem(oldKey);
         if(old){
           const d = JSON.parse(old);
           if(d.months){ Object.assign(store.months, d.months); persist(); }
-          else if(d.salary && !store.months[CURRENT_MK]){
-            store.months[CURRENT_MK] = { salary:d.salary, dailyBdgt:d.dailyBdgt, days:d.days||{} };
+          else if(d.salary && !store.months[CURRENT_MK()]){
+            store.months[CURRENT_MK()] = { salary:d.salary, dailyBdgt:d.dailyBdgt, days:d.days||{} };
             persist();
           }
         }
@@ -737,28 +737,63 @@ function loadStore(){
 
 // ── State ──────────────────────────────────────────────────────────
 let store        = { months: {} };
-const now        = new Date();
-const CURRENT_MK = monthKey(now);
-const TODAY      = toDateStr(now);
-let viewMK       = CURRENT_MK;
+let viewMK       = monthKey(new Date());
 let selCat       = 'grocery';
-let selDate      = TODAY;
+let selDate      = toDateStr(new Date());
+
+// Always returns live current values (not stale from page load)
+function CURRENT_MK(){ return monthKey(new Date()); }
+function TODAY()     { return toDateStr(new Date()); }
 
 // ── Boot — runs after all functions are defined ────────────────────
 window.addEventListener('DOMContentLoaded', function(){
-  loadStore();                              // load first — STORE_KEY now in scope
+  loadStore();
   buildCatChips();
+  viewMK = CURRENT_MK();
+  selDate = TODAY();
   populateMonthSwitcher();
   checkNewMonth();
-  switchMonth(CURRENT_MK, false);
-  document.getElementById('dayPicker').value = TODAY;
+  switchMonth(CURRENT_MK(), false);
+  document.getElementById('dayPicker').value = TODAY();
   updateDateLabel();
   render();
-});
 
-// Save immediately on any page exit / tab switch
-window.addEventListener('beforeunload', persist);
-document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') persist(); });
+  // Auto-refresh date at midnight so app stays current without reload
+  function scheduleMidnightRefresh(){
+    const n    = new Date();
+    const msToMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate()+1, 0, 0, 2) - n;
+    setTimeout(function(){
+      selDate = TODAY();
+      viewMK  = CURRENT_MK();
+      document.getElementById('dayPicker').value = TODAY();
+      updateDateLabel();
+      checkNewMonth();
+      populateMonthSwitcher();
+      switchMonth(CURRENT_MK(), false);
+      render();
+      scheduleMidnightRefresh(); // reschedule for next midnight
+    }, msToMidnight);
+  }
+  scheduleMidnightRefresh();
+
+  // Also refresh date when user returns to tab after being away
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible'){
+      const liveDate = TODAY();
+      const liveMK   = CURRENT_MK();
+      if(selDate !== liveDate || viewMK !== liveMK){
+        selDate = liveDate;
+        viewMK  = liveMK;
+        document.getElementById('dayPicker').value = liveDate;
+        updateDateLabel();
+        checkNewMonth();
+        populateMonthSwitcher();
+        switchMonth(liveMK, true);
+      }
+    }
+    if(document.visibilityState === 'hidden') persist();
+  });
+});
 function curMonth(){ return store.months[viewMK] || {}; }
 function curDays(){  return (store.months[viewMK]||{}).days || {}; }
 function curSalary(){ return (store.months[viewMK]||{}).salary || 0; }
@@ -767,12 +802,12 @@ function allEntries(mk){ return Object.values((store.months[mk||viewMK]||{}).day
 
 // ── New Month Check ─────────────────────────────────────────────────
 function checkNewMonth(){
-  if(store.months[CURRENT_MK] && store.months[CURRENT_MK].salary) return;
+  if(store.months[CURRENT_MK()] && store.months[CURRENT_MK()].salary) return;
   // Find last month with salary
-  const prevKeys = Object.keys(store.months).filter(k=>k<CURRENT_MK && store.months[k].salary).sort();
+  const prevKeys = Object.keys(store.months).filter(k=>k<CURRENT_MK() && store.months[k].salary).sort();
   const lastKey  = prevKeys[prevKeys.length-1];
   const modal    = document.getElementById('newMonthModal');
-  document.getElementById('modalTitle').textContent = '🎉 ' + monthName(CURRENT_MK);
+  document.getElementById('modalTitle').textContent = '🎉 ' + monthName(CURRENT_MK());
   document.getElementById('modalSub').textContent   = 'Set your salary for this month to start tracking.';
   if(lastKey){
     const lm = store.months[lastKey];
@@ -792,29 +827,29 @@ function closeModal(){
 function confirmNewMonth(){
   const v = parseFloat(document.getElementById('modalSalaryInput').value);
   if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
-  const DIM = daysInMonth(CURRENT_MK);
+  const DIM = daysInMonth(CURRENT_MK());
   // Preserve existing days if already present — never wipe entries
-  const existingDays = (store.months[CURRENT_MK]||{}).days || {};
-  store.months[CURRENT_MK] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
+  const existingDays = (store.months[CURRENT_MK()]||{}).days || {};
+  store.months[CURRENT_MK()] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
   persist();
   document.getElementById('newMonthModal').classList.add('hidden');
   populateMonthSwitcher();
-  switchMonth(CURRENT_MK);
+  switchMonth(CURRENT_MK());
 }
 
 // ── Month Switcher ──────────────────────────────────────────────────
 function populateMonthSwitcher(){
   const sel  = document.getElementById('monthSwitcher');
   const keys = Object.keys(store.months).filter(k=>store.months[k].salary).sort().reverse();
-  if(!keys.includes(CURRENT_MK)) keys.unshift(CURRENT_MK);
+  if(!keys.includes(CURRENT_MK())) keys.unshift(CURRENT_MK());
   sel.innerHTML = keys.map(k =>
-    `<option value="${k}" ${k===viewMK?'selected':''}>${monthName(k)}${k===CURRENT_MK?' (Current)':''}</option>`
+    `<option value="${k}" ${k===viewMK?'selected':''}>${monthName(k)}${k===CURRENT_MK()?' (Current)':''}</option>`
   ).join('');
 }
 
 function switchMonth(mk, doRender=true){
   viewMK = mk;
-  const isCurrent = mk === CURRENT_MK;
+  const isCurrent = mk === CURRENT_MK();
   // Banner
   const banner = document.getElementById('viewingBanner');
   if(isCurrent){ banner.classList.add('hidden'); }
@@ -837,13 +872,13 @@ function switchMonth(mk, doRender=true){
 
 // ── Salary ──────────────────────────────────────────────────────────
 function setSalary(){
-  if(viewMK !== CURRENT_MK){ alert('You can only change salary for the current month.'); return; }
+  if(viewMK !== CURRENT_MK()){ alert('You can only change salary for the current month.'); return; }
   const v = parseFloat(document.getElementById('salaryInput').value);
   if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
-  const DIM = daysInMonth(CURRENT_MK);
+  const DIM = daysInMonth(CURRENT_MK());
   // Preserve existing days — never overwrite
-  const existingDays = (store.months[CURRENT_MK]||{}).days || {};
-  store.months[CURRENT_MK] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
+  const existingDays = (store.months[CURRENT_MK()]||{}).days || {};
+  store.months[CURRENT_MK()] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
   persist();
   populateMonthSwitcher();
   render();
@@ -865,14 +900,14 @@ function updateDateLabel(){
 
 // ── Add/Reduce Entry ────────────────────────────────────────────────
 function addEntry(reduce){
-  if(viewMK!==CURRENT_MK){ alert('You can only add entries for the current month.'); return; }
+  if(viewMK!==CURRENT_MK()){ alert('You can only add entries for the current month.'); return; }
   if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
   if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
   const note = document.getElementById('entryNote').value.trim();
   const amt  = reduce ? -Math.abs(raw) : Math.abs(raw);
-  if(!store.months[CURRENT_MK].days[selDate]) store.months[CURRENT_MK].days[selDate]=[];
-  store.months[CURRENT_MK].days[selDate].push({id:Date.now(),cat:selCat,amt,note});
+  if(!store.months[CURRENT_MK()].days[selDate]) store.months[CURRENT_MK()].days[selDate]=[];
+  store.months[CURRENT_MK()].days[selDate].push({id:Date.now(),cat:selCat,amt,note});
   document.getElementById('entryAmt').value  = '';
   document.getElementById('entryNote').value = '';
   persist();
@@ -986,7 +1021,7 @@ function calcUnloggedSavings(){
   const [y,m] = viewMK.split('-').map(Number);
   const now   = new Date();
   // Only count days that have already passed (before today) in the viewed month
-  const lastDay = viewMK === CURRENT_MK
+  const lastDay = viewMK === CURRENT_MK()
     ? now.getDate() - 1          // up to yesterday for current month
     : daysInMonth(viewMK);       // all days for past months
   let saving = 0;
@@ -1041,7 +1076,7 @@ function renderKPI(){
 function renderDayEntries(){
   const list = document.getElementById('entriesList');
   const arr  = curDays()[selDate]||[];
-  const ro   = viewMK!==CURRENT_MK;
+  const ro   = viewMK!==CURRENT_MK();
   if(!arr.length){ list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">No entries for this day</div>'; return; }
   list.innerHTML = arr.map(e=>`
     <div class="entry-item" id="erow-${e.id}">
@@ -1234,7 +1269,7 @@ function renderTable(){
   const allDays=Object.keys(curDays()).sort().reverse();
   const bdgt=curBudget();
   if(!allDays.length){ wrap.innerHTML='<div class="empty"><div class="ei">📋</div>No entries yet</div>'; return; }
-  const ro=viewMK!==CURRENT_MK;
+  const ro=viewMK!==CURRENT_MK();
   let rows='';
   allDays.forEach(date=>{
     const arr=curDays()[date]||[];
@@ -1265,7 +1300,7 @@ function renderTable(){
 
 function renderPrevMonths(){
   const grid=document.getElementById('prevMonthsGrid');
-  const prevKeys=Object.keys(store.months).filter(k=>k<CURRENT_MK&&store.months[k].salary).sort().reverse();
+  const prevKeys=Object.keys(store.months).filter(k=>k<CURRENT_MK()&&store.months[k].salary).sort().reverse();
   if(!prevKeys.length){ grid.innerHTML='<div class="empty"><div class="ei">📅</div>No previous months yet — data will appear here as months pass.</div>'; return; }
   grid.innerHTML='<div class="prev-months-grid">'+prevKeys.map(mk=>{
     const m=store.months[mk];
@@ -1301,7 +1336,7 @@ function importData(event){
     try{
       const d=JSON.parse(e.target.result);
       if(!d.months){ alert('Invalid data file.'); return; }
-      store=d; persist(); populateMonthSwitcher(); switchMonth(CURRENT_MK);
+      store=d; persist(); populateMonthSwitcher(); switchMonth(CURRENT_MK());
       alert('Data imported successfully!');
     }catch(err){ alert('Invalid JSON file.'); }
   };
