@@ -448,13 +448,9 @@ tr:hover td { background:var(--page); }
   background: var(--c1l);
 }
 
-/* Category chips */
+/* Category chips — no hover/active zoom */
 .cat-chip {
-  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
-}
-.cat-chip:hover, .cat-chip:active {
-  transform: scale(1.27) translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  transition: border-color 0.15s;
 }
 
 /* Buttons */
