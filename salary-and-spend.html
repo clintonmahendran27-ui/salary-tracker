@@ -279,6 +279,20 @@ tr:hover td { background:var(--page); }
   </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal-bg hidden" id="deleteModal">
+  <div class="modal-box" style="max-width:360px;text-align:center;">
+    <div style="font-size:44px;margin-bottom:10px;">🗑️</div>
+    <div style="font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px;">Delete Entry?</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:8px;" id="deleteModalDesc">Are you sure you want to delete this entry?</div>
+    <div style="font-size:20px;font-weight:800;color:var(--danger);margin-bottom:20px;" id="deleteModalAmt"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="cancelDelete()" style="flex:1;height:44px;background:var(--page);color:var(--ink2);border:1.5px solid var(--base);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+      <button onclick="confirmDelete()" style="flex:1;height:44px;background:var(--danger);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- Header -->
 <header class="app-header">
   <div class="header-inner">
@@ -635,11 +649,35 @@ function addEntry(reduce){
   showCelebration(selCat, Math.abs(raw), reduce);
 }
 
-function deleteEntry(date,id){
+let _pendingDelete = null;  // { date, id }
+
+function deleteEntry(date, id){
+  // Find entry details for the confirmation message
+  const e = (store.months[viewMK].days[date]||[]).find(x=>x.id===id);
+  if(!e) return;
+  _pendingDelete = { date, id };
+  document.getElementById('deleteModalDesc').textContent =
+    'Delete ' + catLabel(e.cat) + (e.note ? ' · '+e.note : '') + '?';
+  document.getElementById('deleteModalAmt').textContent =
+    (e.amt<0?'−':'') + '₹ ' + fmt(Math.abs(e.amt));
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function cancelDelete(){
+  _pendingDelete = null;
+  document.getElementById('deleteModal').classList.add('hidden');
+}
+
+function confirmDelete(){
+  if(!_pendingDelete) return;
+  const { date, id } = _pendingDelete;
   const days = store.months[viewMK].days;
-  if(!days[date]) return;
-  days[date] = days[date].filter(e=>e.id!==id);
-  if(!days[date].length) delete days[date];
+  if(days[date]){
+    days[date] = days[date].filter(e=>e.id!==id);
+    if(!days[date].length) delete days[date];
+  }
+  _pendingDelete = null;
+  document.getElementById('deleteModal').classList.add('hidden');
   persist(); render();
 }
 
@@ -709,19 +747,43 @@ function applyHero(){
   document.getElementById('kpiBudget').textContent       = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
 }
 
+// Returns total savings from past days in viewMK that had zero entries logged
+function calcUnloggedSavings(){
+  const bdgt = curBudget();
+  if(!bdgt) return 0;
+  const days = curDays();
+  const [y,m] = viewMK.split('-').map(Number);
+  const now   = new Date();
+  // Only count days that have already passed (before today) in the viewed month
+  const lastDay = viewMK === CURRENT_MK
+    ? now.getDate() - 1          // up to yesterday for current month
+    : daysInMonth(viewMK);       // all days for past months
+  let saving = 0;
+  for(let d = 1; d <= lastDay; d++){
+    const dateStr = y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    if(!days[dateStr] || days[dateStr].length === 0){
+      saving += bdgt;  // full day budget saved
+    }
+  }
+  return saving;
+}
+
 function renderKPI(){
   const days       = curDays();
   const bdgt       = curBudget();
   const sal        = curSalary();
   const totalSpent = allEntries().reduce((s,e)=>s+e.amt,0);
   const daysLogged = Object.keys(days).length;
-  const net        = (bdgt*daysLogged) - totalSpent;
-  const remaining  = sal - totalSpent;   // Salary minus all spending so far
+
+  // Count past days in this month (up to yesterday) that had zero entries = full day saved
+  const unloggedSaving = calcUnloggedSavings();
+  const net       = (bdgt * daysLogged) - totalSpent + unloggedSaving;
+  const remaining = sal - totalSpent;
 
   document.getElementById('kpiSpent').textContent      = '₹ '+fmtK(totalSpent);
   document.getElementById('kpiSpentSub').textContent   = daysLogged+' day'+(daysLogged!==1?'s':'')+' logged';
   document.getElementById('kpiSavings').textContent    = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
-  document.getElementById('kpiSavingsSub').textContent = net>=0?'Saved so far 🎉':'Overspent ⚠️';
+  document.getElementById('kpiSavingsSub').textContent = net>=0 ? 'Saved so far 🎉' : 'Overspent ⚠️';
   document.getElementById('kpiDays').textContent       = daysLogged;
   document.getElementById('heroSavings').textContent   = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
   document.getElementById('heroSavings').style.color   = net>=0?'#6ee26e':'#ff8080';
@@ -877,7 +939,7 @@ function renderTable(){
     </tr>`;
   });
   const totalSpent=allEntries().filter(e=>e.amt>0).reduce((s,e)=>s+e.amt,0);
-  const net=(bdgt*allDays.length)-totalSpent;
+  const net=(bdgt*allDays.length)-totalSpent + calcUnloggedSavings();
   rows+=`<tr style="font-weight:800;background:var(--page)">
     <td>Total (${allDays.length} days)</td>
     <td style="font-variant-numeric:tabular-nums">₹${fmtK(totalSpent)}</td>
