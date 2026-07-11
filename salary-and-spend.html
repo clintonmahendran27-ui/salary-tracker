@@ -1026,37 +1026,48 @@ function applyHero(){
   document.getElementById('kpiBudget').textContent       = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
 }
 
-// Returns total savings from past days in viewMK that had zero entries logged
-function calcUnloggedSavings(){
+// ── Net Savings Calculation ────────────────────────────────────────
+// Logic: For every day from day 1 up to TODAY (inclusive):
+//   net += dailyBudget - amountSpentThatDay
+// Unlogged days → spent = 0 → full dailyBudget added as saving
+// Today → spent = whatever logged so far today
+// Future days → not counted at all
+function calcNetSavings(){
   const bdgt = curBudget();
   if(!bdgt) return 0;
-  const days = curDays();
-  const [y,m] = viewMK.split('-').map(Number);
-  const now   = new Date();
-  // Only count days that have already passed (before today) in the viewed month
-  const lastDay = viewMK === CURRENT_MK()
-    ? now.getDate() - 1          // up to yesterday for current month
-    : daysInMonth(viewMK);       // all days for past months
-  let saving = 0;
+  const days   = curDays();
+  const mk     = viewMK;
+  const [y,m]  = mk.split('-').map(Number);
+  const todayStr = TODAY();
+
+  // For past months — count all days in the month
+  // For current month — count day 1 up to today
+  let lastDay;
+  if(mk === CURRENT_MK()){
+    lastDay = parseInt(todayStr.split('-')[2]);
+  } else {
+    lastDay = daysInMonth(mk);
+  }
+
+  let net = 0;
   for(let d = 1; d <= lastDay; d++){
     const dateStr = y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    if(!days[dateStr] || days[dateStr].length === 0){
-      saving += bdgt;  // full day budget saved
-    }
+    const entries = days[dateStr] || [];
+    const spent   = entries.reduce((s,e)=>s+e.amt, 0);
+    net += bdgt - spent;   // positive = saved, negative = overspent
   }
-  return saving;
+  return net;
 }
 
 function renderKPI(){
   const days       = curDays();
   const bdgt       = curBudget();
   const sal        = curSalary();
-  const totalSpent = allEntries().reduce((s,e)=>s+e.amt,0);
+  const totalSpent = allEntries().reduce((s,e)=>s+e.amt, 0);
   const daysLogged = Object.keys(days).length;
 
-  // Count past days in this month (up to yesterday) that had zero entries = full day saved
-  const unloggedSaving = calcUnloggedSavings();
-  const net       = (bdgt * daysLogged) - totalSpent + unloggedSaving;
+  // Net savings = rolling daily balance from day 1 to today
+  const net       = calcNetSavings();
   const remaining = sal - totalSpent;
 
   document.getElementById('kpiSpent').textContent      = '₹ '+fmtK(totalSpent);
@@ -1299,7 +1310,7 @@ function renderTable(){
     </tr>`;
   });
   const totalSpent=allEntries().filter(e=>e.amt>0).reduce((s,e)=>s+e.amt,0);
-  const net=(bdgt*allDays.length)-totalSpent + calcUnloggedSavings();
+  const net = calcNetSavings();
   rows+=`<tr style="font-weight:800;background:var(--page)">
     <td>Total (${allDays.length} days)</td>
     <td style="font-variant-numeric:tabular-nums">₹${fmtK(totalSpent)}</td>
