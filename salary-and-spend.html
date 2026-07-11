@@ -900,11 +900,12 @@ window.addEventListener('DOMContentLoaded', function(){
       viewMK  = CURRENT_MK();
       document.getElementById('dayPicker').value = TODAY();
       updateDateLabel();
-      checkNewMonth();
+      // Show new month modal only when it just turned the 1st
+      if(nowIST().getUTCDate() === 1) checkNewMonth();
       populateMonthSwitcher();
       switchMonth(CURRENT_MK(), false);
       render();
-      scheduleMidnightRefresh(); // reschedule for next midnight
+      scheduleMidnightRefresh();
     }, msToMidnight);
   }
   scheduleMidnightRefresh();
@@ -919,7 +920,10 @@ window.addEventListener('DOMContentLoaded', function(){
         viewMK  = liveMK;
         document.getElementById('dayPicker').value = liveDate;
         updateDateLabel();
-        checkNewMonth();
+        // Only show new month modal if it just became the 1st of a new month
+        const dayOfMonth = nowIST().getUTCDate();
+        const hasSalary  = store.months[CURRENT_MK()] && store.months[CURRENT_MK()].salary;
+        if(dayOfMonth === 1 && !hasSalary) checkNewMonth();
         populateMonthSwitcher();
         switchMonth(liveMK, true);
       }
@@ -935,22 +939,16 @@ function allEntries(mk){ return Object.values((store.months[mk||viewMK]||{}).day
 
 // ── New Month Check ─────────────────────────────────────────────────
 function checkNewMonth(){
-  const istNow = nowIST();
-  const dayOfMonth = istNow.getUTCDate();  // IST day
+  const dayOfMonth = nowIST().getUTCDate();
+  const hasSalary  = store.months[CURRENT_MK()] && store.months[CURRENT_MK()].salary;
 
-  // Salary already set for this month — show welcome splash instead
-  if(store.months[CURRENT_MK()] && store.months[CURRENT_MK()].salary){
-    showWelcomeSplash();
-    return;
-  }
-
-  // No salary set — only ask on 1st of month
-  if(dayOfMonth === 1){
+  // Case 1: 1st of month AND no salary set yet → show New Month modal
+  if(dayOfMonth === 1 && !hasSalary){
     const prevKeys = Object.keys(store.months).filter(k=>k<CURRENT_MK() && store.months[k].salary).sort();
     const lastKey  = prevKeys[prevKeys.length-1];
     const modal    = document.getElementById('newMonthModal');
     document.getElementById('modalTitle').textContent = '🎉 ' + monthName(CURRENT_MK());
-    document.getElementById('modalSub').textContent   = 'Set your salary for this month to start tracking.';
+    document.getElementById('modalSub').textContent   = 'Set your expense for this month to start tracking.';
     if(lastKey){
       const lm = store.months[lastKey];
       const lnet = (lm.dailyBdgt * Object.keys(lm.days).length) - allEntries(lastKey).reduce((s,e)=>s+e.amt,0);
@@ -960,10 +958,16 @@ function checkNewMonth(){
       document.getElementById('modalSalaryInput').value = lm.salary;
     }
     modal.classList.remove('hidden');
-  } else {
-    // Not 1st day and no salary — show welcome splash
-    showWelcomeSplash();
+    return;
   }
+
+  // Case 2: salary set → show welcome splash (every app open)
+  if(hasSalary){
+    showWelcomeSplash();
+    return;
+  }
+
+  // Case 3: no salary, not 1st day → just open app silently (user can set from hero banner)
 }
 
 function closeModal(){
