@@ -365,7 +365,111 @@ tr:hover td { background:var(--page); }
 .empty { text-align:center; padding:32px 16px; color:var(--muted); font-size:14px; }
 .empty .ei { font-size:40px; margin-bottom:8px; }
 
-@media(max-width:600px){ .hero-value{font-size:30px;} .hero-divider{display:none;} }
+@media(max-width:600px){
+  .hero-value { font-size:28px; }
+  .hero-divider { display:none; }
+
+  /* Tighter page padding */
+  .wrap { padding:10px 10px 32px; }
+
+  /* Hero banner compact */
+  .hero-banner { padding:14px 14px 12px; margin-bottom:12px; border-radius:12px; }
+  .hero-banner::before { font-size:70px; }
+  .hero-banner::after  { display:none; }
+  .hero-top { gap:8px; margin-bottom:10px; }
+  .hero-left { min-width:120px; }
+  .hero-label { font-size:10px; }
+  .hero-sub   { font-size:11px; }
+  .hs-val     { font-size:16px; }
+  .hs-lbl     { font-size:9px; }
+  .hero-stats { gap:12px; }
+
+  /* Salary row compact */
+  .salary-row { padding:10px 12px; gap:8px; }
+  .salary-row input { height:34px; font-size:13px; }
+  .btn-set { height:34px; font-size:12px; padding:0 14px; }
+
+  /* KPI tiles 2-column grid on mobile */
+  .kpi-row { grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .kpi-tile { padding:10px 12px; border-radius:10px; }
+  .kpi-value { font-size:17px; }
+  .kpi-label { font-size:9px; }
+  .kpi-sub   { font-size:10px; }
+  .kpi-tile::before { font-size:20px; }
+
+  /* Cards compact */
+  .card { padding:12px 12px; border-radius:12px; margin-bottom:0; }
+  .card-title { font-size:11px; margin-bottom:10px; }
+
+  /* Two-col stack */
+  .two-col { gap:10px; margin-bottom:12px; }
+
+  /* Day picker row */
+  .day-header { margin-bottom:8px; }
+  .day-date { font-size:11px; }
+  .day-picker { height:30px; font-size:12px; }
+
+  /* Category chips compact */
+  .cat-chips { gap:4px; }
+  .cat-chip  { padding:4px 8px; font-size:11px; }
+  .cat-label-sm { font-size:10px; margin-bottom:4px; }
+  .cat-section { margin-bottom:8px; }
+
+  /* Amount input compact */
+  .entry-input-row { gap:6px; margin-bottom:8px; }
+  .entry-input-row input[type=number] { height:44px; font-size:16px; border-radius:10px; }
+  .entry-input-row input[type=text]   { height:44px; font-size:12px; border-radius:10px; }
+
+  /* Add/reduce buttons */
+  .btn-add    { height:34px; padding:0 12px; font-size:12px; }
+  .btn-reduce { height:34px; padding:0 10px; font-size:12px; }
+
+  /* Entry items */
+  .entry-item { padding:6px 8px; font-size:12px; }
+  .entries-list { gap:4px; }
+
+  /* Day summary */
+  .day-summary { padding:8px 10px; margin-top:8px; }
+  .ds-val { font-size:14px; }
+  .ds-lbl { font-size:9px; }
+
+  /* Progress */
+  .progress-wrap { margin-top:10px; }
+  .progress-label { font-size:10px; }
+
+  /* Chart */
+  .chart-area { margin-top:4px; }
+  .leg { gap:8px; margin-bottom:6px; }
+  .leg-item { font-size:10px; }
+
+  /* Category breakdown */
+  .cb-label { font-size:11px; width:80px; }
+  .cb-amt   { font-size:11px; width:56px; }
+
+  /* Table */
+  table { font-size:11px; }
+  th,td { padding:6px 6px; }
+
+  /* Prev month cards */
+  .prev-months-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .pm-card { padding:10px 12px; }
+  .pm-month-name { font-size:12px; }
+  .pm-salary     { font-size:10px; }
+  .psv { font-size:14px; }
+  .psl { font-size:9px; }
+
+  /* Viewing banner */
+  .viewing-banner { padding:10px 12px; margin-bottom:10px; }
+  .vb-text { font-size:12px; }
+  .btn-back { height:28px; font-size:11px; padding:0 10px; }
+
+  /* Header */
+  .header-inner { height:50px; }
+  .app-logo h1  { font-size:16px; }
+  .app-logo span { display:none; }
+  .hdr-btn { height:28px; padding:0 10px; font-size:11px; }
+  .month-sel { height:28px; font-size:11px; }
+}
 </style>
 </head>
 <body>
