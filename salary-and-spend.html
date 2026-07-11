@@ -241,9 +241,22 @@ body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var
 .cat-chip { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:700; border:2px solid transparent; cursor:pointer; transition:all 0.15s; user-select:none; }
 .cat-chip.selected { border-color:currentColor; }
 .entry-input-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
-.entry-input-row input[type=number] { height:38px; padding:0 12px; flex:1; min-width:100px; border:1.5px solid var(--base); border-radius:8px; font-size:14px; font-weight:700; background:var(--surf); color:var(--ink); outline:none; }
-.entry-input-row input[type=text]   { height:38px; padding:0 12px; flex:2; min-width:100px; border:1.5px solid var(--base); border-radius:8px; font-size:13px; background:var(--surf); color:var(--ink); outline:none; }
-.entry-input-row input:focus { border-color:var(--c1); }
+.entry-input-row input[type=number] {
+  height:52px; padding:0 16px; flex:1; min-width:120px;
+  border:2px solid var(--base); border-radius:12px;
+  font-size:18px; font-weight:800;
+  background:linear-gradient(135deg,#f8f6ff,#eef4ff);
+  color:var(--c1); outline:none;
+  box-shadow:0 2px 8px rgba(42,120,214,0.10);
+  transition:border-color 0.15s, box-shadow 0.15s;
+}
+.entry-input-row input[type=text] {
+  height:52px; padding:0 16px; flex:2; min-width:120px;
+  border:2px solid var(--base); border-radius:12px; font-size:14px;
+  background:var(--surf); color:var(--ink); outline:none;
+  transition:border-color 0.15s;
+}
+.entry-input-row input:focus { border-color:var(--c1); box-shadow:0 0 0 3px rgba(42,120,214,0.12); }
 .btn-add    { height:38px; padding:0 16px; background:var(--c1); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
 .btn-add:hover { opacity:0.88; }
 .btn-reduce { height:38px; padding:0 14px; background:var(--dangerbg); color:var(--danger); border:1.5px solid var(--danger); border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
@@ -366,7 +379,7 @@ tr:hover td { background:var(--page); }
     <div class="modal-sub" id="modalSub">Set your salary for this month to continue tracking.</div>
     <div class="modal-prev" id="modalPrev" style="display:none"></div>
     <div class="modal-field">
-      <label>Monthly Salary (₹)</label>
+      <label>Monthly Expense (₹)</label>
       <input type="number" id="modalSalaryInput" placeholder="e.g. 35000" min="1"/>
     </div>
     <button class="btn-modal-primary" onclick="confirmNewMonth()">✓ Start This Month</button>
@@ -419,7 +432,7 @@ tr:hover td { background:var(--page); }
   <div class="hero-banner">
     <div class="hero-top">
       <div class="hero-left">
-        <div class="hero-label">Monthly Salary</div>
+        <div class="hero-label">Monthly Expense</div>
         <div class="hero-value" id="heroSalary">₹ —</div>
         <div class="hero-sub"  id="heroSub">Set your salary to get started</div>
       </div>
@@ -433,20 +446,20 @@ tr:hover td { background:var(--page); }
     </div>
     <div class="salary-row" id="salaryRowWrap">
       <div class="field">
-        <label>Monthly Salary (₹)</label>
+        <label>Monthly Expense (₹)</label>
         <input type="number" id="salaryInput" placeholder="e.g. 30000" min="1"/>
       </div>
       <div class="field">
         <label>Month</label>
         <input type="text" id="monthDisp" readonly/>
       </div>
-      <button class="btn-set" id="btnSetSalary" onclick="setSalary()">✓ Set Salary</button>
+      <button class="btn-set" id="btnSetSalary" onclick="setSalary()">✓ Set Expense</button>
     </div>
   </div>
 
   <!-- KPI -->
   <div class="kpi-row">
-    <div class="kpi-tile" data-icon="💰"><div class="kpi-label">Monthly Salary</div><div class="kpi-value" id="kpiSalary">₹ —</div><div class="kpi-sub" id="kpiSalarySub">Not set</div></div>
+    <div class="kpi-tile" data-icon="💰"><div class="kpi-label">Monthly Expense</div><div class="kpi-value" id="kpiSalary">₹ —</div><div class="kpi-sub" id="kpiSalarySub">Not set</div></div>
     <div class="kpi-tile" data-icon="📅"><div class="kpi-label">Daily Budget</div><div class="kpi-value" id="kpiBudget">₹ —</div><div class="kpi-sub">Per day</div></div>
     <div class="kpi-tile" data-icon="🛒"><div class="kpi-label">Total Spent</div><div class="kpi-value" id="kpiSpent">₹ 0</div><div class="kpi-sub" id="kpiSpentSub">0 days</div></div>
     <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile"><div class="kpi-label">Net Savings</div><div class="kpi-value" id="kpiSavings">₹ 0</div><div class="kpi-sub" id="kpiSavingsSub">Running</div></div>
@@ -729,7 +742,7 @@ function updateDateLabel(){
 // ── Add/Reduce Entry ────────────────────────────────────────────────
 function addEntry(reduce){
   if(viewMK!==CURRENT_MK){ alert('You can only add entries for the current month.'); return; }
-  if(!curSalary()){ alert('Please set your salary first.'); return; }
+  if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
   if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
   const note = document.getElementById('entryNote').value.trim();
