@@ -136,8 +136,8 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --surf:#fcfcfb; --page:#f0ede8; --card:#ffffff;
-  --border:rgba(11,11,11,0.09); --ink:#0b0b0b; --ink2:#52514e;
+  --surf:rgba(255,255,255,0.55); --page:rgba(235,232,245,0.45); --card:rgba(255,255,255,0.55);
+  --border:rgba(255,255,255,0.45); --ink:#0b0b0b; --ink2:#52514e;
   --muted:#898781; --grid:#e1e0d9; --base:#c3c2b7;
   --c1:#2a78d6; --c1l:#dceeff; --c2:#1baf7a; --c2l:#d2f4e8;
   --c3:#eda100; --c3l:#fff1cc; --c4:#e34948; --c4l:#fde8e8;
@@ -147,12 +147,12 @@
   --warn:#c98500; --warnbg:#fff4d6;
   --radius:14px; --shadow:0 2px 12px rgba(11,11,11,0.07);
 }
-body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--page); color:var(--ink); min-height:100vh; position:relative; overflow-x:hidden; }
+body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:linear-gradient(135deg,#e8e4f5 0%,#dff0f5 50%,#e4f5ea 100%); color:var(--ink); min-height:100vh; position:relative; overflow-x:hidden; }
 
 /* ── Falling Money Notes Background ── */
 #money-canvas {
   position:fixed; inset:0; z-index:0;
-  pointer-events:none; opacity:0.18;
+  pointer-events:none; opacity:0.35;
 }
 .wrap, .app-header { position:relative; z-index:1; }
 .modal-bg, .celeb-overlay { z-index:500; }
@@ -173,7 +173,7 @@ body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var
 /* Modal */
 .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:500; display:flex; align-items:center; justify-content:center; padding:16px; }
 .modal-bg.hidden { display:none; }
-.modal-box { background:var(--card); border-radius:20px; padding:32px 28px; max-width:420px; width:100%; box-shadow:0 8px 40px rgba(0,0,0,0.25); position:relative; }
+.modal-box { background:rgba(255,255,255,0.75); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.8); border-radius:20px; padding:32px 28px; max-width:420px; width:100%; box-shadow:0 16px 60px rgba(80,60,160,0.2); position:relative; }
 .modal-icon { font-size:48px; text-align:center; margin-bottom:12px; }
 .modal-title { font-size:22px; font-weight:800; color:var(--ink); text-align:center; margin-bottom:6px; }
 .modal-sub { font-size:14px; color:var(--muted); text-align:center; margin-bottom:24px; }
@@ -221,7 +221,7 @@ body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var
 
 /* KPI */
 .kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:12px; margin-bottom:20px; }
-.kpi-tile { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+.kpi-tile { background:rgba(255,255,255,0.52); border:1px solid rgba(255,255,255,0.7); border-radius:var(--radius); padding:16px 18px; box-shadow:0 4px 20px rgba(80,60,160,0.08); position:relative; overflow:hidden; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
 .kpi-tile::before { content:attr(data-icon); position:absolute; right:10px; top:8px; font-size:28px; opacity:0.12; pointer-events:none; }
 .kpi-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
 .kpi-value { font-size:21px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; }
@@ -234,7 +234,7 @@ body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var
 @media(max-width:700px){ .two-col { grid-template-columns:1fr; } }
 
 /* Cards */
-.card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); }
+.card { background:rgba(255,255,255,0.52); border:1px solid rgba(255,255,255,0.7); border-radius:var(--radius); padding:20px; box-shadow:0 4px 24px rgba(80,60,160,0.08); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
 .card-title { font-size:13px; font-weight:800; color:var(--ink2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
 .card-title span { font-size:16px; }
 
@@ -269,7 +269,7 @@ body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var
 .btn-add:hover { opacity:0.88; }
 .btn-reduce { height:38px; padding:0 14px; background:var(--dangerbg); color:var(--danger); border:1.5px solid var(--danger); border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
 .entries-list { margin-top:8px; display:flex; flex-direction:column; gap:6px; }
-.entry-item { display:flex; align-items:center; gap:8px; background:var(--page); border-radius:8px; padding:8px 10px; font-size:13px; }
+.entry-item { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.45); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.6); border-radius:8px; padding:8px 10px; font-size:13px; }
 .entry-cat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 .entry-name { flex:1; color:var(--ink2); font-weight:600; }
 .entry-amt { font-weight:800; font-variant-numeric:tabular-nums; }
@@ -278,7 +278,7 @@ body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var
 .btn-del-entry:hover  { color:var(--danger); }
 .entry-edit-inp { height:30px; width:90px; padding:0 8px; border:1.5px solid var(--c1); border-radius:6px; font-size:13px; font-weight:700; background:var(--surf); color:var(--ink); outline:none; }
 .btn-save-entry { height:30px; padding:0 10px; background:var(--c1); color:#fff; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; }
-.day-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; background:var(--page); border-radius:10px; padding:10px 14px; margin-top:10px; }
+.day-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; background:rgba(255,255,255,0.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.55); border-radius:10px; padding:10px 14px; margin-top:10px; }
 .ds-item { display:flex; flex-direction:column; align-items:center; gap:1px; }
 .ds-val { font-size:16px; font-weight:800; }
 .ds-lbl { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; }
