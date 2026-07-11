@@ -4,6 +4,41 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Salary & Spend</title>
+
+<!-- PWA / Home Screen -->
+<meta name="application-name" content="Salary & Spend"/>
+<meta name="apple-mobile-web-app-title" content="Salary & Spend"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1a1463"/>
+
+<!-- Inline SVG icon as data URI for apple-touch-icon and favicon -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='url(%23g)'/%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231a1463'/%3E%3Cstop offset='60%25' stop-color='%232a78d6'/%3E%3Cstop offset='100%25' stop-color='%231baf7a'/%3E%3C/linearGradient%3E%3Ccircle cx='256' cy='210' r='100' fill='none' stroke='%23fff' stroke-width='28'/%3E%3Crect x='228' y='155' width='28' height='110' rx='14' fill='%23fff'/%3E%3Crect x='196' y='255' width='92' height='28' rx='14' fill='%23fff'/%3E%3Crect x='140' y='340' width='232' height='28' rx='14' fill='rgba(255,255,255,0.5)'/%3E%3Crect x='180' y='385' width='152' height='22' rx='11' fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='url(%23g)'/%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231a1463'/%3E%3Cstop offset='60%25' stop-color='%232a78d6'/%3E%3Cstop offset='100%25' stop-color='%231baf7a'/%3E%3C/linearGradient%3E%3Ccircle cx='256' cy='210' r='100' fill='none' stroke='%23fff' stroke-width='28'/%3E%3Crect x='228' y='155' width='28' height='110' rx='14' fill='%23fff'/%3E%3Crect x='196' y='255' width='92' height='28' rx='14' fill='%23fff'/%3E%3Crect x='140' y='340' width='232' height='28' rx='14' fill='rgba(255,255,255,0.5)'/%3E%3Crect x='180' y='385' width='152' height='22' rx='11' fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E"/>
+
+<!-- PWA Manifest inline -->
+<script>
+const _manifest = {
+  name: "Salary & Spend",
+  short_name: "Salary & Spend",
+  description: "Smart Daily Budget & Salary Tracker",
+  start_url: "./salary-and-spend.html",
+  display: "standalone",
+  background_color: "#1a1463",
+  theme_color: "#1a1463",
+  orientation: "portrait",
+  icons: [{
+    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%231a1463'/%3E%3Ccircle cx='256' cy='210' r='100' fill='none' stroke='%23fff' stroke-width='28'/%3E%3Crect x='228' y='155' width='28' height='110' rx='14' fill='%23fff'/%3E%3Crect x='196' y='255' width='92' height='28' rx='14' fill='%23fff'/%3E%3C/svg%3E",
+    sizes: "512x512", type: "image/svg+xml", purpose: "any maskable"
+  }]
+};
+const _blob = new Blob([JSON.stringify(_manifest)], {type:'application/manifest+json'});
+const _murl = URL.createObjectURL(_blob);
+const _ml   = document.createElement('link');
+_ml.rel='manifest'; _ml.href=_murl;
+document.currentScript.after(_ml);
+</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -244,6 +279,7 @@ tr:hover td { background:var(--page); }
         <div class="hero-stat"><div class="hs-lbl">Daily Budget</div><div class="hs-val" id="heroDailyBudget">₹ —</div></div>
         <div class="hero-stat"><div class="hs-lbl">Days in Month</div><div class="hs-val" id="heroDays">—</div></div>
         <div class="hero-stat"><div class="hs-lbl">Net Savings</div><div class="hs-val" id="heroSavings" style="color:#6ee26e">₹ 0</div></div>
+        <div class="hero-stat"><div class="hs-lbl">Remaining Balance</div><div class="hs-val" id="heroRemaining" style="color:#ffd580">₹ —</div></div>
       </div>
     </div>
     <div class="salary-row" id="salaryRowWrap">
@@ -265,6 +301,7 @@ tr:hover td { background:var(--page); }
     <div class="kpi-tile" data-icon="📅"><div class="kpi-label">Daily Budget</div><div class="kpi-value" id="kpiBudget">₹ —</div><div class="kpi-sub">Per day</div></div>
     <div class="kpi-tile" data-icon="🛒"><div class="kpi-label">Total Spent</div><div class="kpi-value" id="kpiSpent">₹ 0</div><div class="kpi-sub" id="kpiSpentSub">0 days</div></div>
     <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile"><div class="kpi-label">Net Savings</div><div class="kpi-value" id="kpiSavings">₹ 0</div><div class="kpi-sub" id="kpiSavingsSub">Running</div></div>
+    <div class="kpi-tile" data-icon="💳" id="kpiRemainingTile"><div class="kpi-label">Remaining Balance</div><div class="kpi-value" id="kpiRemaining">₹ —</div><div class="kpi-sub" id="kpiRemainingSub">Salary − Spent</div></div>
     <div class="kpi-tile" data-icon="📆"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpiDays">0</div><div class="kpi-sub">of <span id="kpiDaysTotal">—</span></div></div>
   </div>
 
@@ -621,16 +658,34 @@ function applyHero(){
 function renderKPI(){
   const days       = curDays();
   const bdgt       = curBudget();
+  const sal        = curSalary();
   const totalSpent = allEntries().reduce((s,e)=>s+e.amt,0);
   const daysLogged = Object.keys(days).length;
   const net        = (bdgt*daysLogged) - totalSpent;
-  document.getElementById('kpiSpent').textContent    = '₹ '+fmtK(totalSpent);
-  document.getElementById('kpiSpentSub').textContent = daysLogged+' day'+(daysLogged!==1?'s':'')+' logged';
-  document.getElementById('kpiSavings').textContent  = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
+  const remaining  = sal - totalSpent;   // Salary minus all spending so far
+
+  document.getElementById('kpiSpent').textContent      = '₹ '+fmtK(totalSpent);
+  document.getElementById('kpiSpentSub').textContent   = daysLogged+' day'+(daysLogged!==1?'s':'')+' logged';
+  document.getElementById('kpiSavings').textContent    = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
   document.getElementById('kpiSavingsSub').textContent = net>=0?'Saved so far 🎉':'Overspent ⚠️';
-  document.getElementById('kpiDays').textContent     = daysLogged;
-  document.getElementById('heroSavings').textContent = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
-  document.getElementById('heroSavings').style.color = net>=0?'#6ee26e':'#ff8080';
+  document.getElementById('kpiDays').textContent       = daysLogged;
+  document.getElementById('heroSavings').textContent   = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
+  document.getElementById('heroSavings').style.color   = net>=0?'#6ee26e':'#ff8080';
+
+  // Remaining balance
+  if(sal){
+    document.getElementById('kpiRemaining').textContent    = '₹ '+fmtK(remaining);
+    document.getElementById('kpiRemainingSub').textContent = remaining>=0 ? 'Left from salary' : 'Exceeded salary!';
+    document.getElementById('heroRemaining').textContent   = '₹ '+fmtK(remaining);
+    document.getElementById('heroRemaining').style.color   = remaining >= sal*0.3 ? '#6ee26e' : remaining >= sal*0.1 ? '#ffd580' : '#ff8080';
+    const rt = document.getElementById('kpiRemainingTile');
+    rt.classList.toggle('good',   remaining > sal*0.3);
+    rt.classList.toggle('danger', remaining < 0);
+  } else {
+    document.getElementById('kpiRemaining').textContent  = '₹ —';
+    document.getElementById('heroRemaining').textContent = '₹ —';
+  }
+
   const st = document.getElementById('kpiSavingsTile');
   st.classList.toggle('good',  net>0);
   st.classList.toggle('danger',net<0);
