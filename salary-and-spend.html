@@ -940,18 +940,26 @@ function allEntries(mk){ return Object.values((store.months[mk||viewMK]||{}).day
 // ── New Month Check ─────────────────────────────────────────────────
 function checkNewMonth(){
   const dayOfMonth = nowIST().getUTCDate();
-  const hasSalary  = store.months[CURRENT_MK()] && store.months[CURRENT_MK()].salary;
+  const mk         = CURRENT_MK();
+  const hasSalary  = store.months[mk] && store.months[mk].salary;
 
-  // Case 1: 1st of month AND no salary set yet → show New Month modal
-  if(dayOfMonth === 1 && !hasSalary){
-    const prevKeys = Object.keys(store.months).filter(k=>k<CURRENT_MK() && store.months[k].salary).sort();
+  // ── Strict rule: New Month modal ONLY fires when ALL 3 conditions are true:
+  //    1. It is the 1st day of the month (IST)
+  //    2. No salary has been set for this month yet
+  //    3. It hasn't been shown already this session
+  const sessionKey = 'newMonthShown_' + mk;
+  const alreadyShownThisSession = sessionStorage.getItem(sessionKey);
+
+  if(dayOfMonth === 1 && !hasSalary && !alreadyShownThisSession){
+    sessionStorage.setItem(sessionKey, '1');
+    const prevKeys = Object.keys(store.months).filter(k=>k<mk && store.months[k].salary).sort();
     const lastKey  = prevKeys[prevKeys.length-1];
     const modal    = document.getElementById('newMonthModal');
-    document.getElementById('modalTitle').textContent = '🎉 ' + monthName(CURRENT_MK());
+    document.getElementById('modalTitle').textContent = '🎉 ' + monthName(mk);
     document.getElementById('modalSub').textContent   = 'Set your expense for this month to start tracking.';
     if(lastKey){
-      const lm = store.months[lastKey];
-      const lnet = (lm.dailyBdgt * Object.keys(lm.days).length) - allEntries(lastKey).reduce((s,e)=>s+e.amt,0);
+      const lm   = store.months[lastKey];
+      const lnet = (lm.dailyBdgt * Object.keys(lm.days||{}).length) - allEntries(lastKey).reduce((s,e)=>s+e.amt,0);
       document.getElementById('modalPrev').style.display = 'block';
       document.getElementById('modalPrev').innerHTML =
         `<strong>${monthName(lastKey)}:</strong> Expense ₹${fmtK(lm.salary)} · Net savings <strong style="color:${lnet>=0?'var(--good)':'var(--danger)'}">${lnet>=0?'+':''}₹${fmtK(Math.abs(lnet))}</strong>`;
@@ -961,13 +969,11 @@ function checkNewMonth(){
     return;
   }
 
-  // Case 2: salary set → show welcome splash (every app open)
+  // Show welcome splash only when salary is already set (normal daily open)
   if(hasSalary){
     showWelcomeSplash();
-    return;
   }
-
-  // Case 3: no salary, not 1st day → just open app silently (user can set from hero banner)
+  // If no salary and not 1st → open silently, user sets from hero banner
 }
 
 function closeModal(){
