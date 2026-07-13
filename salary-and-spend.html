@@ -1163,7 +1163,7 @@ function applyRecalc(){
   if(!nb || nb <= 0){ alert('No remaining days to recalculate.'); return; }
   m.adjustedDailyBdgt = nb;
   m.origDailyBdgt     = ob;
-  m.adjustedFromDay   = 1;
+  m.adjustedFromDay   = nowIST().getUTCDate(); // starts from today
   persist();
   document.getElementById('recalcModal').classList.add('hidden');
   // Disable recalculate button
@@ -1335,11 +1335,9 @@ function applyHero(){
 }
 
 // ── Net Savings Calculation ────────────────────────────────────────
-// Logic: For every day from day 1 up to TODAY (inclusive):
-//   net += dailyBudget - amountSpentThatDay
-// Unlogged days → spent = 0 → full dailyBudget added as saving
-// Today → spent = whatever logged so far today
-// Future days → not counted at all
+// Days 1 to (adjustedFromDay-1) : use original daily budget
+// Days adjustedFromDay to today  : use adjusted daily budget
+// Unlogged days = spent ₹0 → full budget counted as saving
 function calcNetSavings(){
   const m      = store.months[viewMK]||{};
   const origB  = m.dailyBdgt || 0;
@@ -1349,15 +1347,14 @@ function calcNetSavings(){
   const adjFromDay = m.adjustedFromDay   || 99999;
   const days       = curDays();
   const [y,mm]     = viewMK.split('-').map(Number);
-  const todayStr   = TODAY();
-  const todayDay   = parseInt(todayStr.split('-')[2]);
+  const todayDay   = parseInt(TODAY().split('-')[2]);
   const lastDay    = viewMK === CURRENT_MK() ? todayDay : daysInMonth(viewMK);
 
   let net = 0;
   for(let d = 1; d <= lastDay; d++){
     const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const spent   = (days[dateStr]||[]).reduce((s,e)=>s+e.amt, 0);
-    // Use adjusted budget only from the day it was applied onwards
+    // Use adjusted budget from the recalculate date onwards (including that day)
     const budget  = (adjB && d >= adjFromDay) ? adjB : origB;
     net += budget - spent;
   }
