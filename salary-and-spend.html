@@ -1142,9 +1142,12 @@ function applyRecalc(){
   if(!nb || nb <= 0){ alert('No remaining days to recalculate.'); return; }
   m.adjustedDailyBdgt = nb;
   m.origDailyBdgt     = ob;
-  m.adjustedFromDay   = 1; // recalculate net savings from day 1 with new budget
+  m.adjustedFromDay   = 1;
   persist();
   document.getElementById('recalcModal').classList.add('hidden');
+  // Disable recalculate button
+  const btn = document.getElementById('btnRecalc');
+  if(btn){ btn.disabled = true; btn.style.opacity = '0.45'; btn.style.cursor = 'not-allowed'; }
   render();
 }
 
@@ -1156,6 +1159,9 @@ function resetRecalc(){
   delete m.origDailyBdgt;
   delete m.adjustedFromDay;
   persist();
+  // Re-enable recalculate button
+  const btn = document.getElementById('btnRecalc');
+  if(btn){ btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
   render();
 }
 function onDateChange(){
@@ -1295,9 +1301,16 @@ function applyHero(){
   if(resetBtn) resetBtn.style.display = isAdj ? '' : 'none';
 
   // Show recalculate button only for current month with salary set
+  // Disable if adjusted budget already applied
   const isCurrent = viewMK === CURRENT_MK();
   const recalcBtn = document.getElementById('btnRecalc');
-  if(recalcBtn) recalcBtn.style.display = (isCurrent && sal) ? '' : 'none';
+  if(recalcBtn){
+    recalcBtn.style.display = (isCurrent && sal) ? '' : 'none';
+    const alreadyApplied = isCurrent && store.months[viewMK] && store.months[viewMK].adjustedDailyBdgt;
+    recalcBtn.disabled        = !!alreadyApplied;
+    recalcBtn.style.opacity   = alreadyApplied ? '0.45' : '1';
+    recalcBtn.style.cursor    = alreadyApplied ? 'not-allowed' : 'pointer';
+  }
 }
 
 // ── Net Savings Calculation ────────────────────────────────────────
