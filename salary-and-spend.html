@@ -1157,6 +1157,8 @@ function resetRecalc(){
   const m  = store.months[mk];
   if(!m) return;
   delete m.adjustedDailyBdgt;
+  delete m.origDailyBdgt;
+  delete m.adjustedFromDay;
   persist();
   render();
 }
@@ -1311,25 +1313,22 @@ function applyHero(){
 function calcNetSavings(){
   const m      = store.months[viewMK]||{};
   const origB  = m.dailyBdgt || 0;
-  const adjB   = m.adjustedDailyBdgt || origB;
   if(!origB) return 0;
 
-  const days     = curDays();
-  const mk       = viewMK;
-  const [y,mm]   = mk.split('-').map(Number);
-  const todayStr = TODAY();
-  const todayDay = parseInt(todayStr.split('-')[2]);
-
-  const lastDay = mk === CURRENT_MK() ? todayDay : daysInMonth(mk);
+  const adjB       = m.adjustedDailyBdgt || null;
+  const adjFromDay = m.adjustedFromDay   || 99999;
+  const days       = curDays();
+  const [y,mm]     = viewMK.split('-').map(Number);
+  const todayStr   = TODAY();
+  const todayDay   = parseInt(todayStr.split('-')[2]);
+  const lastDay    = viewMK === CURRENT_MK() ? todayDay : daysInMonth(viewMK);
 
   let net = 0;
   for(let d = 1; d <= lastDay; d++){
     const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const entries = days[dateStr] || [];
-    const spent   = entries.reduce((s,e)=>s+e.amt, 0);
-    // Use adjusted budget from the day recalc was applied (store adjustedFromDay)
-    const adjFromDay = m.adjustedFromDay || 99999;
-    const budget  = (m.adjustedDailyBdgt && d >= adjFromDay) ? adjB : origB;
+    const spent   = (days[dateStr]||[]).reduce((s,e)=>s+e.amt, 0);
+    // Use adjusted budget only from the day it was applied onwards
+    const budget  = (adjB && d >= adjFromDay) ? adjB : origB;
     net += budget - spent;
   }
   return net;
