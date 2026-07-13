@@ -699,9 +699,9 @@ tr:hover td { background:var(--page); }
       </div>
     </div>
     <div class="hdr-right">
-      <select class="month-sel" id="monthSwitcher" onchange="switchMonth(this.value)" title="View a month"></select>
-      <button class="hdr-btn" onclick="exportData()">⬇ Export</button>
-      <label class="hdr-btn" style="display:flex;align-items:center;cursor:pointer;">
+      <select class="month-sel" id="monthSwitcher" onchange="switchMonth(this.value)" title="View a month" style="background:rgba(74,58,167,0.75);border-color:rgba(160,140,255,0.5);font-weight:800;"></select>
+      <button class="hdr-btn" onclick="exportData()" style="background:rgba(27,175,122,0.8);border-color:rgba(100,230,180,0.5);font-weight:800;">⬇ Export</button>
+      <label class="hdr-btn" style="display:flex;align-items:center;cursor:pointer;background:rgba(42,120,214,0.8);border-color:rgba(100,180,255,0.5);font-weight:800;">
         ⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
       </label>
       <button class="hdr-btn" onclick="openResetAll()" style="background:rgba(208,59,59,0.85);border-color:rgba(255,100,100,0.5);color:#fff;font-weight:800;">🗑 Reset All</button>
