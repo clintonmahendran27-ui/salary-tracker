@@ -516,6 +516,30 @@ tr:hover td { background:var(--page); }
   </div>
 </div>
 
+<!-- Recalculate Modal -->
+<div class="modal-bg hidden" id="recalcModal">
+  <div class="modal-box" style="max-width:400px;">
+    <button onclick="document.getElementById('recalcModal').classList.add('hidden')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;color:#898781;cursor:pointer;">✕</button>
+    <div style="font-size:42px;text-align:center;margin-bottom:10px;">📊</div>
+    <div style="font-size:18px;font-weight:900;color:var(--ink);text-align:center;margin-bottom:16px;">Remaining Days Budget</div>
+
+    <!-- Breakdown rows -->
+    <div style="background:var(--page);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px;" id="recalcBreakdown"></div>
+
+    <!-- New daily budget highlight -->
+    <div style="background:linear-gradient(120deg,#1a1463,#2a78d6);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">New Daily Budget</div>
+      <div style="font-size:36px;font-weight:900;color:#fff;" id="recalcNewBudget">₹ —</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.65);" id="recalcNewSub"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button onclick="document.getElementById('recalcModal').classList.add('hidden')" style="flex:1;height:44px;background:var(--page);color:var(--ink2);border:1.5px solid var(--base);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+      <button onclick="applyRecalc()" style="flex:1;height:44px;background:linear-gradient(90deg,#1a1463,#2a78d6);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">✓ Apply New Budget</button>
+    </div>
+  </div>
+</div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal-bg hidden" id="deleteModal">
   <div class="modal-box" style="max-width:360px;text-align:center;">
@@ -698,13 +722,14 @@ tr:hover td { background:var(--page); }
         <input type="text" id="monthDisp" readonly/>
       </div>
       <button class="btn-set" id="btnSetSalary" onclick="setSalary()">✓ Set Expense</button>
+      <button class="btn-set" id="btnRecalc" onclick="openRecalc()" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.4);display:none;">🔄 Recalculate</button>
     </div>
   </div>
 
   <!-- KPI -->
   <div class="kpi-row">
     <div class="kpi-tile" data-icon="💰"><div class="kpi-label">Monthly Expense</div><div class="kpi-value" id="kpiSalary">₹ —</div><div class="kpi-sub" id="kpiSalarySub">Not set</div></div>
-    <div class="kpi-tile" data-icon="📅"><div class="kpi-label">Daily Budget</div><div class="kpi-value" id="kpiBudget">₹ —</div><div class="kpi-sub">Per day</div></div>
+    <div class="kpi-tile" data-icon="📅"><div class="kpi-label">Daily Budget</div><div class="kpi-value" id="kpiBudget">₹ —</div><div class="kpi-sub" id="kpiBudgetSub">Per day</div><div id="kpiBudgetReset" style="display:none;margin-top:4px"><button onclick="resetRecalc()" style="font-size:10px;color:var(--danger);background:none;border:none;cursor:pointer;padding:0;font-weight:700;">✕ Reset to original</button></div></div>
     <div class="kpi-tile" data-icon="🛒"><div class="kpi-label">Total Spent</div><div class="kpi-value" id="kpiSpent">₹ 0</div><div class="kpi-sub" id="kpiSpentSub">0 days</div></div>
     <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile"><div class="kpi-label">Net Savings</div><div class="kpi-value" id="kpiSavings">₹ 0</div><div class="kpi-sub" id="kpiSavingsSub">Running</div></div>
     <div class="kpi-tile" data-icon="💳" id="kpiRemainingTile"><div class="kpi-label">Remaining Balance</div><div class="kpi-value" id="kpiRemaining">₹ —</div><div class="kpi-sub" id="kpiRemainingSub">Salary − Spent</div></div>
@@ -934,7 +959,19 @@ window.addEventListener('DOMContentLoaded', function(){
 function curMonth(){ return store.months[viewMK] || {}; }
 function curDays(){  return (store.months[viewMK]||{}).days || {}; }
 function curSalary(){ return (store.months[viewMK]||{}).salary || 0; }
-function curBudget(){ return (store.months[viewMK]||{}).dailyBdgt || 0; }
+function curBudget(){
+  const m = store.months[viewMK]||{};
+  // For current month: use adjusted budget if set AND viewing today
+  if(viewMK === CURRENT_MK() && m.adjustedDailyBdgt){
+    const todayDay = nowIST().getUTCDate();
+    const [,, d]   = TODAY().split('-').map(Number);
+    // Only apply adjusted budget from tomorrow onwards — past days keep original
+    // For display/net savings we use adjusted; for today's progress use adjusted
+    return m.adjustedDailyBdgt;
+  }
+  return m.dailyBdgt || 0;
+}
+function curOrigBudget(){ return (store.months[viewMK]||{}).dailyBdgt || 0; }
 function allEntries(mk){ return Object.values((store.months[mk||viewMK]||{}).days||{}).flat(); }
 
 // ── New Month Check ─────────────────────────────────────────────────
@@ -1057,7 +1094,72 @@ function setSalary(){
   render();
 }
 
-// ── Date ────────────────────────────────────────────────────────────
+// ── Recalculate Budget for Remaining Days ──────────────────────────
+function openRecalc(){
+  const mk       = CURRENT_MK();
+  const m        = store.months[mk];
+  if(!m||!m.salary) return;
+
+  const ist        = nowIST();
+  const todayDay   = ist.getUTCDate();
+  const DIM        = daysInMonth(mk);
+  const remaining  = DIM - todayDay;       // days left AFTER today
+  const totalSpent = allEntries(mk).reduce((s,e)=>s+e.amt,0);
+  const balance    = m.salary - totalSpent; // remaining money from salary
+  const newBudget  = remaining > 0 ? balance / remaining : 0;
+  const origBudget = m.salary / DIM;
+
+  // Build breakdown
+  const bd = document.getElementById('recalcBreakdown');
+  const row = (label, val, color) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;">
+       <span style="font-size:13px;color:var(--ink2);font-weight:600;">${label}</span>
+       <span style="font-size:14px;font-weight:800;color:${color||'var(--ink)'};">${val}</span>
+     </div>`;
+
+  bd.innerHTML =
+    row('Monthly Expense',      '₹ '+fmtK(m.salary)) +
+    row('Original Daily Budget','₹ '+fmt(origBudget),'var(--c1)') +
+    row('Total Spent (Day 1–'+todayDay+')', '₹ '+fmtK(totalSpent), totalSpent>m.salary?'var(--danger)':'var(--ink)') +
+    row('Remaining Balance',    '₹ '+fmtK(balance),  balance>=0?'var(--good)':'var(--danger)') +
+    `<div style="border-top:1px solid var(--grid);margin:4px 0;"></div>` +
+    row('Days Remaining (Day '+(todayDay+1)+'–'+DIM+')', remaining+' days','var(--muted)');
+
+  document.getElementById('recalcNewBudget').textContent = '₹ '+fmt(newBudget);
+  document.getElementById('recalcNewSub').textContent    =
+    remaining > 0
+      ? '₹'+fmtK(balance)+' ÷ '+remaining+' days'
+      : 'No days remaining';
+
+  // Store computed value for apply
+  document.getElementById('recalcModal')._newBudget = newBudget;
+  document.getElementById('recalcModal')._origBudget = origBudget;
+  document.getElementById('recalcModal').classList.remove('hidden');
+}
+
+function applyRecalc(){
+  const mk  = CURRENT_MK();
+  const m   = store.months[mk];
+  if(!m) return;
+  const nb  = document.getElementById('recalcModal')._newBudget;
+  const ob  = document.getElementById('recalcModal')._origBudget;
+  if(!nb || nb <= 0){ alert('No remaining days to recalculate.'); return; }
+  m.adjustedDailyBdgt = nb;
+  m.origDailyBdgt     = ob;
+  m.adjustedFromDay   = nowIST().getUTCDate() + 1; // applies from tomorrow
+  persist();
+  document.getElementById('recalcModal').classList.add('hidden');
+  render();
+}
+
+function resetRecalc(){
+  const mk = CURRENT_MK();
+  const m  = store.months[mk];
+  if(!m) return;
+  delete m.adjustedDailyBdgt;
+  persist();
+  render();
+}
 function onDateChange(){
   selDate = document.getElementById('dayPicker').value;
   updateDateLabel();
@@ -1175,8 +1277,11 @@ function render(){
 function applyHero(){
   const sal  = curSalary();
   const bdgt = curBudget();
+  const orig = curOrigBudget();
   const DIM  = daysInMonth(viewMK);
   const mk   = monthName(viewMK);
+  const isAdj = viewMK === CURRENT_MK() && store.months[viewMK]&&store.months[viewMK].adjustedDailyBdgt;
+
   document.getElementById('heroSalary').textContent      = sal ? '₹ '+fmtK(sal) : '₹ —';
   document.getElementById('heroSub').textContent         = mk+' · '+DIM+' days';
   document.getElementById('heroDailyBudget').textContent = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
@@ -1184,6 +1289,17 @@ function applyHero(){
   document.getElementById('kpiSalary').textContent       = sal ? '₹ '+fmtK(sal) : '₹ —';
   document.getElementById('kpiSalarySub').textContent    = mk;
   document.getElementById('kpiBudget').textContent       = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
+  document.getElementById('kpiBudgetSub').textContent    = isAdj
+    ? '🔄 Adjusted · was ₹'+fmt(orig)
+    : 'Per day';
+
+  const resetBtn = document.getElementById('kpiBudgetReset');
+  if(resetBtn) resetBtn.style.display = isAdj ? '' : 'none';
+
+  // Show recalculate button only for current month with salary set
+  const isCurrent = viewMK === CURRENT_MK();
+  const recalcBtn = document.getElementById('btnRecalc');
+  if(recalcBtn) recalcBtn.style.display = (isCurrent && sal) ? '' : 'none';
 }
 
 // ── Net Savings Calculation ────────────────────────────────────────
@@ -1193,28 +1309,28 @@ function applyHero(){
 // Today → spent = whatever logged so far today
 // Future days → not counted at all
 function calcNetSavings(){
-  const bdgt = curBudget();
-  if(!bdgt) return 0;
-  const days   = curDays();
-  const mk     = viewMK;
-  const [y,m]  = mk.split('-').map(Number);
-  const todayStr = TODAY();
+  const m      = store.months[viewMK]||{};
+  const origB  = m.dailyBdgt || 0;
+  const adjB   = m.adjustedDailyBdgt || origB;
+  if(!origB) return 0;
 
-  // For past months — count all days in the month
-  // For current month — count day 1 up to today
-  let lastDay;
-  if(mk === CURRENT_MK()){
-    lastDay = parseInt(todayStr.split('-')[2]);
-  } else {
-    lastDay = daysInMonth(mk);
-  }
+  const days     = curDays();
+  const mk       = viewMK;
+  const [y,mm]   = mk.split('-').map(Number);
+  const todayStr = TODAY();
+  const todayDay = parseInt(todayStr.split('-')[2]);
+
+  const lastDay = mk === CURRENT_MK() ? todayDay : daysInMonth(mk);
 
   let net = 0;
   for(let d = 1; d <= lastDay; d++){
-    const dateStr = y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const entries = days[dateStr] || [];
     const spent   = entries.reduce((s,e)=>s+e.amt, 0);
-    net += bdgt - spent;   // positive = saved, negative = overspent
+    // Use adjusted budget from the day recalc was applied (store adjustedFromDay)
+    const adjFromDay = m.adjustedFromDay || 99999;
+    const budget  = (m.adjustedDailyBdgt && d >= adjFromDay) ? adjB : origB;
+    net += budget - spent;
   }
   return net;
 }
