@@ -961,12 +961,8 @@ function curDays(){  return (store.months[viewMK]||{}).days || {}; }
 function curSalary(){ return (store.months[viewMK]||{}).salary || 0; }
 function curBudget(){
   const m = store.months[viewMK]||{};
-  // For current month: use adjusted budget if set AND viewing today
+  // Return adjusted budget if set (for display, progress bar, day summary)
   if(viewMK === CURRENT_MK() && m.adjustedDailyBdgt){
-    const todayDay = nowIST().getUTCDate();
-    const [,, d]   = TODAY().split('-').map(Number);
-    // Only apply adjusted budget from tomorrow onwards — past days keep original
-    // For display/net savings we use adjusted; for today's progress use adjusted
     return m.adjustedDailyBdgt;
   }
   return m.dailyBdgt || 0;
@@ -1146,7 +1142,7 @@ function applyRecalc(){
   if(!nb || nb <= 0){ alert('No remaining days to recalculate.'); return; }
   m.adjustedDailyBdgt = nb;
   m.origDailyBdgt     = ob;
-  m.adjustedFromDay   = nowIST().getUTCDate() + 1; // applies from tomorrow
+  m.adjustedFromDay   = 1; // recalculate net savings from day 1 with new budget
   persist();
   document.getElementById('recalcModal').classList.add('hidden');
   render();
