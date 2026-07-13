@@ -789,17 +789,6 @@ tr:hover td { background:var(--page); }
     <div class="chart-area"><svg class="cs" id="barChart" style="height:240px"></svg></div>
   </div>
 
-  <!-- Net Savings Comparison Chart (shown only when adjusted budget applied) -->
-  <div class="card" style="margin-bottom:32px;display:none;" id="netSavingsChartCard">
-    <div class="card-title"><span>💹</span> Net Savings — Original vs New Budget</div>
-    <div class="leg">
-      <div class="leg-item"><div class="leg-dot" style="background:#e34948"></div>Original budget net</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#1baf7a"></div>New budget net</div>
-    </div>
-    <div class="chart-area"><svg class="cs" id="netSavingsChart" style="height:260px"></svg></div>
-    <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap;" id="netSavingsSummary"></div>
-  </div>
-
   <!-- Spending Log -->
   <div class="card" style="margin-bottom:32px">
     <div class="card-title"><span>📋</span> Spending Log</div>
@@ -1279,7 +1268,6 @@ function render(){
   renderDaySummary();
   renderChart();
   renderCatBreakdown();
-  renderNetSavingsChart();
   renderTable();
   renderPrevMonths();
 }
@@ -1605,133 +1593,6 @@ function renderTable(){
     <tbody>${rows}</tbody></table></div>`;
 }
 
-// ── Net Savings Comparison Chart ─────────────────────────────────
-function renderNetSavingsChart(){
-  const card = document.getElementById('netSavingsChartCard');
-  const m    = store.months[viewMK]||{};
-
-  // Only show for current month when adjusted budget is applied
-  if(viewMK !== CURRENT_MK() || !m.adjustedDailyBdgt){
-    card.style.display = 'none';
-    return;
-  }
-  card.style.display = '';
-
-  const svg      = document.getElementById('netSavingsChart');
-  const origB    = m.dailyBdgt || 0;
-  const adjB     = m.adjustedDailyBdgt;
-  const days     = curDays();
-  const [y,mm]   = viewMK.split('-').map(Number);
-  const todayDay = parseInt(TODAY().split('-')[2]);
-  const DIM      = daysInMonth(viewMK);
-
-  // Build per-day cumulative net savings for both scenarios
-  const origNets = [], adjNets = [];
-  let origCum = 0, adjCum = 0;
-  for(let d = 1; d <= todayDay; d++){
-    const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const spent   = (days[dateStr]||[]).reduce((s,e)=>s+e.amt,0);
-    origCum += origB - spent;
-    adjCum  += adjB  - spent;
-    origNets.push(origCum);
-    adjNets.push(adjCum);
-  }
-
-  const W   = svg.parentElement.clientWidth || 700;
-  const H   = 240;
-  const PAD = {t:24, r:20, b:40, l:64};
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  svg.style.height = H+'px';
-
-  const allVals  = [...origNets, ...adjNets, 0];
-  const maxV     = Math.max(...allVals) * 1.2 || 1;
-  const minV     = Math.min(...allVals) * 1.2 || -1;
-  const range    = maxV - minV || 1;
-  const n        = origNets.length;
-  const slot     = (W - PAD.l - PAD.r) / Math.max(n-1, 1);
-  const scY      = v => H - PAD.b - ((v - minV) / range) * (H - PAD.t - PAD.b);
-  const scX      = i => PAD.l + i * slot;
-
-  let html = '';
-
-  // Zero line
-  const zy = scY(0);
-  html += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${zy}" y2="${zy}" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
-  html += `<text x="${PAD.l-6}" y="${zy+4}" text-anchor="end" font-size="10" fill="#898781">₹0</text>`;
-
-  // Grid lines
-  [0.25,0.5,0.75,1].forEach(f=>{
-    const v = minV + range*f, y2 = scY(v);
-    html += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${y2}" y2="${y2}" stroke="#e1e0d9" stroke-width="1"/>`;
-    html += `<text x="${PAD.l-6}" y="${y2+4}" text-anchor="end" font-size="10" fill="#898781" font-variant-numeric="tabular-nums">₹${fmtK(v)}</text>`;
-  });
-
-  // Area fill for adjusted (green)
-  if(adjNets.length > 1){
-    let areaPath = `M${scX(0)},${scY(adjNets[0])}`;
-    adjNets.forEach((v,i)=>{ if(i>0) areaPath+=` L${scX(i)},${scY(v)}`; });
-    areaPath += ` L${scX(n-1)},${scY(0)} L${scX(0)},${scY(0)} Z`;
-    html += `<path d="${areaPath}" fill="rgba(27,175,122,0.12)"/>`;
-  }
-
-  // Area fill for original (red)
-  if(origNets.length > 1){
-    let areaPath = `M${scX(0)},${scY(origNets[0])}`;
-    origNets.forEach((v,i)=>{ if(i>0) areaPath+=` L${scX(i)},${scY(v)}`; });
-    areaPath += ` L${scX(n-1)},${scY(0)} L${scX(0)},${scY(0)} Z`;
-    html += `<path d="${areaPath}" fill="rgba(227,73,72,0.10)"/>`;
-  }
-
-  // Lines
-  const drawLine = (data, color) => {
-    if(data.length < 2) return '';
-    let d = `M${scX(0)},${scY(data[0])}`;
-    data.forEach((v,i)=>{ if(i>0) d+=` L${scX(i)},${scY(v)}`; });
-    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
-  };
-  html += drawLine(origNets, '#e34948');
-  html += drawLine(adjNets,  '#1baf7a');
-
-  // End dots
-  if(n > 0){
-    const ox = scX(n-1), oy = scY(origNets[n-1]);
-    const ax = scX(n-1), ay = scY(adjNets[n-1]);
-    html += `<circle cx="${ox}" cy="${oy}" r="5" fill="#e34948" stroke="#fcfcfb" stroke-width="2"/>`;
-    html += `<circle cx="${ax}" cy="${ay}" r="5" fill="#1baf7a" stroke="#fcfcfb" stroke-width="2"/>`;
-    // End labels
-    html += `<text x="${ox+8}" y="${oy+4}" font-size="11" font-weight="700" fill="#e34948">₹${fmtK(origNets[n-1])}</text>`;
-    html += `<text x="${ax+8}" y="${ay+4}" font-size="11" font-weight="700" fill="#1baf7a">₹${fmtK(adjNets[n-1])}</text>`;
-  }
-
-  // X-axis day labels
-  origNets.forEach((_,i)=>{
-    if(i % Math.max(1,Math.floor(n/10)) === 0 || i === n-1)
-      html += `<text x="${scX(i)}" y="${H-PAD.b+14}" text-anchor="middle" font-size="10" fill="#898781">${i+1}</text>`;
-  });
-
-  // Baseline
-  html += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${H-PAD.b}" y2="${H-PAD.b}" stroke="#c3c2b7" stroke-width="1.5"/>`;
-  html += `<text x="${PAD.l+(W-PAD.l-PAD.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#898781">Day of ${monthName(viewMK)}</text>`;
-
-  svg.innerHTML = html;
-
-  // Summary tiles
-  const origFinal = origNets[n-1]||0, adjFinal = adjNets[n-1]||0;
-  const diff = adjFinal - origFinal;
-  document.getElementById('netSavingsSummary').innerHTML = `
-    <div style="flex:1;min-width:120px;background:rgba(227,73,72,0.08);border:1px solid rgba(227,73,72,0.2);border-radius:10px;padding:12px 14px;text-align:center;">
-      <div style="font-size:10px;font-weight:700;color:#e34948;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Original Net</div>
-      <div style="font-size:20px;font-weight:900;color:#e34948;">${origFinal>=0?'+':''}₹${fmtK(origFinal)}</div>
-    </div>
-    <div style="flex:1;min-width:120px;background:rgba(27,175,122,0.08);border:1px solid rgba(27,175,122,0.2);border-radius:10px;padding:12px 14px;text-align:center;">
-      <div style="font-size:10px;font-weight:700;color:#1baf7a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">New Budget Net</div>
-      <div style="font-size:20px;font-weight:900;color:#1baf7a;">${adjFinal>=0?'+':''}₹${fmtK(adjFinal)}</div>
-    </div>
-    <div style="flex:1;min-width:120px;background:rgba(42,120,214,0.08);border:1px solid rgba(42,120,214,0.2);border-radius:10px;padding:12px 14px;text-align:center;">
-      <div style="font-size:10px;font-weight:700;color:#2a78d6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Improvement</div>
-      <div style="font-size:20px;font-weight:900;color:#2a78d6;">${diff>=0?'+':''}₹${fmtK(diff)}</div>
-    </div>`;
-}
 
 function renderPrevMonths(){
   const grid=document.getElementById('prevMonthsGrid');
