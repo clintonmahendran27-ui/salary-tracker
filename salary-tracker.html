@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Daily Salary Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .viz-root {
+    --surface-1:      #fcfcfb;
+    --surface-page:   #f2f1ee;
+    --surface-card:   #ffffff;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid-line:      #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-1-light: #cde2fb;
+    --status-good:    #0ca30c;
+    --status-critical:#d03b3b;
+    --status-warn:    #eda100;
+    --status-good-bg: #e8f7e8;
+    --status-bad-bg:  #fdeaea;
+    --accent:         #2a78d6;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--surface-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --surface-1:      #1a1a19;
+      --surface-page:   #0d0d0d;
+      --surface-card:   #1f1f1e;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid-line:      #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-1-light: #1c3a6e;
+      --status-good:    #0ca30c;
+      --status-critical:#e66767;
+      --status-warn:    #c98500;
+      --status-good-bg: #0d2e0d;
+      --status-bad-bg:  #2e0d0d;
+      --accent:         #3987e5;
+    }
+  }
+
+  body { background: var(--surface-page); }
+
+  .app-header {
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .month-badge {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--series-1);
+    background: var(--series-1-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .main-wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+
+  /* ── Salary Setup Card ── */
+  .setup-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+  .field input {
+    height: 40px;
+    padding: 0 12px;
+    border: 1.5px solid var(--baseline);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .field input[readonly] { background: var(--surface-page); color: var(--text-secondary); cursor: default; }
+
+  .btn-primary {
+    height: 40px;
+    padding: 0 20px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+
+  /* ── KPI Row ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .kpi-tile {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .kpi-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .kpi-value { font-size: 26px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
+  .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .kpi-tile.good .kpi-value { color: var(--status-good); }
+  .kpi-tile.bad  .kpi-value { color: var(--status-critical); }
+
+  /* ── Entry Card ── */
+  .entry-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .entry-card h2 { font-size: 14px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+
+  /* ── Chart ── */
+  .chart-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .chart-card h2 { font-size: 14px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .chart-legend { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-line { width: 20px; height: 2px; flex-shrink: 0; }
+
+  .chart-area { position: relative; width: 100%; height: 240px; margin-top: 8px; }
+  svg.chart-svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* ── Table ── */
+  .table-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .table-card h2 { font-size: 14px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1.5px solid var(--grid-line); }
+  td { padding: 10px 10px; border-bottom: 1px solid var(--grid-line); color: var(--text-primary); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface-page); }
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .tag.saved  { background: var(--status-good-bg); color: var(--status-good); }
+  .tag.over   { background: var(--status-bad-bg);  color: var(--status-critical); }
+  .btn-del { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 0 4px; }
+  .btn-del:hover { color: var(--status-critical); }
+
+  .empty-state { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
+
+  /* Tooltip */
+  .tooltip-box {
+    position: fixed; pointer-events: none;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 12px; font-weight: 600;
+    padding: 6px 10px; border-radius: 6px;
+    white-space: nowrap; z-index: 999;
+    opacity: 0; transition: opacity 0.1s;
+  }
+</style>
+</head>
+<body class="viz-root">
+
+<div class="app-header">
+  <h1>Daily Budget Tracker</h1>
+  <span class="month-badge" id="monthBadge"></span>
+</div>
+
+<div class="main-wrap">
+
+  <!-- Salary Setup -->
+  <div class="setup-card">
+    <div class="field">
+      <label>Monthly Salary (₹)</label>
+      <input type="number" id="salaryInput" placeholder="e.g. 30000" min="1"/>
+    </div>
+    <div class="field">
+      <label>Month</label>
+      <input type="text" id="monthDisplay" readonly/>
+    </div>
+    <div class="field">
+      <label>Days in Month</label>
+      <input type="text" id="daysDisplay" readonly/>
+    </div>
+    <div class="field">
+      <label>Daily Budget (₹)</label>
+      <input type="text" id="dailyBudgetDisplay" readonly/>
+    </div>
+    <button class="btn-primary" onclick="setSalary()">Set Salary</button>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-tile" id="kpi-salary">
+      <div class="kpi-label">Monthly Salary</div>
+      <div class="kpi-value" id="kv-salary">₹ —</div>
+      <div class="kpi-sub" id="ks-salary">Not set</div>
+    </div>
+    <div class="kpi-tile" id="kpi-budget">
+      <div class="kpi-label">Daily Budget</div>
+      <div class="kpi-value" id="kv-budget">₹ —</div>
+      <div class="kpi-sub" id="ks-budget">Per day</div>
+    </div>
+    <div class="kpi-tile" id="kpi-spent">
+      <div class="kpi-label">Total Spent</div>
+      <div class="kpi-value" id="kv-spent">₹ 0</div>
+      <div class="kpi-sub" id="ks-spent">0 days logged</div>
+    </div>
+    <div class="kpi-tile" id="kpi-saving">
+      <div class="kpi-label">Net Savings</div>
+      <div class="kpi-value" id="kv-saving">₹ 0</div>
+      <div class="kpi-sub" id="ks-saving">Running balance</div>
+    </div>
+  </div>
+
+  <!-- Add Entry -->
+  <div class="entry-card">
+    <h2>Log Today's Spending</h2>
+    <div class="setup-card" style="padding:0; background:none; border:none; margin:0;">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="entryDate"/>
+      </div>
+      <div class="field">
+        <label>Amount Spent (₹)</label>
+        <input type="number" id="entryAmount" placeholder="e.g. 250" min="0"/>
+      </div>
+      <div class="field">
+        <label>Note (optional)</label>
+        <input type="text" id="entryNote" placeholder="e.g. groceries"/>
+      </div>
+      <button class="btn-primary" onclick="addEntry()">Add Entry</button>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-card">
+    <h2>Daily Spending vs Budget</h2>
+    <div class="chart-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#2a78d6"></div> Spent</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#0ca30c"></div> Under budget (saving)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#d03b3b"></div> Over budget</div>
+      <div class="legend-item"><div class="legend-line" style="background:#eda100; border-top: 2px dashed #eda100; height:0"></div> Daily budget line</div>
+    </div>
+    <div class="chart-area">
+      <svg class="chart-svg" id="chartSvg"></svg>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <h2>Spending Log</h2>
+    <div id="tableContainer">
+      <div class="empty-state">No entries yet. Set your salary and log your first spending.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="tooltip-box" id="tooltip"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  let salary     = 0;
+  let dailyBudget = 0;
+  let entries    = [];   // { date, amount, note }
+
+  const now      = new Date();
+  const year     = now.getFullYear();
+  const month    = now.getMonth();  // 0-indexed
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthName   = now.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+
+  // ── Init ───────────────────────────────────────────────
+  document.getElementById('monthBadge').textContent  = monthName;
+  document.getElementById('monthDisplay').value      = monthName;
+  document.getElementById('daysDisplay').value       = daysInMonth;
+
+  // Default date to today
+  const todayStr = now.toISOString().split('T')[0];
+  document.getElementById('entryDate').value = todayStr;
+
+  // Load from localStorage
+  const saved = localStorage.getItem('dbt_data');
+  if (saved) {
+    const d = JSON.parse(saved);
+    if (d.salary)  { salary = d.salary; dailyBudget = d.dailyBudget; applySetup(); }
+    if (d.entries) { entries = d.entries; }
+    render();
+  }
+
+  function persist() {
+    localStorage.setItem('dbt_data', JSON.stringify({ salary, dailyBudget, entries }));
+  }
+
+  // ── Set Salary ─────────────────────────────────────────
+  function setSalary() {
+    const v = parseFloat(document.getElementById('salaryInput').value);
+    if (!v || v <= 0) { alert('Please enter a valid salary amount.'); return; }
+    salary      = v;
+    dailyBudget = salary / daysInMonth;
+    applySetup();
+    persist();
+    render();
+  }
+
+  function applySetup() {
+    document.getElementById('dailyBudgetDisplay').value = '₹ ' + fmt(dailyBudget);
+    document.getElementById('salaryInput').value        = salary;
+  }
+
+  // ── Add Entry ──────────────────────────────────────────
+  function addEntry() {
+    if (!salary) { alert('Please set your monthly salary first.'); return; }
+    const date   = document.getElementById('entryDate').value;
+    const amount = parseFloat(document.getElementById('entryAmount').value);
+    const note   = document.getElementById('entryNote').value.trim();
+    if (!date)          { alert('Please select a date.'); return; }
+    if (isNaN(amount) || amount < 0) { alert('Please enter a valid amount.'); return; }
+
+    entries.push({ date, amount, note });
+    entries.sort((a, b) => a.date.localeCompare(b.date));
+
+    document.getElementById('entryAmount').value = '';
+    document.getElementById('entryNote').value   = '';
+    persist();
+    render();
+  }
+
+  function deleteEntry(idx) {
+    entries.splice(idx, 1);
+    persist();
+    render();
+  }
+
+  // ── Render ─────────────────────────────────────────────
+  function render() {
+    renderKPI();
+    renderChart();
+    renderTable();
+  }
+
+  function renderKPI() {
+    const totalSpent  = entries.reduce((s, e) => s + e.amount, 0);
+    const totalBudget = dailyBudget * entries.length;
+    const netSaving   = totalBudget - totalSpent;
+
+    const kv = (id, val) => document.getElementById(id).textContent = val;
+    kv('kv-salary', salary ? '₹ ' + fmtK(salary) : '₹ —');
+    kv('ks-salary', salary ? monthName : 'Not set');
+    kv('kv-budget', dailyBudget ? '₹ ' + fmt(dailyBudget) : '₹ —');
+    kv('kv-spent',  '₹ ' + fmtK(totalSpent));
+    kv('ks-spent',  entries.length + ' day' + (entries.length !== 1 ? 's' : '') + ' logged');
+    kv('kv-saving', (netSaving >= 0 ? '+' : '') + '₹ ' + fmtK(Math.abs(netSaving)));
+    kv('ks-saving', netSaving >= 0 ? 'Saved so far' : 'Overspent so far');
+
+    const savTile = document.getElementById('kpi-saving');
+    savTile.classList.toggle('good', netSaving > 0);
+    savTile.classList.toggle('bad',  netSaving < 0);
+  }
+
+  function renderChart() {
+    const svg = document.getElementById('chartSvg');
+    if (!entries.length) { svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="var(--text-muted)" font-size="13">No entries yet</text>'; return; }
+
+    const PAD = { top: 20, right: 16, bottom: 36, left: 52 };
+    const W   = svg.parentElement.clientWidth  || 600;
+    const H   = 240;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+    const vals  = entries.map(e => e.amount);
+    const maxV  = Math.max(...vals, dailyBudget) * 1.15 || 1;
+    const n     = entries.length;
+    const barW  = Math.max(8, Math.min(40, (W - PAD.left - PAD.right) / n * 0.55));
+    const slot  = (W - PAD.left - PAD.right) / n;
+    const scaleY = v => H - PAD.bottom - (v / maxV) * (H - PAD.top - PAD.bottom);
+
+    let html = '';
+
+    // Grid lines
+    const ticks = 4;
+    for (let i = 0; i <= ticks; i++) {
+      const v  = (maxV / ticks) * i;
+      const cy = scaleY(v);
+      html += `<line x1="${PAD.left}" x2="${W - PAD.right}" y1="${cy}" y2="${cy}" stroke="var(--grid-line)" stroke-width="1"/>`;
+      html += `<text x="${PAD.left - 6}" y="${cy + 4}" text-anchor="end" font-size="10" fill="var(--text-muted)">₹${fmtK(v)}</text>`;
+    }
+
+    // Budget dashed line
+    const by = scaleY(dailyBudget);
+    html += `<line x1="${PAD.left}" x2="${W - PAD.right}" y1="${by}" y2="${by}" stroke="#eda100" stroke-width="1.5" stroke-dasharray="5,4"/>`;
+    html += `<text x="${W - PAD.right + 4}" y="${by + 4}" font-size="10" fill="#eda100" font-weight="700">Budget</text>`;
+
+    // Bars
+    entries.forEach((e, i) => {
+      const cx    = PAD.left + slot * i + slot / 2;
+      const x     = cx - barW / 2;
+      const barH  = Math.max(2, (H - PAD.bottom) - scaleY(e.amount));
+      const cy    = scaleY(e.amount);
+      const over  = e.amount > dailyBudget;
+      const color = over ? '#d03b3b' : '#2a78d6';
+
+      const dayLabel = e.date.slice(8);  // day number
+      html += `
+        <rect class="bar-rect" x="${x}" y="${cy}" width="${barW}" height="${barH}" rx="3"
+              fill="${color}" opacity="0.88"
+              data-date="${e.date}" data-amount="${e.amount}" data-budget="${fmt(dailyBudget)}"
+              data-diff="${fmt(Math.abs(dailyBudget - e.amount))}" data-over="${over}"
+              onmouseenter="showTip(event,this)" onmouseleave="hideTip()"/>
+        <text x="${cx}" y="${H - PAD.bottom + 14}" text-anchor="middle" font-size="10" fill="var(--text-muted)">${dayLabel}</text>`;
+
+      // Saving indicator dot
+      if (!over) {
+        html += `<circle cx="${cx}" cy="${cy - 6}" r="3" fill="#0ca30c"/>`;
+      }
+    });
+
+    // Baseline
+    html += `<line x1="${PAD.left}" x2="${W - PAD.right}" y1="${H - PAD.bottom}" y2="${H - PAD.bottom}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+    html += `<text x="${PAD.left + (W - PAD.left - PAD.right)/2}" y="${H - 4}" text-anchor="middle" font-size="11" fill="var(--text-muted)">Day of ${monthName}</text>`;
+
+    svg.innerHTML = html;
+  }
+
+  function renderTable() {
+    const container = document.getElementById('tableContainer');
+    if (!entries.length) {
+      container.innerHTML = '<div class="empty-state">No entries yet. Set your salary and log your first spending.</div>';
+      return;
+    }
+
+    let runSaving = 0;
+    let rows = '';
+    // Show newest first in table
+    const sorted = [...entries].map((e, origIdx) => ({ ...e, origIdx })).reverse();
+    sorted.forEach(e => {
+      const diff  = dailyBudget - e.amount;
+      runSaving  += diff;  // not used per-row (calc from all), just for display
+      const over  = diff < 0;
+      const absDiff = Math.abs(diff);
+      rows += `<tr>
+        <td>${formatDate(e.date)}</td>
+        <td>₹ ${fmt(e.amount)}</td>
+        <td>₹ ${fmt(dailyBudget)}</td>
+        <td><span class="tag ${over ? 'over' : 'saved'}">${over ? '▲ +₹' + fmt(absDiff) + ' over' : '▼ ₹' + fmt(absDiff) + ' saved'}</span></td>
+        <td style="color:var(--text-muted)">${e.note || '—'}</td>
+        <td><button class="btn-del" onclick="deleteEntry(${e.origIdx})" title="Delete">✕</button></td>
+      </tr>`;
+    });
+
+    // Running savings row
+    const totalSaving = entries.reduce((s, e) => s + (dailyBudget - e.amount), 0);
+    const pos = totalSaving >= 0;
+
+    container.innerHTML = `
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Spent</th><th>Budget</th><th>Difference</th><th>Note</th><th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr>
+          <td colspan="3" style="font-weight:700; color:var(--text-secondary); padding-top:12px">Net Savings</td>
+          <td style="padding-top:12px">
+            <span class="tag ${pos ? 'saved' : 'over'}" style="font-size:13px">
+              ${pos ? '✓ ₹' + fmt(totalSaving) + ' saved' : '✗ ₹' + fmt(Math.abs(totalSaving)) + ' over'}
+            </span>
+          </td>
+          <td colspan="2"></td>
+        </tr></tfoot>
+      </table>`;
+  }
+
+  // ── Tooltip ────────────────────────────────────────────
+  function showTip(e, el) {
+    const t   = document.getElementById('tooltip');
+    const over = el.dataset.over === 'true';
+    t.textContent = `${el.dataset.date} | Spent ₹${el.dataset.amount} | Budget ₹${el.dataset.budget} | ${over ? 'Over by' : 'Saved'} ₹${el.dataset.diff}`;
+    t.style.opacity = 1;
+    moveTip(e);
+    el.addEventListener('mousemove', moveTip);
+  }
+  function moveTip(e) {
+    const t = document.getElementById('tooltip');
+    t.style.left = (e.clientX + 12) + 'px';
+    t.style.top  = (e.clientY - 28) + 'px';
+  }
+  function hideTip() {
+    document.getElementById('tooltip').style.opacity = 0;
+  }
+
+  // ── Helpers ────────────────────────────────────────────
+  function fmt(n)  { return isNaN(n) ? '0' : Number(n.toFixed(2)).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
+  function fmtK(n) { return isNaN(n) ? '0' : Number(Math.round(n)).toLocaleString('en-IN'); }
+  function formatDate(str) {
+    const d = new Date(str + 'T00:00:00');
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  window.addEventListener('resize', renderChart);
+</script>
+</body>
+</html>
