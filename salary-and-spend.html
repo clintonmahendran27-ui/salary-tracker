@@ -1020,7 +1020,12 @@ window.addEventListener('DOMContentLoaded', function(){
 });
 function curMonth(){ return store.months[viewMK] || {}; }
 function curDays(){  return (store.months[viewMK]||{}).days || {}; }
-function curSalary(){ return (store.months[viewMK]||{}).salary || 0; }
+function curSalary(){
+  const m = store.months[viewMK]||{};
+  // After recalc, show the remaining balance as the effective monthly expense
+  if(viewMK === CURRENT_MK() && m.adjustedSalary !== undefined) return m.adjustedSalary;
+  return m.salary || 0;
+}
 function curBudget(){
   const m = store.months[viewMK]||{};
   // Return adjusted budget if set (for display, progress bar, day summary)
@@ -1131,7 +1136,7 @@ function switchMonth(mk, doRender=true){
   document.getElementById('monthDisp').value         = monthName(mk);
   document.getElementById('kpiDaysTotal').textContent= DIM;
   document.getElementById('heroDays').textContent    = DIM;
-  document.getElementById('salaryInput').value       = curSalary()||'';
+  document.getElementById('salaryInput').value       = (store.months[mk]||{}).origSalary || (store.months[mk]||{}).salary || '';
   document.getElementById('btnSetSalary').style.display = isCurrent ? '' : 'none';
   // Sync switcher
   document.getElementById('monthSwitcher').value = mk;
@@ -1192,6 +1197,7 @@ function openRecalc(){
   // Store computed value for apply
   document.getElementById('recalcModal')._newBudget = newBudget;
   document.getElementById('recalcModal')._origBudget = origBudget;
+  document.getElementById('recalcModal')._balance = balance;
   document.getElementById('recalcModal').classList.remove('hidden');
 }
 
@@ -1199,15 +1205,17 @@ function applyRecalc(){
   const mk  = CURRENT_MK();
   const m   = store.months[mk];
   if(!m) return;
-  const nb  = document.getElementById('recalcModal')._newBudget;
-  const ob  = document.getElementById('recalcModal')._origBudget;
+  const nb      = document.getElementById('recalcModal')._newBudget;
+  const ob      = document.getElementById('recalcModal')._origBudget;
+  const balance = document.getElementById('recalcModal')._balance;
   if(!nb || nb <= 0){ alert('No remaining days to recalculate.'); return; }
   m.adjustedDailyBdgt = nb;
   m.origDailyBdgt     = ob;
-  m.adjustedFromDay   = nowIST().getUTCDate(); // starts from today
+  m.origSalary        = m.salary;          // save original monthly expense
+  m.adjustedSalary    = balance;           // new "monthly expense" = remaining balance
+  m.adjustedFromDay   = nowIST().getUTCDate();
   persist();
   document.getElementById('recalcModal').classList.add('hidden');
-  // Disable recalculate button
   const btn = document.getElementById('btnRecalc');
   if(btn){ btn.disabled = true; btn.style.opacity = '0.45'; btn.style.cursor = 'not-allowed'; }
   render();
@@ -1217,11 +1225,14 @@ function resetRecalc(){
   const mk = CURRENT_MK();
   const m  = store.months[mk];
   if(!m) return;
+  // Restore original salary, remove all adjusted values
+  if(m.origSalary) m.salary = m.origSalary;
   delete m.adjustedDailyBdgt;
   delete m.origDailyBdgt;
+  delete m.adjustedSalary;
+  delete m.origSalary;
   delete m.adjustedFromDay;
   persist();
-  // Re-enable recalculate button
   const btn = document.getElementById('btnRecalc');
   if(btn){ btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
   render();
@@ -1341,19 +1352,23 @@ function render(){
 }
 
 function applyHero(){
-  const sal  = curSalary();
-  const bdgt = curBudget();
-  const orig = curOrigBudget();
-  const DIM  = daysInMonth(viewMK);
-  const mk   = monthName(viewMK);
-  const isAdj = viewMK === CURRENT_MK() && store.months[viewMK]&&store.months[viewMK].adjustedDailyBdgt;
+  const m     = store.months[viewMK]||{};
+  const sal   = curSalary();
+  const bdgt  = curBudget();
+  const orig  = curOrigBudget();
+  const DIM   = daysInMonth(viewMK);
+  const mk    = monthName(viewMK);
+  const isAdj = viewMK === CURRENT_MK() && m.adjustedDailyBdgt;
 
   document.getElementById('heroSalary').textContent      = sal ? '₹ '+fmtK(sal) : '₹ —';
-  document.getElementById('heroSub').textContent         = mk+' · '+DIM+' days';
+  document.getElementById('heroSub').textContent         = isAdj
+    ? mk+' · Remaining Balance'
+    : mk+' · '+DIM+' days';
   document.getElementById('heroDailyBudget').textContent = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
   document.getElementById('heroDays').textContent        = DIM;
+  // KPI monthly expense tile — show adjusted salary (remaining balance) or original
   document.getElementById('kpiSalary').textContent       = sal ? '₹ '+fmtK(sal) : '₹ —';
-  document.getElementById('kpiSalarySub').textContent    = mk;
+  document.getElementById('kpiSalarySub').textContent    = isAdj ? '🔄 Remaining Balance' : mk;
   document.getElementById('kpiBudget').textContent       = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
   document.getElementById('kpiBudgetSub').textContent    = isAdj
     ? '🔄 Adjusted · was ₹'+fmt(orig)
@@ -1363,22 +1378,22 @@ function applyHero(){
   if(resetBtn) resetBtn.style.display = isAdj ? '' : 'none';
 
   // Show recalculate button only for current month with salary set
-  // Disable if adjusted budget already applied
   const isCurrent = viewMK === CURRENT_MK();
+  const origSal   = m.origSalary || m.salary || 0;
   const recalcBtn = document.getElementById('btnRecalc');
   if(recalcBtn){
-    recalcBtn.style.display = (isCurrent && sal) ? '' : 'none';
-    const alreadyApplied = isCurrent && store.months[viewMK] && store.months[viewMK].adjustedDailyBdgt;
-    recalcBtn.disabled        = !!alreadyApplied;
-    recalcBtn.style.opacity   = alreadyApplied ? '0.45' : '1';
-    recalcBtn.style.cursor    = alreadyApplied ? 'not-allowed' : 'pointer';
+    recalcBtn.style.display = (isCurrent && origSal) ? '' : 'none';
+    recalcBtn.disabled        = !!isAdj;
+    recalcBtn.style.opacity   = isAdj ? '0.45' : '1';
+    recalcBtn.style.cursor    = isAdj ? 'not-allowed' : 'pointer';
   }
+  // Hero salary input — always show original salary for editing
+  document.getElementById('salaryInput').value = (m.origSalary || m.salary) || '';
 }
 
 // ── Net Savings Calculation ────────────────────────────────────────
-// Days 1 to (adjustedFromDay-1) : use original daily budget
-// Days adjustedFromDay to today  : use adjusted daily budget
-// Unlogged days = spent ₹0 → full budget counted as saving
+// If adjusted: count net savings ONLY from adjustedFromDay using adjustedDailyBdgt
+// If not adjusted: count from day 1 using original dailyBdgt
 function calcNetSavings(){
   const m      = store.months[viewMK]||{};
   const origB  = m.dailyBdgt || 0;
@@ -1392,26 +1407,45 @@ function calcNetSavings(){
   const lastDay    = viewMK === CURRENT_MK() ? todayDay : daysInMonth(viewMK);
 
   let net = 0;
-  for(let d = 1; d <= lastDay; d++){
+  // When adjusted: only calculate net savings from adjustedFromDay onwards
+  const startDay = adjB ? adjFromDay : 1;
+  for(let d = startDay; d <= lastDay; d++){
     const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const spent   = (days[dateStr]||[]).reduce((s,e)=>s+e.amt, 0);
-    // Use adjusted budget from the recalculate date onwards (including that day)
-    const budget  = (adjB && d >= adjFromDay) ? adjB : origB;
+    const budget  = adjB ? adjB : origB;
     net += budget - spent;
   }
   return net;
 }
 
 function renderKPI(){
+  const m          = store.months[viewMK]||{};
   const days       = curDays();
   const bdgt       = curBudget();
   const sal        = curSalary();
   const totalSpent = allEntries().reduce((s,e)=>s+e.amt, 0);
   const daysLogged = Object.keys(days).length;
+  const isAdj      = viewMK === CURRENT_MK() && m.adjustedDailyBdgt;
 
-  // Net savings = rolling daily balance from day 1 to today
-  const net       = calcNetSavings();
-  const remaining = sal - totalSpent;
+  // Net savings = rolling daily balance (from today if adjusted)
+  const net = calcNetSavings();
+
+  // Remaining balance:
+  // - After recalc: adjustedSalary minus spending from adjustedFromDay onwards
+  // - Normal: original salary minus all spending
+  let remaining;
+  if(isAdj && m.adjustedFromDay){
+    const [y,mm] = viewMK.split('-').map(Number);
+    const todayDay = parseInt(TODAY().split('-')[2]);
+    let spentFromAdj = 0;
+    for(let d = m.adjustedFromDay; d <= todayDay; d++){
+      const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      spentFromAdj += (days[dateStr]||[]).reduce((s,e)=>s+e.amt, 0);
+    }
+    remaining = m.adjustedSalary - spentFromAdj;
+  } else {
+    remaining = (m.salary||0) - totalSpent;
+  }
 
   document.getElementById('kpiSpent').textContent      = '₹ '+fmtK(totalSpent);
   document.getElementById('kpiSpentSub').textContent   = daysLogged+' day'+(daysLogged!==1?'s':'')+' logged';
@@ -1421,14 +1455,15 @@ function renderKPI(){
   document.getElementById('heroSavings').textContent   = (net>=0?'+':'')+'₹ '+fmtK(Math.abs(net));
   document.getElementById('heroSavings').style.color   = net>=0?'#6ee26e':'#ff8080';
 
-  // Remaining balance
+  // Remaining balance display
   if(sal){
     document.getElementById('kpiRemaining').textContent    = '₹ '+fmtK(remaining);
     document.getElementById('kpiRemainingSub').textContent = remaining>=0 ? 'Left from salary' : 'Exceeded salary!';
     document.getElementById('heroRemaining').textContent   = '₹ '+fmtK(remaining);
-    document.getElementById('heroRemaining').style.color   = remaining >= sal*0.3 ? '#6ee26e' : remaining >= sal*0.1 ? '#ffd580' : '#ff8080';
+    const refSal = m.origSalary || m.salary || 1;
+    document.getElementById('heroRemaining').style.color   = remaining >= refSal*0.3 ? '#6ee26e' : remaining >= refSal*0.1 ? '#ffd580' : '#ff8080';
     const rt = document.getElementById('kpiRemainingTile');
-    rt.classList.toggle('good',   remaining > sal*0.3);
+    rt.classList.toggle('good',   remaining > 0);
     rt.classList.toggle('danger', remaining < 0);
   } else {
     document.getElementById('kpiRemaining').textContent  = '₹ —';
