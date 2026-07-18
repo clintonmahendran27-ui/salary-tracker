@@ -1039,12 +1039,9 @@ tr:hover td { background:var(--page); }
         <div class="cat-chips" id="catChips"></div>
       </div>
       <div class="entry-input-row">
-        <input type="number" id="entryAmt"  placeholder="₹ Amount" min="0" step="0.01"/>
-        <input type="text"   id="entryNote" placeholder="Note (optional)"/>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="addBtns">
-        <!-- Swipe-to-Add button -->
-        <div class="swipe-btn-wrap" id="swipeBtnWrap" title="Swipe right to add">
+        <input type="number" id="entryAmt" placeholder="₹ Amount" min="0" step="0.01"/>
+        <!-- Swipe-to-Add replaces Note field -->
+        <div class="swipe-btn-wrap" id="swipeBtnWrap" title="Swipe right to add" style="flex:2;">
           <div class="swipe-track">
             <div class="swipe-thumb" id="swipeThumb">
               <span class="swipe-arrow">→</span>
@@ -1052,6 +1049,8 @@ tr:hover td { background:var(--page); }
             <span class="swipe-label" id="swipeLabel">Swipe to Add</span>
           </div>
         </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="addBtns">
         <button class="btn-reduce" onclick="addEntry(true)">－ Reduce</button>
       </div>
       <div class="entries-list" id="entriesList"></div>
@@ -1597,12 +1596,11 @@ function addEntry(reduce){
   if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
   if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
-  const note = document.getElementById('entryNote').value.trim();
+  const note = '';
   const amt  = reduce ? -Math.abs(raw) : Math.abs(raw);
   if(!store.months[CURRENT_MK()].days[selDate]) store.months[CURRENT_MK()].days[selDate]=[];
   store.months[CURRENT_MK()].days[selDate].push({id:Date.now(),cat:selCat,amt,note});
-  document.getElementById('entryAmt').value  = '';
-  document.getElementById('entryNote').value = '';
+  document.getElementById('entryAmt').value = '';
   persist();
   render();
   showCelebration(selCat, Math.abs(raw), reduce);
