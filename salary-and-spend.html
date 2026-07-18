@@ -905,11 +905,10 @@ tr:hover td { background:var(--page); }
         <div class="cat-chips" id="catChips"></div>
       </div>
       <div class="entry-input-row">
-        <input type="number" id="entryAmt"  placeholder="₹ Amount" min="0" step="0.01"/>
-        <input type="text"   id="entryNote" placeholder="Note (optional)"/>
+        <input type="number" id="entryAmt" placeholder="₹ Amount" min="0" step="0.01" style="flex:1;"/>
+        <button class="btn-add" onclick="addEntry(false)" style="flex:1;height:52px;font-size:16px;font-weight:900;border-radius:12px;">＋ Add</button>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="addBtns">
-        <button class="btn-add"    onclick="addEntry(false)">＋ Add</button>
         <button class="btn-reduce" onclick="addEntry(true)">－ Reduce</button>
       </div>
       <div class="entries-list" id="entriesList"></div>
@@ -1455,12 +1454,11 @@ function addEntry(reduce){
   if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
   if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
-  const note = document.getElementById('entryNote').value.trim();
+  const note = '';
   const amt  = reduce ? -Math.abs(raw) : Math.abs(raw);
   if(!store.months[CURRENT_MK()].days[selDate]) store.months[CURRENT_MK()].days[selDate]=[];
   store.months[CURRENT_MK()].days[selDate].push({id:Date.now(),cat:selCat,amt,note});
-  document.getElementById('entryAmt').value  = '';
-  document.getElementById('entryNote').value = '';
+  document.getElementById('entryAmt').value = '';
   persist();
   render();
   showCelebration(selCat, Math.abs(raw), reduce);
