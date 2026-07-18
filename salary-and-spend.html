@@ -341,7 +341,14 @@ svg.cs { overflow:visible; display:block; width:100%; }
 .cb-fill  { height:100%; border-radius:5px; width:0%; transition: width 0.9s cubic-bezier(0.34,1.56,0.64,1); }
 .cb-amt   { font-size:12px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; width:68px; text-align:right; }
 
-/* Table */
+/* Filter chips */
+.filter-chip {
+  height:30px; padding:0 12px; border-radius:20px; font-size:12px; font-weight:700;
+  border:2px solid var(--base); background:var(--surf); color:var(--ink2);
+  cursor:pointer; transition:all 0.15s; white-space:nowrap;
+}
+.filter-chip:hover { background:var(--c5l); border-color:var(--c5); }
+.filter-chip.active { background:linear-gradient(90deg,#003366,#66cdaa); color:#fff; border-color:transparent; }
 .tbl-wrap { overflow-x:auto; }
 table { width:100%; border-collapse:collapse; font-size:13px; }
 th { text-align:left; padding:8px 10px; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; border-bottom:1.5px solid var(--grid); }
@@ -886,6 +893,49 @@ tr:hover td { background:var(--page); }
   <div class="tab-panel" id="tab-history">
     <div class="card" style="margin-top:16px;margin-bottom:20px">
       <div class="card-title"><span>📋</span> Spending Log</div>
+
+      <!-- Filter Bar -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:flex-end;">
+        <!-- Quick filter chips -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex:1;">
+          <button class="filter-chip active" id="fchip-all"     onclick="setFilter('all')">All</button>
+          <button class="filter-chip"        id="fchip-today"   onclick="setFilter('today')">Today</button>
+          <button class="filter-chip"        id="fchip-week"    onclick="setFilter('week')">This Week</button>
+          <button class="filter-chip"        id="fchip-month"   onclick="setFilter('month')">This Month</button>
+          <button class="filter-chip"        id="fchip-custom"  onclick="setFilter('custom')">Custom</button>
+        </div>
+      </div>
+
+      <!-- Custom date range (hidden by default) -->
+      <div id="customRangeRow" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:130px;">
+          <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;white-space:nowrap;">From</label>
+          <input type="date" id="filterFrom" onchange="renderTable()"
+            style="flex:1;height:36px;padding:0 10px;border:2px solid var(--base);border-radius:8px;font-size:13px;background:var(--surf);color:var(--ink);outline:none;"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:130px;">
+          <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;white-space:nowrap;">To</label>
+          <input type="date" id="filterTo" onchange="renderTable()"
+            style="flex:1;height:36px;padding:0 10px;border:2px solid var(--base);border-radius:8px;font-size:13px;background:var(--surf);color:var(--ink);outline:none;"/>
+        </div>
+      </div>
+
+      <!-- Category filter -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+        <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;">Category:</span>
+        <button class="filter-chip active" id="fcat-all" onclick="setCatFilter('all')">All</button>
+        <button class="filter-chip" id="fcat-grocery"   onclick="setCatFilter('grocery')">🛒</button>
+        <button class="filter-chip" id="fcat-food"      onclick="setCatFilter('food')">🍱</button>
+        <button class="filter-chip" id="fcat-transport" onclick="setCatFilter('transport')">🚌</button>
+        <button class="filter-chip" id="fcat-medical"   onclick="setCatFilter('medical')">💊</button>
+        <button class="filter-chip" id="fcat-bills"     onclick="setCatFilter('bills')">⚡</button>
+        <button class="filter-chip" id="fcat-clothing"  onclick="setCatFilter('clothing')">👗</button>
+        <button class="filter-chip" id="fcat-others"    onclick="setCatFilter('others')">📦</button>
+      </div>
+
+      <!-- Results summary -->
+      <div id="filterSummary" style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px;"></div>
+
       <div id="tableWrap"><div class="empty"><div class="ei">📋</div>No entries yet</div></div>
     </div>
     <div class="card" id="prevMonthsSection" style="margin-bottom:20px">
@@ -1761,19 +1811,96 @@ function renderChart(){
   }
 }
 
+// ── History Filters ─────────────────────────────────────────────────
+let activeFilter    = 'all';
+let activeCatFilter = 'all';
+
+function setFilter(f){
+  activeFilter = f;
+  document.querySelectorAll('[id^="fchip-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('fchip-'+f).classList.add('active');
+  const customRow = document.getElementById('customRangeRow');
+  if(customRow) customRow.style.display = f === 'custom' ? 'flex' : 'none';
+  renderTable();
+}
+
+function setCatFilter(cat){
+  activeCatFilter = cat;
+  document.querySelectorAll('[id^="fcat-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('fcat-'+cat).classList.add('active');
+  renderTable();
+}
+
+function getFilteredDays(){
+  const allDays = Object.keys(curDays()).sort().reverse();
+  const today   = TODAY();
+  const [y,m,d] = today.split('-').map(Number);
+
+  // Date range from quick filter
+  let from = null, to = null;
+  if(activeFilter === 'today'){
+    from = to = today;
+  } else if(activeFilter === 'week'){
+    // Monday of current week
+    const dt = new Date(today+'T00:00:00');
+    const day = dt.getDay(); // 0=Sun
+    const diff = (day === 0 ? -6 : 1 - day);
+    const mon = new Date(dt); mon.setDate(dt.getDate() + diff);
+    from = mon.toISOString().split('T')[0];
+    to   = today;
+  } else if(activeFilter === 'month'){
+    from = `${String(y).padStart(4,'0')}-${String(m).padStart(2,'0')}-01`;
+    to   = today;
+  } else if(activeFilter === 'custom'){
+    from = document.getElementById('filterFrom')?.value || null;
+    to   = document.getElementById('filterTo')?.value   || null;
+  }
+
+  return allDays.filter(date => {
+    // Date range filter
+    if(from && date < from) return false;
+    if(to   && date > to)   return false;
+    // Category filter
+    if(activeCatFilter !== 'all'){
+      const entries = curDays()[date] || [];
+      if(!entries.some(e => e.cat === activeCatFilter)) return false;
+    }
+    return true;
+  });
+}
+
 function renderTable(){
-  const wrap=document.getElementById('tableWrap');
-  const allDays=Object.keys(curDays()).sort().reverse();
-  const bdgt=curBudget();
-  if(!allDays.length){ wrap.innerHTML='<div class="empty"><div class="ei">📋</div>No entries yet</div>'; return; }
-  const ro=viewMK!==CURRENT_MK();
-  let rows='';
-  allDays.forEach(date=>{
-    const arr=curDays()[date]||[];
-    const spent=arr.reduce((s,e)=>s+e.amt,0);
-    const diff=bdgt-spent,over=diff<0;
-    const cats=[...new Set(arr.map(e=>e.cat))].map(k=>catLabel(k)).join(', ');
-    rows+=`<tr>
+  const wrap = document.getElementById('tableWrap');
+  const bdgt = curBudget();
+  const filteredDays = getFilteredDays();
+  const allDays      = Object.keys(curDays()).sort().reverse();
+
+  // Summary line
+  const summary = document.getElementById('filterSummary');
+  if(summary){
+    if(activeFilter === 'all' && activeCatFilter === 'all'){
+      summary.textContent = `${allDays.length} day${allDays.length!==1?'s':''} logged`;
+    } else {
+      summary.textContent = `Showing ${filteredDays.length} of ${allDays.length} day${allDays.length!==1?'s':''}`;
+    }
+  }
+
+  if(!filteredDays.length){
+    wrap.innerHTML = allDays.length
+      ? '<div class="empty"><div class="ei">🔍</div>No entries match this filter</div>'
+      : '<div class="empty"><div class="ei">📋</div>No entries yet</div>';
+    return;
+  }
+
+  let rows = '';
+  filteredDays.forEach(date => {
+    const arr   = activeCatFilter === 'all'
+      ? (curDays()[date]||[])
+      : (curDays()[date]||[]).filter(e => e.cat === activeCatFilter);
+    const spent = arr.reduce((s,e)=>s+e.amt, 0);
+    const diff  = bdgt - spent, over = diff < 0;
+    const cats  = [...new Set(arr.map(e=>e.cat))].map(k=>catLabel(k)).join(', ');
+    rows += `<tr>
       <td style="font-weight:700">${formatDate(date)}</td>
       <td style="font-variant-numeric:tabular-nums">₹${fmt(spent)}</td>
       <td style="font-variant-numeric:tabular-nums">₹${fmt(bdgt)}</td>
@@ -1782,15 +1909,22 @@ function renderTable(){
       <td>${arr.length} item${arr.length!==1?'s':''}</td>
     </tr>`;
   });
-  const totalSpent=allEntries().filter(e=>e.amt>0).reduce((s,e)=>s+e.amt,0);
+
+  const filteredSpent = filteredDays.reduce((s,date)=>{
+    const arr = activeCatFilter === 'all'
+      ? (curDays()[date]||[])
+      : (curDays()[date]||[]).filter(e=>e.cat===activeCatFilter);
+    return s + arr.filter(e=>e.amt>0).reduce((a,e)=>a+e.amt,0);
+  }, 0);
   const net = calcNetSavings();
-  rows+=`<tr style="font-weight:800;background:var(--page)">
-    <td>Total (${allDays.length} days)</td>
-    <td style="font-variant-numeric:tabular-nums">₹${fmtK(totalSpent)}</td>
-    <td style="font-variant-numeric:tabular-nums">₹${fmtK(bdgt*allDays.length)}</td>
+  rows += `<tr style="font-weight:800;background:var(--page)">
+    <td>Total (${filteredDays.length} days)</td>
+    <td style="font-variant-numeric:tabular-nums">₹${fmtK(filteredSpent)}</td>
+    <td style="font-variant-numeric:tabular-nums">₹${fmtK(bdgt*filteredDays.length)}</td>
     <td><span class="tag ${net>=0?'good':'danger'}">${net>=0?'✓ ₹'+fmtK(net)+' saved':'✗ ₹'+fmtK(Math.abs(net))+' over'}</span></td>
     <td colspan="2"></td></tr>`;
-  wrap.innerHTML=`<div class="tbl-wrap"><table>
+
+  wrap.innerHTML = `<div class="tbl-wrap"><table>
     <thead><tr><th>Date</th><th>Spent</th><th>Budget</th><th>Difference</th><th>Categories</th><th>Items</th></tr></thead>
     <tbody>${rows}</tbody></table></div>`;
 }
