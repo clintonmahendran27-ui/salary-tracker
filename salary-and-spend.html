@@ -638,113 +638,156 @@ tr:hover td { background:var(--page); }
   </div>
 </div>
 
-<!-- Welcome Splash -->
+<!-- Welcome Onboarding -->
 <div id="welcomeSplash" style="display:none">
   <style>
     #welcomeSplash {
       position:fixed; inset:0; z-index:900;
       display:flex; align-items:center; justify-content:center;
-      background:rgba(13,14,17,0.80);
-      backdrop-filter:blur(9px);
-      -webkit-backdrop-filter:blur(9px);
-      animation: splashBgIn 0.5s ease both;
+      background:rgba(0,0,0,0.55);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      animation:splashBgIn 0.4s ease both;
     }
-    @keyframes splashBgIn {
-      from { opacity:0; } to { opacity:1; }
+    @keyframes splashBgIn { from{opacity:0} to{opacity:1} }
+    #welcomeSplash.closing { animation:splashBgOut 0.4s ease forwards; }
+    @keyframes splashBgOut { to{opacity:0} }
+
+    .ob-wrap {
+      width:88%; max-width:360px;
+      border-radius:28px; overflow:hidden;
+      box-shadow:0 24px 80px rgba(0,0,0,0.45);
+      animation:obIn 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-    #welcomeSplash.closing {
-      animation: splashBgOut 0.6s ease forwards;
+    @keyframes obIn {
+      from{transform:scale(0.7) translateY(40px);opacity:0}
+      to  {transform:scale(1)   translateY(0);   opacity:1}
     }
-    @keyframes splashBgOut {
-      to { opacity:0; }
+    .ob-wrap.closing {
+      animation:obOut 0.4s cubic-bezier(0.55,0,1,0.45) forwards;
     }
-    .splash-box {
-      position:relative;
-      background:#111111;
-      border:3px solid #F9C200;
-      border-radius:28px; padding:44px 40px 36px;
-      max-width:420px; width:90%; text-align:center; overflow:hidden;
-      box-shadow:0 24px 80px rgba(0,0,0,0.50);
-      animation: splashBoxIn 0.65s cubic-bezier(0.34,1.56,0.64,1) both;
+    @keyframes obOut { to{transform:scale(0.85) translateY(-24px);opacity:0} }
+
+    /* ── Slide 1 — Yellow ── */
+    .ob-slide1 {
+      background:#F9C200;
+      padding:36px 28px 32px;
+      text-align:center;
+      display:flex; flex-direction:column; align-items:center; gap:0;
     }
-    @keyframes splashBoxIn {
-      from { transform:scale(0.6) translateY(40px); opacity:0; }
-      to   { transform:scale(1)   translateY(0);    opacity:1; }
+    .ob-illus {
+      width:100%; max-width:220px;
+      margin:0 auto 28px;
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+      animation:obIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
     }
-    .splash-box.closing {
-      animation: splashBoxOut 0.5s cubic-bezier(0.55,0,1,0.45) forwards;
+    .ob-cube {
+      aspect-ratio:1; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:26px; font-weight:900;
+      box-shadow:3px 3px 0 rgba(0,0,0,0.18);
     }
-    @keyframes splashBoxOut {
-      to { transform:scale(0.8) translateY(-30px); opacity:0; }
+    .ob-s1-title {
+      font-size:26px; font-weight:900; color:#111111;
+      line-height:1.25; margin-bottom:28px;
+      animation:obText 0.5s ease 0.3s both;
     }
-    /* Animated gradient ring */
-    .splash-ring {
-      position:absolute; inset:-2px;
-      border-radius:28px;
-      background:conic-gradient(from 0deg,#F9C200,#FF8C42,#FF3527,#FF6B35,#F9C200);
-      opacity:0.6;
-      z-index:-1;
-      animation:ringRotate 3s linear infinite;
-      -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-      mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-      -webkit-mask-composite:xor; mask-composite:exclude;
-      padding:2px;
+    @keyframes obText {
+      from{transform:translateY(14px);opacity:0}
+      to  {transform:translateY(0);opacity:1}
     }
-    @keyframes ringRotate { to { transform:rotate(360deg); } }
-    .splash-emoji {
-      font-size:58px; line-height:1; display:block; margin-bottom:16px;
-      animation:splashEmoji 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+    .ob-arrow-btn {
+      width:52px; height:52px; border-radius:50%;
+      background:#111111; border:none; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px; color:#F9C200;
+      box-shadow:0 4px 16px rgba(0,0,0,0.25);
+      transition:transform 0.18s;
+      touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+      animation:obText 0.5s ease 0.45s both;
     }
-    @keyframes splashEmoji {
-      from { transform:scale(0) rotate(-20deg); opacity:0; }
-      to   { transform:scale(1) rotate(0deg);   opacity:1; }
+    .ob-arrow-btn:hover { transform:scale(1.08); }
+
+    /* ── Slide 2 — White ── */
+    .ob-slide2 {
+      background:#ffffff;
+      padding:32px 28px 36px;
+      display:none; flex-direction:column; align-items:flex-start; gap:0;
     }
-    .splash-title {
-      font-size:32px; font-weight:900; color:#F9C200;
-      letter-spacing:-0.5px; margin-bottom:10px;
-      animation:splashText 0.6s ease 0.4s both;
-      text-shadow: 0 0 24px rgba(249,194,0,0.60);
+    .ob-slide2.active { display:flex; }
+    .ob-s2-illus {
+      width:100%; text-align:center; margin-bottom:24px;
+      font-size:90px; line-height:1;
+      animation:obIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
     }
-    .splash-sub {
-      font-size:14px; color:rgba(255,255,255,0.80);
-      line-height:1.6; font-weight:500;
-      animation:splashText 0.6s ease 0.55s both;
+    .ob-s2-title {
+      font-size:28px; font-weight:900; color:#111111;
+      margin-bottom:12px; display:flex; align-items:center; gap:8px;
+      animation:obText 0.5s ease 0.2s both;
     }
-    @keyframes splashText {
-      from { transform:translateY(16px); opacity:0; }
-      to   { transform:translateY(0);    opacity:1; }
+    .ob-s2-title::before {
+      content:''; display:inline-block;
+      width:12px; height:12px; border-radius:50%; background:#FF3527; flex-shrink:0;
     }
-    /* Floating coins */
-    .splash-coin {
-      position:absolute; font-size:22px;
-      animation:coinFloat 2.5s ease-in-out infinite alternate;
-      opacity:0.7; pointer-events:none;
+    .ob-s2-desc {
+      font-size:14px; color:#666; line-height:1.7; margin-bottom:28px;
+      animation:obText 0.5s ease 0.3s both;
     }
-    @keyframes coinFloat {
-      from { transform:translateY(0) rotate(-10deg); }
-      to   { transform:translateY(-12px) rotate(10deg); }
+    .ob-start-btn {
+      width:100%; height:50px; border-radius:25px;
+      background:linear-gradient(90deg,#FF3527,#FF8C42);
+      border:none; cursor:pointer; color:#fff;
+      font-size:16px; font-weight:800; letter-spacing:0.3px;
+      box-shadow:0 6px 20px rgba(255,53,39,0.35);
+      transition:transform 0.18s, box-shadow 0.18s;
+      touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+      animation:obText 0.5s ease 0.4s both;
     }
-    .splash-bar {
-      height:3px; border-radius:3px;
-      background:linear-gradient(90deg,#FF3527,#FF8C42,#F9C200);
-      margin-top:22px;
-      animation:splashBarGrow 3s linear 0.6s both;
+    .ob-start-btn:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(255,53,39,0.40); }
+
+    /* Dots indicator */
+    .ob-dots {
+      display:flex; gap:6px; justify-content:center; margin-top:20px;
     }
-    @keyframes splashBarGrow {
-      from { width:0%; } to { width:100%; }
+    .ob-dot {
+      width:8px; height:8px; border-radius:4px;
+      background:rgba(0,0,0,0.20); transition:all 0.25s;
     }
+    .ob-dot.active { width:22px; background:#111111; }
   </style>
-  <div class="splash-box" id="splashBox">
-    <div class="splash-ring"></div>
-    <span class="splash-emoji">👋</span>
-    <div class="splash-title">Welcome!</div>
-    <div class="splash-sub">Welcome to your personal money tracker.<br>Keep an eye on your expenses, understand your spending habits, and make smarter financial decisions every day.</div>
-    <div class="splash-bar"></div>
-    <!-- Floating coins -->
-    <span class="splash-coin" style="top:12px;left:16px;animation-delay:0s">💰</span>
-    <span class="splash-coin" style="top:12px;right:16px;animation-delay:0.4s">₹</span>
-    <span class="splash-coin" style="bottom:16px;left:20px;animation-delay:0.8s">💸</span>
-    <span class="splash-coin" style="bottom:16px;right:20px;animation-delay:1.2s">🪙</span>
+
+  <div class="ob-wrap" id="obWrap">
+    <!-- Slide 1 -->
+    <div class="ob-slide1" id="obSlide1">
+      <div class="ob-illus">
+        <div class="ob-cube" style="background:#E63946;">💰</div>
+        <div class="ob-cube" style="background:#2A9D8F;">📈</div>
+        <div class="ob-cube" style="background:#E76F51;">₹</div>
+        <div class="ob-cube" style="background:#264653;">💳</div>
+        <div class="ob-cube" style="background:#F4A261;">🏦</div>
+        <div class="ob-cube" style="background:#E63946;">📊</div>
+        <div class="ob-cube" style="background:#2A9D8F;">💸</div>
+        <div class="ob-cube" style="background:#264653;">🪙</div>
+        <div class="ob-cube" style="background:#E76F51;">📅</div>
+      </div>
+      <div class="ob-s1-title">One App<br>That Manages<br>Your Money</div>
+      <button class="ob-arrow-btn" onclick="obNextSlide()">›</button>
+      <div class="ob-dots" style="margin-top:20px;">
+        <div class="ob-dot active" id="obDot1"></div>
+        <div class="ob-dot" id="obDot2"></div>
+      </div>
+    </div>
+    <!-- Slide 2 -->
+    <div class="ob-slide2" id="obSlide2">
+      <div class="ob-s2-illus">👋</div>
+      <div class="ob-s2-title">Welcome</div>
+      <div class="ob-s2-desc">Track your daily expenses, monitor your salary balance, and make smarter financial decisions — all in one place.</div>
+      <button class="ob-start-btn" onclick="obClose()">Get Started</button>
+      <div class="ob-dots" style="margin-top:20px;width:100%;">
+        <div class="ob-dot" id="obDot3"></div>
+        <div class="ob-dot active" id="obDot4"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1203,18 +1246,19 @@ function closeModal(){
 function showWelcomeSplash(){
   const splash = document.getElementById('welcomeSplash');
   splash.style.display = 'flex';
-  // Auto-close after 3 seconds with exit animation
-  setTimeout(function(){
-    splash.classList.add('closing');
-    document.getElementById('splashBox').classList.add('closing');
-    setTimeout(function(){ splash.style.display = 'none'; }, 600);
-  }, 3000);
-  // Also close on tap/click
-  splash.addEventListener('click', function(){
-    splash.classList.add('closing');
-    document.getElementById('splashBox').classList.add('closing');
-    setTimeout(function(){ splash.style.display = 'none'; }, 600);
-  }, { once: true });
+}
+
+function obNextSlide(){
+  document.getElementById('obSlide1').style.display = 'none';
+  document.getElementById('obSlide2').classList.add('active');
+}
+
+function obClose(){
+  const splash = document.getElementById('welcomeSplash');
+  const wrap   = document.getElementById('obWrap');
+  wrap.classList.add('closing');
+  splash.classList.add('closing');
+  setTimeout(function(){ splash.style.display = 'none'; }, 420);
 }
 
 function confirmNewMonth(){
