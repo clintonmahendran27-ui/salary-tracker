@@ -1211,7 +1211,7 @@ window.addEventListener('DOMContentLoaded', function(){
         // Only show new month modal if it just became the 1st of a new month
         const dayOfMonth = nowIST().getUTCDate();
         const hasSalary  = store.months[CURRENT_MK()] && store.months[CURRENT_MK()].salary;
-        if(dayOfMonth === 1 && !hasSalary) checkNewMonth();
+        if(dayOfMonth === 1 && !hasSalary && !localStorage.getItem('newMonthShown_'+CURRENT_MK())) checkNewMonth();
         populateMonthSwitcher();
         switchMonth(liveMK, true);
       }
@@ -1244,15 +1244,12 @@ function checkNewMonth(){
   const mk         = CURRENT_MK();
   const hasSalary  = store.months[mk] && store.months[mk].salary;
 
-  // ── Strict rule: New Month modal ONLY fires when ALL 3 conditions are true:
-  //    1. It is the 1st day of the month (IST)
-  //    2. No salary has been set for this month yet
-  //    3. It hasn't been shown already this session
-  const sessionKey = 'newMonthShown_' + mk;
-  const alreadyShownThisSession = sessionStorage.getItem(sessionKey);
+  // ── New Month modal fires ONLY on the 1st day, once per month, no salary set yet
+  const shownKey = 'newMonthShown_' + mk;
+  const alreadyShown = localStorage.getItem(shownKey);
 
-  if(dayOfMonth === 1 && !hasSalary && !alreadyShownThisSession){
-    sessionStorage.setItem(sessionKey, '1');
+  if(dayOfMonth === 1 && !hasSalary && !alreadyShown){
+    localStorage.setItem(shownKey, '1');
     const prevKeys = Object.keys(store.months).filter(k=>k<mk && store.months[k].salary).sort();
     const lastKey  = prevKeys[prevKeys.length-1];
     const modal    = document.getElementById('newMonthModal');
