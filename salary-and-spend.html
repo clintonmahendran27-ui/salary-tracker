@@ -513,6 +513,37 @@ tr:hover td { background:var(--page); }
 
 @media(max-width:600px){ .hero-value{font-size:30px;} .hero-divider{display:none;} }
 
+/* ── Bottom Tab Navigation ── */
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+.bottom-tab-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:300;
+  display:flex; align-items:stretch;
+  background:linear-gradient(135deg,#003366 0%,#005599 55%,#66cdaa 100%);
+  box-shadow:0 -2px 20px rgba(0,51,102,0.25);
+  padding-bottom:env(safe-area-inset-bottom);
+  height:64px;
+}
+.tab-btn {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; background:none; border:none; cursor:pointer;
+  color:rgba(255,255,255,0.55); transition:color 0.18s, background 0.18s;
+  padding:8px 4px; position:relative;
+}
+.tab-btn:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.08); }
+.tab-btn.active { color:#fff; }
+.tab-btn.active::after {
+  content:''; position:absolute; top:0; left:20%; right:20%;
+  height:3px; border-radius:0 0 4px 4px;
+  background:linear-gradient(90deg,#f37a48,#66cdaa);
+}
+.tab-icon  { font-size:20px; line-height:1; }
+.tab-label { font-size:10px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; }
+
+/* Push wrap content above tab bar */
+.wrap { padding-bottom:80px; }
+
 /* ── Digital watch font for all numbers ── */
 .hero-value, .hs-val, .kpi-value, .ds-val, .psv,
 #heroSavings, #heroRemaining, #heroDailyBudget,
@@ -762,50 +793,51 @@ tr:hover td { background:var(--page); }
     <button class="btn-back" onclick="switchMonth(CURRENT_MK())">← Back to Current Month</button>
   </div>
 
-  <!-- Hero -->
-  <div class="hero-banner">
-    <div class="hero-top">
-      <div class="hero-left">
-        <div class="hero-label">Monthly Expense</div>
-        <div class="hero-value" id="heroSalary">₹ —</div>
-        <div class="hero-sub"  id="heroSub">Set your salary to get started</div>
+  <!-- ── TAB: HOME ── -->
+  <div class="tab-panel active" id="tab-home">
+    <!-- Hero -->
+    <div class="hero-banner">
+      <div class="hero-top">
+        <div class="hero-left">
+          <div class="hero-label">Monthly Expense</div>
+          <div class="hero-value" id="heroSalary">₹ —</div>
+          <div class="hero-sub"  id="heroSub">Set your salary to get started</div>
+        </div>
+        <div class="hero-divider"></div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hs-lbl">Daily Budget</div><div class="hs-val" id="heroDailyBudget">₹ —</div></div>
+          <div class="hero-stat"><div class="hs-lbl">Days in Month</div><div class="hs-val" id="heroDays">—</div></div>
+          <div class="hero-stat"><div class="hs-lbl">Net Savings</div><div class="hs-val" id="heroSavings" style="color:#6ee26e">₹ 0</div></div>
+          <div class="hero-stat"><div class="hs-lbl">Remaining Balance</div><div class="hs-val" id="heroRemaining" style="color:#ffd580">₹ —</div></div>
+        </div>
       </div>
-      <div class="hero-divider"></div>
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="hs-lbl">Daily Budget</div><div class="hs-val" id="heroDailyBudget">₹ —</div></div>
-        <div class="hero-stat"><div class="hs-lbl">Days in Month</div><div class="hs-val" id="heroDays">—</div></div>
-        <div class="hero-stat"><div class="hs-lbl">Net Savings</div><div class="hs-val" id="heroSavings" style="color:#6ee26e">₹ 0</div></div>
-        <div class="hero-stat"><div class="hs-lbl">Remaining Balance</div><div class="hs-val" id="heroRemaining" style="color:#ffd580">₹ —</div></div>
+      <div class="salary-row" id="salaryRowWrap" style="margin-top:48px;">
+        <div class="field">
+          <label>Monthly Expense (₹)</label>
+          <input type="number" id="salaryInput" placeholder="e.g. 30000" min="1"/>
+        </div>
+        <div class="field">
+          <label>Month</label>
+          <input type="text" id="monthDisp" readonly/>
+        </div>
+        <button class="btn-set" id="btnSetSalary" onclick="setSalary()">✓ Set Expense</button>
+        <button class="btn-set" id="btnRecalc" onclick="openRecalc()" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.4);display:none;">🔄 Recalculate</button>
       </div>
     </div>
-    <div class="salary-row" id="salaryRowWrap" style="margin-top:48px;">
-      <div class="field">
-        <label>Monthly Expense (₹)</label>
-        <input type="number" id="salaryInput" placeholder="e.g. 30000" min="1"/>
-      </div>
-      <div class="field">
-        <label>Month</label>
-        <input type="text" id="monthDisp" readonly/>
-      </div>
-      <button class="btn-set" id="btnSetSalary" onclick="setSalary()">✓ Set Expense</button>
-      <button class="btn-set" id="btnRecalc" onclick="openRecalc()" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.4);display:none;">🔄 Recalculate</button>
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-tile" data-icon="💰"><div class="kpi-label">Monthly Expense</div><div class="kpi-value" id="kpiSalary">₹ —</div><div class="kpi-sub" id="kpiSalarySub">Not set</div></div>
+      <div class="kpi-tile" data-icon="📅"><div class="kpi-label">Daily Budget</div><div class="kpi-value" id="kpiBudget">₹ —</div><div class="kpi-sub" id="kpiBudgetSub">Per day</div><div id="kpiBudgetReset" style="display:none;margin-top:8px"><button onclick="resetRecalc()" style="font-size:12px;font-weight:800;color:#fff;background:var(--danger);border:none;border-radius:8px;cursor:pointer;padding:6px 12px;width:100%;letter-spacing:0.3px;box-shadow:0 2px 8px rgba(208,59,59,0.35);">↩ Reset to Original</button></div></div>
+      <div class="kpi-tile" data-icon="🛒"><div class="kpi-label">Total Spent</div><div class="kpi-value" id="kpiSpent">₹ 0</div><div class="kpi-sub" id="kpiSpentSub">0 days</div></div>
+      <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile"><div class="kpi-label">Net Savings</div><div class="kpi-value" id="kpiSavings">₹ 0</div><div class="kpi-sub" id="kpiSavingsSub">Running</div></div>
+      <div class="kpi-tile" data-icon="💳" id="kpiRemainingTile"><div class="kpi-label">Remaining Balance</div><div class="kpi-value" id="kpiRemaining">₹ —</div><div class="kpi-sub" id="kpiRemainingSub">Salary − Spent</div></div>
+      <div class="kpi-tile" data-icon="📆"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpiDays">0</div><div class="kpi-sub">of <span id="kpiDaysTotal">—</span></div></div>
     </div>
   </div>
 
-  <!-- KPI -->
-  <div class="kpi-row">
-    <div class="kpi-tile" data-icon="💰"><div class="kpi-label">Monthly Expense</div><div class="kpi-value" id="kpiSalary">₹ —</div><div class="kpi-sub" id="kpiSalarySub">Not set</div></div>
-    <div class="kpi-tile" data-icon="📅"><div class="kpi-label">Daily Budget</div><div class="kpi-value" id="kpiBudget">₹ —</div><div class="kpi-sub" id="kpiBudgetSub">Per day</div><div id="kpiBudgetReset" style="display:none;margin-top:8px"><button onclick="resetRecalc()" style="font-size:12px;font-weight:800;color:#fff;background:var(--danger);border:none;border-radius:8px;cursor:pointer;padding:6px 12px;width:100%;letter-spacing:0.3px;box-shadow:0 2px 8px rgba(208,59,59,0.35);">↩ Reset to Original</button></div></div>
-    <div class="kpi-tile" data-icon="🛒"><div class="kpi-label">Total Spent</div><div class="kpi-value" id="kpiSpent">₹ 0</div><div class="kpi-sub" id="kpiSpentSub">0 days</div></div>
-    <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile"><div class="kpi-label">Net Savings</div><div class="kpi-value" id="kpiSavings">₹ 0</div><div class="kpi-sub" id="kpiSavingsSub">Running</div></div>
-    <div class="kpi-tile" data-icon="💳" id="kpiRemainingTile"><div class="kpi-label">Remaining Balance</div><div class="kpi-value" id="kpiRemaining">₹ —</div><div class="kpi-sub" id="kpiRemainingSub">Salary − Spent</div></div>
-    <div class="kpi-tile" data-icon="📆"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpiDays">0</div><div class="kpi-sub">of <span id="kpiDaysTotal">—</span></div></div>
-  </div>
-
-  <!-- Main Grid -->
-  <div class="two-col">
-    <!-- Add Spending -->
-    <div class="card">
+  <!-- ── TAB: ADD ── -->
+  <div class="tab-panel" id="tab-add">
+    <div class="card" style="margin-top:16px">
       <div class="card-title"><span>➕</span> Add Spending</div>
       <div class="day-header">
         <div class="day-date" id="selectedDateLabel">Select a date to log</div>
@@ -834,40 +866,61 @@ tr:hover td { background:var(--page); }
         <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       </div>
     </div>
-    <!-- Category Breakdown -->
-    <div class="card">
+  </div>
+
+  <!-- ── TAB: CHARTS ── -->
+  <div class="tab-panel" id="tab-charts">
+    <div class="card" style="margin-top:16px;margin-bottom:20px">
       <div class="card-title"><span>🍕</span> Category Breakdown</div>
       <div id="catBreakdown"><div class="empty"><div class="ei">📊</div>No spending yet</div></div>
       <div style="display:flex;justify-content:center;margin-top:16px">
         <svg id="donutSvg" width="160" height="160" viewBox="0 0 160 160"></svg>
       </div>
     </div>
-  </div>
-
-  <!-- Chart -->
-  <div class="card" style="margin-bottom:32px">
-    <div class="card-title"><span>📈</span> Daily Spending vs Budget</div>
-    <div class="leg">
-      <div class="leg-item"><div class="leg-dot" style="background:var(--c1)"></div>Under budget</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--c4)"></div>Over budget</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--c3);opacity:0.7"></div>Budget line</div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title"><span>📈</span> Daily Spending vs Budget</div>
+      <div class="leg">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--c1)"></div>Under budget</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--c4)"></div>Over budget</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--c3);opacity:0.7"></div>Budget line</div>
+      </div>
+      <div class="chart-area"><svg class="cs" id="barChart" style="height:240px"></svg></div>
     </div>
-    <div class="chart-area"><svg class="cs" id="barChart" style="height:240px"></svg></div>
   </div>
 
-  <!-- Spending Log -->
-  <div class="card" style="margin-bottom:32px">
-    <div class="card-title"><span>📋</span> Spending Log</div>
-    <div id="tableWrap"><div class="empty"><div class="ei">📋</div>No entries yet</div></div>
-  </div>
-
-  <!-- Previous Months -->
-  <div class="card" id="prevMonthsSection">
-    <div class="card-title"><span>🗂</span> Previous Months</div>
-    <div id="prevMonthsGrid"><div class="empty"><div class="ei">📅</div>No previous months yet</div></div>
+  <!-- ── TAB: HISTORY ── -->
+  <div class="tab-panel" id="tab-history">
+    <div class="card" style="margin-top:16px;margin-bottom:20px">
+      <div class="card-title"><span>📋</span> Spending Log</div>
+      <div id="tableWrap"><div class="empty"><div class="ei">📋</div>No entries yet</div></div>
+    </div>
+    <div class="card" id="prevMonthsSection" style="margin-bottom:20px">
+      <div class="card-title"><span>🗂</span> Previous Months</div>
+      <div id="prevMonthsGrid"><div class="empty"><div class="ei">📅</div>No previous months yet</div></div>
+    </div>
   </div>
 
 </div>
+
+<!-- ── Bottom Tab Bar ── -->
+<nav class="bottom-tab-bar">
+  <button class="tab-btn active" onclick="switchTab('home')" id="tabbtn-home">
+    <span class="tab-icon">🏠</span>
+    <span class="tab-label">Home</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('add')" id="tabbtn-add">
+    <span class="tab-icon">➕</span>
+    <span class="tab-label">Add</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('charts')" id="tabbtn-charts">
+    <span class="tab-icon">📈</span>
+    <span class="tab-label">Charts</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('history')" id="tabbtn-history">
+    <span class="tab-icon">📋</span>
+    <span class="tab-label">History</span>
+  </button>
+</nav>
 <div class="tip" id="tip"></div>
 <div class="celeb-overlay hidden" id="celebOverlay">
   <div class="celeb-card" id="celebCard" onclick="closeCelebration()" style="cursor:pointer;" title="Tap to dismiss">
@@ -1855,6 +1908,18 @@ function moveTip(e){ const t=document.getElementById('tip'); t.style.left=(e.cli
 function hideTip(){ document.getElementById('tip').style.opacity=0; }
 
 window.addEventListener('resize',renderChart);
+
+// ── Bottom Tab Switching ─────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('tabbtn-'+name).classList.add('active');
+  // Re-render chart when charts tab becomes visible (SVG needs visible container)
+  if(name === 'charts') { renderChart(); renderCatBreakdown(); }
+  // Scroll to top of content on tab switch
+  window.scrollTo({top:0, behavior:'smooth'});
+}
 
 // ── Scroll-triggered zoom via Intersection Observer ──────────────
 function initScrollZoom(){
