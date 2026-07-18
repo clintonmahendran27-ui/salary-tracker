@@ -624,7 +624,7 @@ tr:hover td { background:var(--page); }
     #welcomeSplash {
       position:fixed; inset:0; z-index:900;
       display:flex; align-items:center; justify-content:center;
-      background:rgba(20,10,60,0.55);
+      background:rgba(0,26,51,0.65);
       backdrop-filter:blur(9px);
       -webkit-backdrop-filter:blur(9px);
       animation: splashBgIn 0.5s ease both;
@@ -640,8 +640,8 @@ tr:hover td { background:var(--page); }
     }
     .splash-box {
       position:relative;
-      background:rgba(255,255,255,0.13);
-      border:1.5px solid rgba(255,255,255,0.3);
+      background:linear-gradient(145deg,rgba(0,51,102,0.80),rgba(102,205,170,0.35));
+      border:1.5px solid rgba(173,216,230,0.45);
       border-radius:28px;
       padding:44px 40px 36px;
       max-width:420px; width:90%;
@@ -649,7 +649,7 @@ tr:hover td { background:var(--page); }
       overflow:hidden;
       backdrop-filter:blur(42px);
       -webkit-backdrop-filter:blur(42px);
-      box-shadow:0 24px 80px rgba(30,10,100,0.45);
+      box-shadow:0 24px 80px rgba(0,51,102,0.50);
       animation: splashBoxIn 0.65s cubic-bezier(0.34,1.56,0.64,1) both;
     }
     @keyframes splashBoxIn {
@@ -685,12 +685,13 @@ tr:hover td { background:var(--page); }
       to   { transform:scale(1) rotate(0deg);   opacity:1; }
     }
     .splash-title {
-      font-size:28px; font-weight:900; color:#fff;
+      font-size:28px; font-weight:900; color:#add8e6;
       letter-spacing:-0.5px; margin-bottom:10px;
       animation:splashText 0.6s ease 0.4s both;
+      text-shadow: 0 0 18px rgba(102,205,170,0.6);
     }
     .splash-sub {
-      font-size:14px; color:rgba(255,255,255,0.78);
+      font-size:14px; color:rgba(250,218,221,0.88);
       line-height:1.6; font-weight:500;
       animation:splashText 0.6s ease 0.55s both;
     }
