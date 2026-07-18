@@ -146,7 +146,7 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:#F9C20
 body.dark-mode {
   --surf:#1a1a1a;    --page:#111111;    --card:#1e1e1e;
   --border:rgba(255,255,255,0.10); --ink:#f0f0f0; --ink2:#cccccc;
-  --muted:#888888;   --grid:#2a2a2a;    --base:#444444;
+  --muted:#aaaaaa;   --grid:#2a2a2a;    --base:#444444;
   --c1:#ff6b5b;  --c1l:#2a1a18;
   --c2:#ffaa55;  --c2l:#2a1e10;
   --c3:#ffd700;  --c3l:#2a2400;
@@ -156,7 +156,54 @@ body.dark-mode {
   --danger:#ff5555; --dangerbg:rgba(255,85,85,0.15);
   --warn:#ffaa55;   --warnbg:rgba(255,170,85,0.15);
   background:#1a1200 !important;
+  color:#f0f0f0 !important;
 }
+
+/* Force ALL text white in dark mode */
+body.dark-mode,
+body.dark-mode *:not(.hdr-btn):not(.btn-set):not(.btn-add):not(.btn-modal-primary) {
+  color: #f0f0f0;
+}
+
+/* Specific overrides for values/numbers */
+body.dark-mode .kpi-value,
+body.dark-mode .kpi-label,
+body.dark-mode .kpi-sub,
+body.dark-mode .hero-value,
+body.dark-mode .hero-label,
+body.dark-mode .hero-sub,
+body.dark-mode .hs-val,
+body.dark-mode .hs-lbl,
+body.dark-mode .ds-val,
+body.dark-mode .ds-lbl,
+body.dark-mode .card-title,
+body.dark-mode .day-date,
+body.dark-mode .entry-name,
+body.dark-mode .entry-amt,
+body.dark-mode .cb-label,
+body.dark-mode .cb-amt,
+body.dark-mode .pm-month-name,
+body.dark-mode .pm-salary,
+body.dark-mode .psv,
+body.dark-mode .psl,
+body.dark-mode td,
+body.dark-mode th,
+body.dark-mode label,
+body.dark-mode .modal-title,
+body.dark-mode .modal-sub,
+body.dark-mode .vb-text { color:#f0f0f0 !important; }
+
+/* Muted text slightly dimmer but still visible */
+body.dark-mode .muted,
+body.dark-mode [style*="color:var(--muted)"],
+body.dark-mode .kpi-sub,
+body.dark-mode .hero-sub,
+body.dark-mode .hs-lbl { color:#bbbbbb !important; }
+
+/* Good/danger/warn keep their colors */
+body.dark-mode .kpi-tile.good .kpi-value { color:#4ac87a !important; }
+body.dark-mode .kpi-tile.danger .kpi-value { color:#ff5555 !important; }
+
 body.dark-mode .app-header { background:#111111 !important; border-bottom:3px solid #ffd700; }
 body.dark-mode .hero-banner { background:linear-gradient(120deg,#1a1200 0%,#2a2000 50%,#1a1a00 100%) !important; }
 body.dark-mode .kpi-tile, body.dark-mode .card { background:rgba(30,30,20,0.85) !important; border-color:rgba(255,215,0,0.15) !important; }
@@ -167,6 +214,13 @@ body.dark-mode .salary-row input { background:rgba(255,255,255,0.1) !important; 
 body.dark-mode .modal-box { background:#1e1e10 !important; color:#f0f0f0 !important; }
 body.dark-mode .pm-card { background:#1e1e10 !important; border-color:rgba(255,215,0,0.15) !important; }
 body.dark-mode #money-canvas { opacity:0.2 !important; }
+body.dark-mode .progress-track { background:#333 !important; }
+body.dark-mode .cb-track { background:#333 !important; }
+body.dark-mode table { color:#f0f0f0 !important; }
+body.dark-mode tr:hover td { background:rgba(255,215,0,0.05) !important; }
+body.dark-mode .tag.good { background:rgba(74,200,122,0.2) !important; color:#4ac87a !important; }
+body.dark-mode .tag.danger { background:rgba(255,85,85,0.2) !important; color:#ff5555 !important; }
+body.dark-mode .viewing-banner { background:linear-gradient(90deg,#2a2000,#3a3000) !important; }
 
 /* ── Vintage paper grain overlay ── */
 body::before {
