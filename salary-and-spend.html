@@ -1266,11 +1266,11 @@ function checkNewMonth(){
     return;
   }
 
-  // Show welcome splash only when salary is already set (normal daily open)
-  if(hasSalary){
+  // ── Always show welcome splash on every app open (once per session) ──
+  if(!sessionStorage.getItem('welcomeShown')){
+    sessionStorage.setItem('welcomeShown', '1');
     showWelcomeSplash();
   }
-  // If no salary and not 1st → open silently, user sets from hero banner
 }
 
 function closeModal(){
