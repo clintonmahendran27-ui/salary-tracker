@@ -776,14 +776,6 @@ tr:hover td { background:var(--page); }
         <span>Smart Daily Budget Tracker</span>
       </div>
     </div>
-    <div class="hdr-right">
-      <select class="month-sel" id="monthSwitcher" onchange="switchMonth(this.value)" title="View a month" style="background:rgba(0,51,102,0.75);border-color:rgba(173,216,230,0.5);font-weight:800;"></select>
-      <button class="hdr-btn" onclick="exportData()" style="background:rgba(102,205,170,0.85);border-color:rgba(100,230,180,0.5);font-weight:800;">⬇ Export</button>
-      <label class="hdr-btn" style="display:flex;align-items:center;cursor:pointer;background:rgba(173,216,230,0.85);border-color:rgba(200,235,255,0.5);font-weight:800;color:#003366;">
-        ⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
-      </label>
-      <button class="hdr-btn" onclick="openResetAll()" style="background:rgba(243,122,72,0.90);border-color:rgba(255,160,120,0.5);color:#fff;font-weight:800;">🗑 Reset All</button>
-    </div>
   </div>
 </header>
 
@@ -902,6 +894,45 @@ tr:hover td { background:var(--page); }
     </div>
   </div>
 
+  <!-- ── TAB: SETTINGS ── -->
+  <div class="tab-panel" id="tab-settings">
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Month Switcher -->
+      <div class="card">
+        <div class="card-title"><span>📅</span> Select Month</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Switch between months to view past data.</div>
+        <select class="month-sel" id="monthSwitcher" onchange="switchMonth(this.value)"
+          style="width:100%;height:44px;font-size:14px;font-weight:700;border-radius:10px;border:2px solid var(--base);background:var(--surf);color:var(--ink);padding:0 14px;outline:none;">
+        </select>
+      </div>
+
+      <!-- Export -->
+      <div class="card">
+        <div class="card-title"><span>⬇</span> Export Data</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Download all your spending data as a JSON file for backup.</div>
+        <button onclick="exportData()" style="width:100%;height:46px;background:linear-gradient(90deg,#003366,#66cdaa);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">⬇ Export Data</button>
+      </div>
+
+      <!-- Import -->
+      <div class="card">
+        <div class="card-title"><span>⬆</span> Import Data</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Restore data from a previously exported JSON file.</div>
+        <label style="display:block;width:100%;height:46px;background:linear-gradient(90deg,#005599,#add8e6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+          ⬆ Import Data<input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
+        </label>
+      </div>
+
+      <!-- Reset All -->
+      <div class="card" style="border:1.5px solid rgba(217,79,42,0.3);background:rgba(253,232,226,0.7);">
+        <div class="card-title" style="color:var(--danger);"><span>⚠️</span> Danger Zone</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Permanently delete all months, expenses, and salary data. This cannot be undone.</div>
+        <button onclick="openResetAll()" style="width:100%;height:46px;background:var(--danger);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">🗑 Reset All Data</button>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <!-- ── Bottom Tab Bar ── -->
@@ -922,6 +953,11 @@ tr:hover td { background:var(--page); }
     <span class="tab-icon">📋</span>
     <span class="tab-label">History</span>
   </button>
+  <button class="tab-btn" onclick="switchTab('settings')" id="tabbtn-settings">
+    <span class="tab-icon">⚙️</span>
+    <span class="tab-label">Settings</span>
+  </button>
+</nav>
 </nav>
 <div class="tip" id="tip"></div>
 <div class="celeb-overlay hidden" id="celebOverlay">
