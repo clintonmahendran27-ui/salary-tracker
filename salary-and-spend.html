@@ -140,87 +140,8 @@ button, a, label, select, input[type=date], input[type=number], input[type=text]
   --warn:#FF8C42;   --warnbg:rgba(255,140,66,0.12);
   --radius:16px; --shadow:0 4px 24px rgba(0,0,0,0.12);
 }
-body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:#F9C200; color:var(--ink); min-height:100vh; position:relative; transition:background 0.3s, color 0.3s; }
-
-/* ── Dark Mode ── */
-body.dark-mode {
-  --surf:#1a1a1a;    --page:#111111;    --card:#1e1e1e;
-  --border:rgba(255,255,255,0.10); --ink:#f0f0f0; --ink2:#cccccc;
-  --muted:#aaaaaa;   --grid:#2a2a2a;    --base:#444444;
-  --c1:#ff6b5b;  --c1l:#2a1a18;
-  --c2:#ffaa55;  --c2l:#2a1e10;
-  --c3:#ffd700;  --c3l:#2a2400;
-  --c4:#ff4444;  --c4l:#2a1010;
-  --c5:#ff8c42;  --c5l:#2a1a08;
-  --good:#4ac87a;   --goodbg:rgba(74,200,122,0.15);
-  --danger:#ff5555; --dangerbg:rgba(255,85,85,0.15);
-  --warn:#ffaa55;   --warnbg:rgba(255,170,85,0.15);
-  background:#1a1200 !important;
-  color:#f0f0f0 !important;
-}
-
-/* Force ALL text white in dark mode */
-body.dark-mode,
-body.dark-mode *:not(.hdr-btn):not(.btn-set):not(.btn-add):not(.btn-modal-primary) {
-  color: #f0f0f0;
-}
-
-/* Specific overrides for values/numbers */
-body.dark-mode .kpi-value,
-body.dark-mode .kpi-label,
-body.dark-mode .kpi-sub,
-body.dark-mode .hero-value,
-body.dark-mode .hero-label,
-body.dark-mode .hero-sub,
-body.dark-mode .hs-val,
-body.dark-mode .hs-lbl,
-body.dark-mode .ds-val,
-body.dark-mode .ds-lbl,
-body.dark-mode .card-title,
-body.dark-mode .day-date,
-body.dark-mode .entry-name,
-body.dark-mode .entry-amt,
-body.dark-mode .cb-label,
-body.dark-mode .cb-amt,
-body.dark-mode .pm-month-name,
-body.dark-mode .pm-salary,
-body.dark-mode .psv,
-body.dark-mode .psl,
-body.dark-mode td,
-body.dark-mode th,
-body.dark-mode label,
-body.dark-mode .modal-title,
-body.dark-mode .modal-sub,
-body.dark-mode .vb-text { color:#f0f0f0 !important; }
-
-/* Muted text slightly dimmer but still visible */
-body.dark-mode .muted,
-body.dark-mode [style*="color:var(--muted)"],
-body.dark-mode .kpi-sub,
-body.dark-mode .hero-sub,
-body.dark-mode .hs-lbl { color:#bbbbbb !important; }
-
-/* Good/danger/warn keep their colors */
-body.dark-mode .kpi-tile.good .kpi-value { color:#4ac87a !important; }
-body.dark-mode .kpi-tile.danger .kpi-value { color:#ff5555 !important; }
-
-body.dark-mode .app-header { background:#111111 !important; border-bottom:3px solid #ffd700; }
-body.dark-mode .hero-banner { background:linear-gradient(120deg,#1a1200 0%,#2a2000 50%,#1a1a00 100%) !important; }
-body.dark-mode .kpi-tile, body.dark-mode .card { background:rgba(30,30,20,0.85) !important; border-color:rgba(255,215,0,0.15) !important; }
-body.dark-mode .entry-item { background:rgba(40,35,20,0.8) !important; border-color:rgba(255,215,0,0.1) !important; }
-body.dark-mode .day-summary { background:rgba(40,35,20,0.8) !important; }
-body.dark-mode input, body.dark-mode select { background:#2a2510 !important; color:#f0f0f0 !important; border-color:#444 !important; }
-body.dark-mode .salary-row input { background:rgba(255,255,255,0.1) !important; color:#fff !important; }
-body.dark-mode .modal-box { background:#1e1e10 !important; color:#f0f0f0 !important; }
-body.dark-mode .pm-card { background:#1e1e10 !important; border-color:rgba(255,215,0,0.15) !important; }
-body.dark-mode #money-canvas { opacity:0.2 !important; }
-body.dark-mode .progress-track { background:#333 !important; }
-body.dark-mode .cb-track { background:#333 !important; }
-body.dark-mode table { color:#f0f0f0 !important; }
-body.dark-mode tr:hover td { background:rgba(255,215,0,0.05) !important; }
-body.dark-mode .tag.good { background:rgba(74,200,122,0.2) !important; color:#4ac87a !important; }
-body.dark-mode .tag.danger { background:rgba(255,85,85,0.2) !important; color:#ff5555 !important; }
-body.dark-mode .viewing-banner { background:linear-gradient(90deg,#2a2000,#3a3000) !important; }
+body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:#F9C200; color:var(--ink); min-height:100vh; position:relative; }
+.wrap, .app-header { overflow-x:hidden; }
 
 /* ── Vintage paper grain overlay ── */
 body::before {
@@ -350,47 +271,6 @@ body::before {
 .btn-add    { height:38px; padding:0 16px; background:var(--c1); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
 .btn-add:hover { opacity:0.88; }
 .btn-reduce { height:38px; padding:0 14px; background:var(--dangerbg); color:var(--danger); border:1.5px solid var(--danger); border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
-
-/* ── Swipe-to-Add Button ── */
-.swipe-btn-wrap { flex:1; min-width:160px; user-select:none; }
-.swipe-track {
-  position:relative; height:46px; border-radius:23px;
-  background:linear-gradient(90deg,#FF3527,#FF8C42);
-  overflow:hidden; cursor:pointer;
-  box-shadow:0 4px 14px rgba(255,53,39,0.35);
-}
-.swipe-thumb {
-  position:absolute; left:4px; top:4px;
-  width:38px; height:38px; border-radius:50%;
-  background:#fff; display:flex; align-items:center; justify-content:center;
-  box-shadow:0 2px 8px rgba(0,0,0,0.2);
-  transition:left 0.08s linear;
-  z-index:2; cursor:grab;
-}
-.swipe-thumb:active { cursor:grabbing; }
-.swipe-arrow {
-  font-size:18px; font-weight:900; color:#FF3527;
-  animation:arrowPulse 1.2s ease-in-out infinite;
-  display:inline-block;
-}
-@keyframes arrowPulse {
-  0%,100% { transform:translateX(0); opacity:1; }
-  50%      { transform:translateX(4px); opacity:0.6; }
-}
-.swipe-label {
-  position:absolute; left:0; right:0; top:0; bottom:0;
-  display:flex; align-items:center; justify-content:center;
-  padding-left:44px;
-  font-size:13px; font-weight:800; color:rgba(255,255,255,0.9);
-  pointer-events:none; letter-spacing:0.3px;
-}
-.swipe-track.swiped {
-  background:linear-gradient(90deg,#2a8a50,#1baf7a) !important;
-  box-shadow:0 4px 14px rgba(27,175,122,0.4);
-}
-.swipe-track.swiped .swipe-thumb { background:#fff; }
-.swipe-track.swiped .swipe-arrow { color:#2a8a50; animation:none; }
-body.dark-mode .swipe-track { box-shadow:0 4px 14px rgba(255,53,39,0.2); }
 .entries-list { margin-top:8px; display:flex; flex-direction:column; gap:6px; }
 .entry-item { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.32); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.6); border-radius:8px; padding:8px 10px; font-size:13px; }
 .entry-cat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
@@ -482,14 +362,12 @@ tr:hover td { background:var(--page); }
 }
 .celeb-overlay.hidden { display:none !important; }
 .celeb-card {
-  background:linear-gradient(135deg,#111111 0%,#1a1a00 100%);
-  border:2px solid #F9C200;
-  border-radius:24px;
+  background:#fff; border-radius:24px;
   padding:28px 36px; text-align:center;
-  box-shadow:0 16px 60px rgba(249,194,0,0.3), 0 4px 24px rgba(0,0,0,0.5);
+  box-shadow:0 16px 60px rgba(0,0,0,0.22);
   pointer-events:auto;
   animation: celebPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
-  position:relative; min-width:240px;
+  position:relative; min-width:220px;
 }
 @keyframes celebPop {
   from { transform:scale(0.5) translateY(40px); opacity:0; }
@@ -499,7 +377,7 @@ tr:hover td { background:var(--page); }
 @keyframes celebFade {
   to { transform:scale(0.85) translateY(-20px); opacity:0; }
 }
-.celeb-bg { position:absolute; inset:0; border-radius:24px; opacity:0.06; z-index:0; }
+.celeb-bg { position:absolute; inset:0; border-radius:24px; opacity:0.08; z-index:0; }
 .celeb-inner { position:relative; z-index:1; }
 .celeb-emoji { font-size:64px; line-height:1; margin-bottom:8px;
   animation:celebBounce 0.6s ease infinite alternate; display:block; }
@@ -507,18 +385,9 @@ tr:hover td { background:var(--page); }
   from { transform:translateY(0) scale(1); }
   to   { transform:translateY(-8px) scale(1.08); }
 }
-.celeb-cat { font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px; color:#F9C200; }
-.celeb-amt { font-size:36px; font-weight:900; letter-spacing:-1px; margin-bottom:4px; color:#ffffff; }
-.celeb-msg { font-size:13px; color:rgba(255,255,255,0.65); font-weight:600; }
-
-/* Shiny gold divider under emoji */
-.celeb-inner::after {
-  content:'';
-  display:block;
-  width:48px; height:3px;
-  background:linear-gradient(90deg,#F9C200,#FF8C42);
-  border-radius:2px; margin:8px auto 10px;
-}
+.celeb-cat { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.celeb-amt { font-size:32px; font-weight:900; letter-spacing:-1px; margin-bottom:4px; }
+.celeb-msg { font-size:13px; color:#898781; font-weight:600; }
 .celeb-particles { position:absolute; inset:0; border-radius:24px; overflow:hidden; pointer-events:none; }
 .celeb-p { position:absolute; width:8px; height:8px; border-radius:50%;
   animation:pFly 1s ease-out forwards; }
@@ -964,15 +833,12 @@ tr:hover td { background:var(--page); }
 <header class="app-header">
   <div class="header-inner">
     <div class="app-logo">
-      <div class="logo-icon" style="background:#F9C200;color:#111111;font-weight:900;font-size:28px;width:46px;height:46px;border-radius:12px;">₹</div>
+      <div class="logo-icon" style="background:#F9C200;color:#111111;font-weight:900;font-size:22px;">₹</div>
       <div>
         <h1>PocketPilot</h1>
         <span>Smart Daily Budget Tracker</span>
       </div>
     </div>
-    <button id="darkModeBtn" onclick="toggleDarkMode()"
-      style="height:36px;padding:0 14px;background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;font-size:18px;cursor:pointer;transition:background 0.15s;"
-      title="Toggle Dark Mode">🌙</button>
   </div>
 </header>
 
@@ -1039,18 +905,11 @@ tr:hover td { background:var(--page); }
         <div class="cat-chips" id="catChips"></div>
       </div>
       <div class="entry-input-row">
-        <input type="number" id="entryAmt" placeholder="₹ Amount" min="0" step="0.01"/>
-        <!-- Swipe-to-Add replaces Note field -->
-        <div class="swipe-btn-wrap" id="swipeBtnWrap" title="Swipe right to add" style="flex:2;">
-          <div class="swipe-track">
-            <div class="swipe-thumb" id="swipeThumb">
-              <span class="swipe-arrow">→</span>
-            </div>
-            <span class="swipe-label" id="swipeLabel">Swipe to Add</span>
-          </div>
-        </div>
+        <input type="number" id="entryAmt"  placeholder="₹ Amount" min="0" step="0.01"/>
+        <input type="text"   id="entryNote" placeholder="Note (optional)"/>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="addBtns">
+        <button class="btn-add"    onclick="addEntry(false)">＋ Add</button>
         <button class="btn-reduce" onclick="addEntry(true)">－ Reduce</button>
       </div>
       <div class="entries-list" id="entriesList"></div>
@@ -1596,11 +1455,12 @@ function addEntry(reduce){
   if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
   if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
-  const note = '';
+  const note = document.getElementById('entryNote').value.trim();
   const amt  = reduce ? -Math.abs(raw) : Math.abs(raw);
   if(!store.months[CURRENT_MK()].days[selDate]) store.months[CURRENT_MK()].days[selDate]=[];
   store.months[CURRENT_MK()].days[selDate].push({id:Date.now(),cat:selCat,amt,note});
-  document.getElementById('entryAmt').value = '';
+  document.getElementById('entryAmt').value  = '';
+  document.getElementById('entryNote').value = '';
   persist();
   render();
   showCelebration(selCat, Math.abs(raw), reduce);
@@ -2224,10 +2084,10 @@ function showCelebration(cat, amt, reduce){
   document.getElementById('celebEmoji').textContent = cfg.emoji;
   document.getElementById('celebCat').textContent   = catLabel(cat).replace(/^\S+\s/,'');
   document.getElementById('celebAmt').textContent   = '₹ ' + fmtK(amt);
-  document.getElementById('celebAmt').style.color   = '#ffffff';
-  document.getElementById('celebCat').style.color   = '#F9C200';
+  document.getElementById('celebAmt').style.color   = cfg.gradient.split(',')[0];
+  document.getElementById('celebCat').style.color   = cfg.gradient.split(',')[0];
   document.getElementById('celebMsg').textContent   = cfg.msgs[Math.floor(cfg.msgs.length * (amt % 1 === 0 ? (amt/100)%1 : 0.5)) % cfg.msgs.length] || cfg.msgs[0];
-  document.getElementById('celebBg').style.background = 'linear-gradient(135deg,#F9C200,#FF8C42)';
+  document.getElementById('celebBg').style.background = `linear-gradient(135deg,${cfg.gradient})`;
 
   // Particles
   const pWrap = document.getElementById('celebParticles');
@@ -2273,25 +2133,6 @@ function showTip(e,el){
 function moveTip(e){ const t=document.getElementById('tip'); t.style.left=(e.clientX+14)+'px'; t.style.top=(e.clientY-34)+'px'; }
 function hideTip(){ document.getElementById('tip').style.opacity=0; }
 
-// ── Dark Mode ────────────────────────────────────────────────
-function toggleDarkMode(){
-  const isDark = document.body.classList.toggle('dark-mode');
-  const btn = document.getElementById('darkModeBtn');
-  if(btn) btn.textContent = isDark ? '☀️' : '🌙';
-  try{ localStorage.setItem('sns_darkmode', isDark ? '1' : '0'); }catch(e){}
-}
-
-// Restore dark mode preference on load
-window.addEventListener('DOMContentLoaded', function(){
-  try{
-    if(localStorage.getItem('sns_darkmode') === '1'){
-      document.body.classList.add('dark-mode');
-      const btn = document.getElementById('darkModeBtn');
-      if(btn) btn.textContent = '☀️';
-    }
-  }catch(e){}
-}, { once: false });
-
 window.addEventListener('resize',renderChart);
 
 // ── Bottom Tab Switching ─────────────────────────────────────────────
@@ -2327,121 +2168,6 @@ function initScrollZoom(){
   new MutationObserver(observeAll).observe(document.body, { childList:true, subtree:true });
 }
 initScrollZoom();
-
-// ── Swipe-to-Add Button Logic ────────────────────────────────
-function initSwipeButton(){
-  const wrap  = document.getElementById('swipeBtnWrap');
-  if(!wrap) return;
-
-  function setup(){
-    const track = wrap.querySelector('.swipe-track');
-    const thumb = wrap.querySelector('.swipe-thumb');
-    const label = wrap.querySelector('.swipe-label');
-    if(!track || !thumb) return;
-
-    let startX = 0, currentX = 0, isDragging = false;
-    let capturedAmt = 0;  // ← captured at touch start before blur
-    const maxSlide = () => track.clientWidth - thumb.offsetWidth - 8;
-    const threshold = () => maxSlide() * 0.72;
-
-    function onStart(e){
-      if(track.classList.contains('swiped')) return;
-      // Capture amount value NOW before input loses focus
-      const amtEl = document.getElementById('entryAmt');
-      capturedAmt = parseFloat(amtEl ? amtEl.value : '0');
-      isDragging = true;
-      startX = (e.touches ? e.touches[0].clientX : e.clientX);
-      thumb.style.transition = 'none';
-    }
-
-    function onMove(e){
-      if(!isDragging) return;
-      e.preventDefault();
-      const x = (e.touches ? e.touches[0].clientX : e.clientX);
-      currentX = Math.min(Math.max(0, x - startX), maxSlide());
-      thumb.style.left = (4 + currentX) + 'px';
-      const pct = currentX / maxSlide();
-      label.style.opacity = 1 - pct * 1.5;
-    }
-
-    function onEnd(){
-      if(!isDragging) return;
-      isDragging = false;
-      thumb.style.transition = 'left 0.25s cubic-bezier(0.34,1.56,0.64,1)';
-
-      if(currentX >= threshold()){
-        // Validate captured amount
-        if(isNaN(capturedAmt) || capturedAmt <= 0){
-          alert('Enter a valid amount.');
-          thumb.style.left = '4px';
-          label.style.opacity = 1;
-          currentX = 0;
-          return;
-        }
-
-        // Fully swiped — trigger add with captured amount
-        thumb.style.left = (4 + maxSlide()) + 'px';
-        track.classList.add('swiped');
-        label.textContent = '✓ Added!';
-        label.style.opacity = 1;
-        label.style.paddingLeft = '0';
-
-        // Inject captured value back into input then call addEntry
-        const amtEl = document.getElementById('entryAmt');
-        if(amtEl) amtEl.value = capturedAmt;
-        addEntry(false);
-
-        // Reset after 1.2s
-        setTimeout(()=>{
-          track.classList.remove('swiped');
-          thumb.style.left = '4px';
-          label.textContent = 'Swipe to Add';
-          label.style.paddingLeft = '44px';
-          label.style.opacity = 1;
-          currentX = 0;
-          capturedAmt = 0;
-        }, 1200);
-      } else {
-        // Snap back
-        thumb.style.left = '4px';
-        label.style.opacity = 1;
-        currentX = 0;
-      }
-    }
-
-    // Touch events (mobile)
-    thumb.addEventListener('touchstart',  onStart, { passive:true });
-    document.addEventListener('touchmove', onMove,  { passive:false });
-    document.addEventListener('touchend',  onEnd);
-
-    // Mouse events (desktop)
-    thumb.addEventListener('mousedown',  onStart);
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup',   onEnd);
-  }
-
-  setup();
-
-  new MutationObserver(()=>{
-    if(document.getElementById('swipeThumb')) setup();
-  }).observe(wrap, { childList:true, subtree:true });
-}
-
-window.addEventListener('DOMContentLoaded', initSwipeButton);
-    thumb.addEventListener('mousedown',  onStart);
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup',   onEnd);
-  }
-
-  setup();
-
-  // Re-init if DOM changes (tab switch etc.)
-  new MutationObserver(()=>{
-    if(document.getElementById('swipeThumb')) setup();
-  }).observe(wrap, { childList:true, subtree:true });
-}
-
-window.addEventListener('DOMContentLoaded', initSwipeButton);
 
 // ── Falling Money Notes Background Animation ──────────────────────
 (function(){
