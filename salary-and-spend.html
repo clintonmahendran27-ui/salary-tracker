@@ -200,7 +200,7 @@ body::before {
 .btn-back { height:32px; padding:0 14px; background:#F9C200; color:#111111; border:none; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; }
 
 /* Hero */
-.hero-banner { border-radius:var(--radius); background:linear-gradient(135deg,#FF3527 0%,#FF6B35 50%,#FF8C42 100%); border:none; padding:28px 28px 24px; margin-top:20px; margin-bottom:32px; position:relative; overflow:hidden; box-shadow:0 8px 32px rgba(255,53,39,0.35); }
+.hero-banner { border-radius:var(--radius); background:linear-gradient(135deg,#FF3527 0%,#FF6B35 50%,#FF8C42 100%); border:none; padding:24px 24px 20px; margin-top:8px; margin-bottom:24px; position:relative; overflow:hidden; box-shadow:0 8px 32px rgba(255,53,39,0.35); }
 .hero-banner::before { content:'💰'; position:absolute; right:-10px; top:-10px; font-size:120px; opacity:0.08; pointer-events:none; }
 .hero-banner::after  { content:'📊'; position:absolute; right:90px; bottom:-15px; font-size:90px; opacity:0.07; pointer-events:none; }
 .hero-top { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
@@ -869,7 +869,7 @@ tr:hover td { background:var(--page); }
           <div class="hero-stat"><div class="hs-lbl">Remaining Balance</div><div class="hs-val" id="heroRemaining" style="color:#ffd580">₹ —</div></div>
         </div>
       </div>
-      <div class="salary-row" id="salaryRowWrap" style="margin-top:48px;">
+      <div class="salary-row" id="salaryRowWrap" style="margin-top:16px;">
         <div class="field">
           <label>Monthly Expense (₹)</label>
           <input type="number" id="salaryInput" placeholder="e.g. 30000" min="1"/>
@@ -1299,7 +1299,7 @@ function obClose(){
 
 function confirmNewMonth(){
   const v = parseFloat(document.getElementById('modalSalaryInput').value);
-  if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
+  if(!v||v<=0){ showToast('Please enter a valid amount'); return; }
   const DIM = daysInMonth(CURRENT_MK());
   // Preserve existing days if already present — never wipe entries
   const existingDays = (store.months[CURRENT_MK()]||{}).days || {};
@@ -1345,16 +1345,19 @@ function switchMonth(mk, doRender=true){
 
 // ── Salary ──────────────────────────────────────────────────────────
 function setSalary(){
-  if(viewMK !== CURRENT_MK()){ alert('You can only change salary for the current month.'); return; }
+  if(viewMK !== CURRENT_MK()){
+    viewMK = CURRENT_MK();
+    switchMonth(CURRENT_MK(), false);
+  }
   const v = parseFloat(document.getElementById('salaryInput').value);
-  if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
+  if(!v||v<=0){ showToast('Please enter a valid amount'); return; }
   const DIM = daysInMonth(CURRENT_MK());
-  // Preserve existing days — never overwrite
   const existingDays = (store.months[CURRENT_MK()]||{}).days || {};
   store.months[CURRENT_MK()] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
   persist();
   populateMonthSwitcher();
   render();
+  showToast('Expense set ✓');
 }
 
 // ── Recalculate Budget for Remaining Days ──────────────────────────
@@ -1452,10 +1455,10 @@ function updateDateLabel(){
 
 // ── Add/Reduce Entry ────────────────────────────────────────────────
 function addEntry(reduce){
-  if(viewMK!==CURRENT_MK()){ alert('You can only add entries for the current month.'); return; }
-  if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
+  if(viewMK!==CURRENT_MK()){ showToast('Switch to current month to add entries'); return; }
+  if(!curSalary()){ showToast('Please set your Monthly Expense first'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
-  if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
+  if(isNaN(raw)||raw<=0){ showToast('Enter a valid amount'); return; }
   const note = document.getElementById('entryNote').value.trim();
   const amt  = reduce ? -Math.abs(raw) : Math.abs(raw);
   if(!store.months[CURRENT_MK()].days[selDate]) store.months[CURRENT_MK()].days[selDate]=[];
@@ -2140,6 +2143,25 @@ function moveTip(e){ const t=document.getElementById('tip'); t.style.left=(e.cli
 function hideTip(){ document.getElementById('tip').style.opacity=0; }
 
 window.addEventListener('resize',renderChart);
+
+// ── Toast notification (replaces alert() for PWA compatibility) ──────
+function showToast(msg, duration){
+  let t = document.getElementById('appToast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'appToast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#111;color:#F9C200;font-size:14px;font-weight:700;padding:10px 22px;border-radius:24px;z-index:99999;opacity:0;transition:all 0.25s;pointer-events:none;border:1.5px solid #F9C200;white-space:nowrap;max-width:90vw;text-align:center;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, duration || 2200);
+}
 
 // ── Bottom Tab Switching ─────────────────────────────────────────────
 function switchTab(name){
