@@ -30,7 +30,7 @@
     const c  = document.createElement('canvas');
     c.width  = size; c.height = size;
     const ctx = c.getContext('2d');
-    const r   = size * 0.22;            // corner radius
+    const r   = size * 0.22;
 
     // Rounded rect clip
     ctx.beginPath();
@@ -45,64 +45,45 @@
     ctx.closePath();
     ctx.clip();
 
-    // Background gradient purple → blue
-    const bg = ctx.createLinearGradient(0,0,size,size);
-    bg.addColorStop(0,   '#5b2fcf');
-    bg.addColorStop(0.5, '#3a5bd9');
-    bg.addColorStop(1,   '#1baf7a');
-    ctx.fillStyle = bg;
+    // ── Black background
+    ctx.fillStyle = '#111111';
     ctx.fillRect(0,0,size,size);
 
-    // Subtle shine at top
-    const shine = ctx.createLinearGradient(0,0,0,size*0.45);
-    shine.addColorStop(0,'rgba(255,255,255,0.18)');
-    shine.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle = shine;
-    ctx.fillRect(0,0,size,size);
+    // ── Yellow circle behind ₹
+    const cx = size * 0.50, cy = size * 0.50;
+    const circR = size * 0.34;
+    ctx.beginPath();
+    ctx.arc(cx, cy, circR, 0, Math.PI*2);
+    ctx.fillStyle = '#F9C200';
+    ctx.fill();
 
-    const u = size/512;   // unit scale
+    // ── Subtle inner ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, circR - size*0.025, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+    ctx.lineWidth = size * 0.018;
+    ctx.stroke();
 
-    // ── Wallet body ──
-    function rr(x,y,w,h,cr,fill,stroke,sw){
-      ctx.beginPath();
-      ctx.moveTo(x+cr,y); ctx.lineTo(x+w-cr,y);
-      ctx.quadraticCurveTo(x+w,y,x+w,y+cr);
-      ctx.lineTo(x+w,y+h-cr); ctx.quadraticCurveTo(x+w,y+h,x+w-cr,y+h);
-      ctx.lineTo(x+cr,y+h);   ctx.quadraticCurveTo(x,y+h,x,y+h-cr);
-      ctx.lineTo(x,y+cr);     ctx.quadraticCurveTo(x,y,x+cr,y);
-      ctx.closePath();
-      if(fill)  { ctx.fillStyle=fill; ctx.fill(); }
-      if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=sw||2; ctx.stroke(); }
-    }
-
-    // Wallet outer
-    rr(72*u,148*u,368*u,230*u,28*u,'rgba(255,255,255,0.13)','rgba(255,255,255,0.35)',5*u);
-    // Wallet top stripe
-    rr(72*u,148*u,368*u,72*u,28*u,'rgba(255,255,255,0.22)',null);
-    // Fix top-stripe bottom corners (overpaint)
-    ctx.fillStyle='rgba(255,255,255,0.22)';
-    ctx.fillRect(72*u, 190*u, 368*u, 30*u);
-
-    // Card slot (right side)
-    rr(326*u,238*u,100*u,96*u,18*u,'rgba(255,255,255,0.12)','rgba(255,255,255,0.45)',3*u);
-
-    // Two chip circles on card
-    ctx.beginPath(); ctx.arc(356*u,286*u,16*u,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
-    ctx.beginPath(); ctx.arc(383*u,286*u,16*u,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.28)'; ctx.fill();
-
-    // Content lines on wallet
-    rr(106*u,256*u,130*u,14*u,7*u,'rgba(255,255,255,0.65)',null);
-    rr(106*u,284*u,88*u,11*u,5*u,'rgba(255,255,255,0.38)',null);
-    rr(106*u,308*u,108*u,11*u,5*u,'rgba(255,255,255,0.38)',null);
-
-    // ── ₹ symbol centered bottom ──
-    ctx.font = `900 ${Math.round(78*u)}px system-ui,sans-serif`;
+    // ── ₹ symbol centered, black on yellow
+    const fontSize = Math.round(size * 0.38);
+    ctx.font = `900 ${fontSize}px system-ui,sans-serif`;
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle    = 'rgba(255,255,255,0.95)';
-    ctx.fillText('₹', size/2, size*0.835);
+    ctx.fillStyle    = '#111111';
+    ctx.fillText('₹', cx, cy + size*0.02);
+
+    // ── Four corner yellow dots for decoration
+    const dp = size * 0.10;
+    const dotR = size * 0.04;
+    [
+      [dp, dp], [size-dp, dp],
+      [dp, size-dp], [size-dp, size-dp]
+    ].forEach(([x,y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, dotR, 0, Math.PI*2);
+      ctx.fillStyle = '#F9C200';
+      ctx.fill();
+    });
 
     return c.toDataURL('image/png');
   }
@@ -764,7 +745,7 @@ tr:hover td { background:var(--page); }
 <header class="app-header">
   <div class="header-inner">
     <div class="app-logo">
-      <div class="logo-icon">💸</div>
+      <div class="logo-icon" style="background:#F9C200;color:#111111;font-weight:900;font-size:22px;">₹</div>
       <div>
         <h1>Salary &amp; Spend</h1>
         <span>Smart Daily Budget Tracker</span>
