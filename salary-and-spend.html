@@ -142,21 +142,21 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  /* ── Dust Storm / Seal Brown / Orange Pantone / Pale Copper / Linen palette ── */
-  --surf:rgba(250,240,230,0.70);   --page:rgba(245,232,220,0.55);   --card:rgba(250,240,230,0.65);
-  --border:rgba(218,138,103,0.28); --ink:#2a0d0d;                    --ink2:#6b2e1a;
-  --muted:#a0654a;                 --grid:#f0ddd0;                   --base:#da8a67;
-  --c1:#ff7900; --c1l:#fff0e0;
-  --c2:#da8a67; --c2l:#faeade;
-  --c3:#5c1a1a; --c3l:#f5e0d8;
-  --c4:#e05a00; --c4l:#ffe8d0;
-  --c5:#8b3a1a; --c5l:#fde8dc;
-  --good:#5c7a2a;  --goodbg:#eaf5d0;
-  --danger:#b83a1a; --dangerbg:#fde8e0;
-  --warn:#ff7900;   --warnbg:#fff0d8;
-  --radius:14px; --shadow:0 2px 16px rgba(92,26,26,0.12);
+  /* ── Midnight Blue / Light Blue / Pale Pink / Mandarin / Medium Aquamarine ── */
+  --surf:rgba(250,218,221,0.60);   --page:rgba(245,210,215,0.50);   --card:rgba(253,224,228,0.60);
+  --border:rgba(173,216,230,0.40); --ink:#001a33;                    --ink2:#003366;
+  --muted:#5a7a9a;                 --grid:#d8eef5;                   --base:#add8e6;
+  --c1:#f37a48; --c1l:#fdeee8;
+  --c2:#66cdaa; --c2l:#e0f7ef;
+  --c3:#003366; --c3l:#ddeeff;
+  --c4:#e05530; --c4l:#fde8e0;
+  --c5:#add8e6; --c5l:#edf7fb;
+  --good:#2a9d6a;  --goodbg:#d6f5e8;
+  --danger:#d94f2a; --dangerbg:#fde8e2;
+  --warn:#f37a48;   --warnbg:#fdeee8;
+  --radius:14px; --shadow:0 2px 16px rgba(0,51,102,0.12);
 }
-body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:#faf0e6; color:var(--ink); min-height:100vh; position:relative; overflow-x:hidden; }
+body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:#fadadd; color:var(--ink); min-height:100vh; position:relative; overflow-x:hidden; }
 
 /* ── Vintage paper grain overlay ── */
 body::before {
@@ -176,7 +176,7 @@ body::before {
 .modal-bg, .celeb-overlay { z-index:500; }
 
 /* Header */
-.app-header { background:linear-gradient(135deg,#5c1a1a 0%,#8b3a1a 55%,#da8a67 100%); padding:0 24px; position:sticky; top:0; z-index:200; box-shadow:0 2px 16px rgba(92,26,26,0.30); }
+.app-header { background:linear-gradient(135deg,#003366 0%,#005599 55%,#66cdaa 100%); padding:0 24px; position:sticky; top:0; z-index:200; box-shadow:0 2px 16px rgba(0,51,102,0.35); }
 .header-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; gap:12px; flex-wrap:wrap; }
 .app-logo { display:flex; align-items:center; gap:10px; }
 .app-logo .logo-icon { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:20px; }
@@ -201,21 +201,21 @@ body::before {
 .modal-field input:focus { border-color:var(--c1); }
 .modal-prev { background:var(--page); border-radius:10px; padding:12px 14px; margin-bottom:20px; font-size:13px; color:var(--ink2); }
 .modal-prev strong { color:var(--ink); }
-.btn-modal-primary { width:100%; height:46px; background:linear-gradient(90deg,#5c1a1a,#ff7900); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:800; cursor:pointer; transition:opacity 0.15s; }
+.btn-modal-primary { width:100%; height:46px; background:linear-gradient(90deg,#003366,#f37a48); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:800; cursor:pointer; transition:opacity 0.15s; }
 .btn-modal-primary:hover { opacity:0.9; }
 
 /* Layout */
 .wrap { max-width:1100px; margin:0 auto; padding:24px 16px 48px; }
 
 /* Viewing banner */
-.viewing-banner { background:linear-gradient(90deg,#5c1a1a,#da8a67); border-radius:var(--radius); padding:14px 20px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.viewing-banner { background:linear-gradient(90deg,#003366,#66cdaa); border-radius:var(--radius); padding:14px 20px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 .viewing-banner.hidden { display:none; }
 .vb-text { color:#fff; font-size:14px; font-weight:700; }
 .vb-text span { opacity:0.7; font-weight:500; }
-.btn-back { height:32px; padding:0 14px; background:#fff; color:#5c1a1a; border:none; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; }
+.btn-back { height:32px; padding:0 14px; background:#fff; color:#003366; border:none; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; }
 
 /* Hero */
-.hero-banner { border-radius:var(--radius); background:linear-gradient(120deg,#5c1a1a 0%,#8b3a1a 45%,#da8a67 100%); padding:24px 28px 20px; margin-top:48px; margin-bottom:32px; position:relative; overflow:hidden; box-shadow:var(--shadow); }
+.hero-banner { border-radius:var(--radius); background:linear-gradient(120deg,#003366 0%,#005599 45%,#66cdaa 100%); padding:24px 28px 20px; margin-top:48px; margin-bottom:32px; position:relative; overflow:hidden; box-shadow:var(--shadow); }
 .hero-banner::before { content:'💰'; position:absolute; right:-10px; top:-10px; font-size:120px; opacity:0.08; pointer-events:none; }
 .hero-banner::after  { content:'📊'; position:absolute; right:90px; bottom:-15px; font-size:90px; opacity:0.07; pointer-events:none; }
 .hero-top { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
@@ -234,12 +234,12 @@ body::before {
 .salary-row input::placeholder { color:rgba(255,255,255,0.4); }
 .salary-row input:focus { border-color:rgba(255,255,255,0.7); }
 .salary-row input[readonly] { opacity:0.7; cursor:default; }
-.btn-set { height:38px; padding:0 20px; background:#fff; color:#5c1a1a; border:none; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
+.btn-set { height:38px; padding:0 20px; background:#fff; color:#003366; border:none; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
 .btn-set:hover { opacity:0.9; }
 
 /* KPI */
 .kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:14px; margin-bottom:32px; }
-.kpi-tile { background:rgba(250,235,220,0.60); border:1px solid rgba(218,138,103,0.30); border-radius:var(--radius); padding:16px 18px; box-shadow:0 4px 20px rgba(92,26,26,0.08); position:relative; overflow:hidden; backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); }
+.kpi-tile { background:rgba(220,238,248,0.60); border:1px solid rgba(173,216,230,0.40); border-radius:var(--radius); padding:16px 18px; box-shadow:0 4px 20px rgba(0,51,102,0.08); position:relative; overflow:hidden; backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); }
 .kpi-tile::before { content:attr(data-icon); position:absolute; right:10px; top:8px; font-size:28px; opacity:0.12; pointer-events:none; }
 .kpi-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
 .kpi-value { font-size:21px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; }
@@ -252,7 +252,7 @@ body::before {
 @media(max-width:700px){ .two-col { grid-template-columns:1fr; } }
 
 /* Cards */
-.card { background:rgba(250,235,220,0.60); border:1px solid rgba(218,138,103,0.30); border-radius:var(--radius); padding:20px; box-shadow:0 4px 24px rgba(92,26,26,0.08); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); }
+.card { background:rgba(220,238,248,0.60); border:1px solid rgba(173,216,230,0.40); border-radius:var(--radius); padding:20px; box-shadow:0 4px 24px rgba(0,51,102,0.08); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); }
 .card-title { font-size:13px; font-weight:800; color:var(--ink2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
 .card-title span { font-size:16px; }
 
@@ -531,13 +531,13 @@ tr:hover td { background:var(--page); }
 
 /* Fallback glow effect for the digital look */
 .hero-value {
-  text-shadow: 0 0 14px rgba(255,121,0,0.55), 0 0 3px rgba(255,121,0,0.25);
+  text-shadow: 0 0 14px rgba(102,205,170,0.60), 0 0 3px rgba(173,216,230,0.30);
 }
 .kpi-value {
-  text-shadow: 0 0 8px rgba(218,138,103,0.4);
+  text-shadow: 0 0 8px rgba(0,51,102,0.25);
 }
-.kpi-tile.good .kpi-value  { text-shadow: 0 0 10px rgba(92,122,42,0.4); }
-.kpi-tile.danger .kpi-value{ text-shadow: 0 0 10px rgba(184,58,26,0.4); }
+.kpi-tile.good .kpi-value  { text-shadow: 0 0 10px rgba(42,157,106,0.4); }
+.kpi-tile.danger .kpi-value{ text-shadow: 0 0 10px rgba(217,79,42,0.4); }
 </style>
 </head>
 <body>
@@ -591,7 +591,7 @@ tr:hover td { background:var(--page); }
     <div style="background:var(--page);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px;" id="recalcBreakdown"></div>
 
     <!-- New daily budget highlight -->
-    <div style="background:linear-gradient(120deg,#5c1a1a,#ff7900);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;">
+    <div style="background:linear-gradient(120deg,#003366,#66cdaa);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;">
       <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">New Daily Budget</div>
       <div style="font-size:36px;font-weight:900;color:#fff;" id="recalcNewBudget">₹ —</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.65);" id="recalcNewSub"></div>
@@ -599,7 +599,7 @@ tr:hover td { background:var(--page); }
 
     <div style="display:flex;gap:10px;">
       <button onclick="document.getElementById('recalcModal').classList.add('hidden')" style="flex:1;height:44px;background:var(--page);color:var(--ink2);border:1.5px solid var(--base);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
-      <button onclick="applyRecalc()" style="flex:1;height:44px;background:linear-gradient(90deg,#5c1a1a,#ff7900);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">✓ Apply New Budget</button>
+      <button onclick="applyRecalc()" style="flex:1;height:44px;background:linear-gradient(90deg,#003366,#66cdaa);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">✓ Apply New Budget</button>
     </div>
   </div>
 </div>
@@ -666,7 +666,7 @@ tr:hover td { background:var(--page); }
     .splash-ring {
       position:absolute; inset:-2px;
       border-radius:28px;
-      background:conic-gradient(from 0deg,#ff7900,#da8a67,#e5c4b3,#5c1a1a,#8b3a1a,#ff7900);
+      background:conic-gradient(from 0deg,#003366,#add8e6,#fadadd,#f37a48,#66cdaa,#003366);
       opacity:0.6;
       z-index:-1;
       animation:ringRotate 3s linear infinite;
@@ -710,7 +710,7 @@ tr:hover td { background:var(--page); }
     }
     .splash-bar {
       height:3px; border-radius:3px;
-      background:linear-gradient(90deg,#5c1a1a,#ff7900,#da8a67);
+      background:linear-gradient(90deg,#003366,#66cdaa,#f37a48);
       margin-top:22px;
       animation:splashBarGrow 3s linear 0.6s both;
     }
@@ -743,12 +743,12 @@ tr:hover td { background:var(--page); }
       </div>
     </div>
     <div class="hdr-right">
-      <select class="month-sel" id="monthSwitcher" onchange="switchMonth(this.value)" title="View a month" style="background:rgba(92,26,26,0.75);border-color:rgba(218,138,103,0.5);font-weight:800;"></select>
-      <button class="hdr-btn" onclick="exportData()" style="background:rgba(255,121,0,0.85);border-color:rgba(255,180,80,0.5);font-weight:800;">⬇ Export</button>
-      <label class="hdr-btn" style="display:flex;align-items:center;cursor:pointer;background:rgba(218,138,103,0.85);border-color:rgba(255,200,150,0.5);font-weight:800;">
+      <select class="month-sel" id="monthSwitcher" onchange="switchMonth(this.value)" title="View a month" style="background:rgba(0,51,102,0.75);border-color:rgba(173,216,230,0.5);font-weight:800;"></select>
+      <button class="hdr-btn" onclick="exportData()" style="background:rgba(102,205,170,0.85);border-color:rgba(100,230,180,0.5);font-weight:800;">⬇ Export</button>
+      <label class="hdr-btn" style="display:flex;align-items:center;cursor:pointer;background:rgba(173,216,230,0.85);border-color:rgba(200,235,255,0.5);font-weight:800;color:#003366;">
         ⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
       </label>
-      <button class="hdr-btn" onclick="openResetAll()" style="background:rgba(139,26,26,0.85);border-color:rgba(255,100,80,0.5);color:#fff;font-weight:800;">🗑 Reset All</button>
+      <button class="hdr-btn" onclick="openResetAll()" style="background:rgba(243,122,72,0.90);border-color:rgba(255,160,120,0.5);color:#fff;font-weight:800;">🗑 Reset All</button>
     </div>
   </div>
 </header>
@@ -1935,14 +1935,14 @@ initScrollZoom();
     ctx.restore();
   }
 
-  // Note color schemes — Dust Storm / Seal Brown / Pale Copper tones
+  // Note color schemes — Midnight Blue / Light Blue / Pale Pink / Mandarin / Aquamarine
   const NOTE_COLORS = [
-    ['#5c1a1a','#3a0a0a'],
-    ['#8b3a1a','#5c1a0a'],
-    ['#da8a67','#b86040'],
-    ['#e5c4b3','#c89a80'],
-    ['#ff7900','#c85a00'],
-    ['#a05030','#783820'],
+    ['#003366','#001a33'],
+    ['#005599','#003366'],
+    ['#66cdaa','#3aaa80'],
+    ['#add8e6','#7ab8cc'],
+    ['#f37a48','#c05020'],
+    ['#fadadd','#e8b0b8'],
   ];
   const SYMBOLS = ['$','₹','£','€','$','₹','$'];
 
