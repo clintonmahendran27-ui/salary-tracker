@@ -708,33 +708,37 @@ tr:hover td { background:var(--page); }
     }
     .ob-arrow-btn:hover { transform:scale(1.08); }
 
-    /* ── Slide 2 — White ── */
+    /* ── Slide 2 — White illustrated ── */
     .ob-slide2 {
       background:#ffffff;
-      padding:32px 28px 36px;
-      display:none; flex-direction:column; align-items:flex-start; gap:0;
+      padding:0 0 32px 0;
+      display:none; flex-direction:column; align-items:stretch;
     }
     .ob-slide2.active { display:flex; }
-    .ob-s2-illus {
-      width:100%; text-align:center; margin-bottom:24px;
-      font-size:90px; line-height:1;
-      animation:obIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+    .ob-s2-img {
+      width:100%; background:#f0f4ff;
+      display:flex; align-items:flex-end; justify-content:center;
+      padding-top:32px; min-height:260px; overflow:hidden;
+    }
+    .ob-s2-body {
+      padding:24px 28px 0;
+      display:flex; flex-direction:column; gap:0;
     }
     .ob-s2-title {
       font-size:28px; font-weight:900; color:#111111;
-      margin-bottom:12px; display:flex; align-items:center; gap:8px;
+      margin-bottom:10px; display:flex; align-items:center; gap:10px;
       animation:obText 0.5s ease 0.2s both;
     }
     .ob-s2-title::before {
-      content:''; display:inline-block;
-      width:12px; height:12px; border-radius:50%; background:#FF3527; flex-shrink:0;
+      content:''; display:inline-block; flex-shrink:0;
+      width:13px; height:13px; border-radius:50%; background:#FF3527;
     }
     .ob-s2-desc {
-      font-size:14px; color:#666; line-height:1.7; margin-bottom:28px;
+      font-size:14px; color:#888; line-height:1.75; margin-bottom:28px;
       animation:obText 0.5s ease 0.3s both;
     }
     .ob-start-btn {
-      width:100%; height:50px; border-radius:25px;
+      width:100%; height:52px; border-radius:30px;
       background:linear-gradient(90deg,#FF3527,#FF8C42);
       border:none; cursor:pointer; color:#fff;
       font-size:16px; font-weight:800; letter-spacing:0.3px;
@@ -779,13 +783,47 @@ tr:hover td { background:var(--page); }
     </div>
     <!-- Slide 2 -->
     <div class="ob-slide2" id="obSlide2">
-      <div class="ob-s2-illus">👋</div>
-      <div class="ob-s2-title">Welcome</div>
-      <div class="ob-s2-desc">Track your daily expenses, monitor your salary balance, and make smarter financial decisions — all in one place.</div>
-      <button class="ob-start-btn" onclick="obClose()">Get Started</button>
-      <div class="ob-dots" style="margin-top:20px;width:100%;">
-        <div class="ob-dot" id="obDot3"></div>
-        <div class="ob-dot active" id="obDot4"></div>
+      <!-- Illustrated character area -->
+      <div class="ob-s2-img">
+        <svg width="180" height="230" viewBox="0 0 180 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Head -->
+          <ellipse cx="90" cy="42" rx="26" ry="28" fill="#E8956D"/>
+          <!-- Hair squiggle -->
+          <path d="M74 22 Q80 10 90 14 Q100 10 106 22" stroke="#333" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <!-- Eyes -->
+          <circle cx="82" cy="40" r="3.5" fill="#333"/>
+          <circle cx="98" cy="40" r="3.5" fill="#333"/>
+          <!-- Smile -->
+          <path d="M83 52 Q90 60 97 52" stroke="#333" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Neck -->
+          <rect x="83" y="68" width="14" height="12" rx="4" fill="#E8956D"/>
+          <!-- Body — teal sweater -->
+          <rect x="52" y="78" width="76" height="80" rx="16" fill="#3ABAC2"/>
+          <!-- Left arm raised (waving) -->
+          <path d="M52 88 Q28 70 20 50" stroke="#3ABAC2" stroke-width="22" stroke-linecap="round"/>
+          <!-- Hand waving -->
+          <ellipse cx="20" cy="46" rx="14" ry="16" fill="#E8956D"/>
+          <!-- Fingers -->
+          <line x1="10" y1="36" x2="8"  y2="26" stroke="#E8956D" stroke-width="5" stroke-linecap="round"/>
+          <line x1="17" y1="32" x2="16" y2="22" stroke="#E8956D" stroke-width="5" stroke-linecap="round"/>
+          <line x1="24" y1="31" x2="24" y2="21" stroke="#E8956D" stroke-width="5" stroke-linecap="round"/>
+          <line x1="30" y1="33" x2="32" y2="23" stroke="#E8956D" stroke-width="5" stroke-linecap="round"/>
+          <!-- Right arm down -->
+          <path d="M128 100 Q152 112 156 132" stroke="#3ABAC2" stroke-width="20" stroke-linecap="round"/>
+          <ellipse cx="157" cy="138" rx="12" ry="14" fill="#E8956D"/>
+          <!-- Trousers — yellow-green -->
+          <rect x="56" y="148" width="30" height="72" rx="10" fill="#8DC63F"/>
+          <rect x="94" y="148" width="30" height="72" rx="10" fill="#8DC63F"/>
+          <!-- Shoes -->
+          <ellipse cx="71" cy="222" rx="18" ry="8" fill="#2D2D2D"/>
+          <ellipse cx="109" cy="222" rx="18" ry="8" fill="#2D2D2D"/>
+        </svg>
+      </div>
+      <!-- Text body -->
+      <div class="ob-s2-body">
+        <div class="ob-s2-title">Welcome</div>
+        <div class="ob-s2-desc">Track your daily expenses, monitor your salary balance, and make smarter financial decisions — all in one place.</div>
+        <button class="ob-start-btn" onclick="obClose()">Get Started</button>
       </div>
     </div>
   </div>
