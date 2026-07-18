@@ -2340,11 +2340,15 @@ function initSwipeButton(){
     if(!track || !thumb) return;
 
     let startX = 0, currentX = 0, isDragging = false;
+    let capturedAmt = 0;  // ← captured at touch start before blur
     const maxSlide = () => track.clientWidth - thumb.offsetWidth - 8;
-    const threshold = () => maxSlide() * 0.72;  // 72% = trigger
+    const threshold = () => maxSlide() * 0.72;
 
     function onStart(e){
       if(track.classList.contains('swiped')) return;
+      // Capture amount value NOW before input loses focus
+      const amtEl = document.getElementById('entryAmt');
+      capturedAmt = parseFloat(amtEl ? amtEl.value : '0');
       isDragging = true;
       startX = (e.touches ? e.touches[0].clientX : e.clientX);
       thumb.style.transition = 'none';
@@ -2366,14 +2370,25 @@ function initSwipeButton(){
       thumb.style.transition = 'left 0.25s cubic-bezier(0.34,1.56,0.64,1)';
 
       if(currentX >= threshold()){
-        // Fully swiped — trigger add
+        // Validate captured amount
+        if(isNaN(capturedAmt) || capturedAmt <= 0){
+          alert('Enter a valid amount.');
+          thumb.style.left = '4px';
+          label.style.opacity = 1;
+          currentX = 0;
+          return;
+        }
+
+        // Fully swiped — trigger add with captured amount
         thumb.style.left = (4 + maxSlide()) + 'px';
         track.classList.add('swiped');
         label.textContent = '✓ Added!';
         label.style.opacity = 1;
         label.style.paddingLeft = '0';
 
-        // Trigger entry
+        // Inject captured value back into input then call addEntry
+        const amtEl = document.getElementById('entryAmt');
+        if(amtEl) amtEl.value = capturedAmt;
         addEntry(false);
 
         // Reset after 1.2s
@@ -2384,6 +2399,7 @@ function initSwipeButton(){
           label.style.paddingLeft = '44px';
           label.style.opacity = 1;
           currentX = 0;
+          capturedAmt = 0;
         }, 1200);
       } else {
         // Snap back
@@ -2399,6 +2415,19 @@ function initSwipeButton(){
     document.addEventListener('touchend',  onEnd);
 
     // Mouse events (desktop)
+    thumb.addEventListener('mousedown',  onStart);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onEnd);
+  }
+
+  setup();
+
+  new MutationObserver(()=>{
+    if(document.getElementById('swipeThumb')) setup();
+  }).observe(wrap, { childList:true, subtree:true });
+}
+
+window.addEventListener('DOMContentLoaded', initSwipeButton);
     thumb.addEventListener('mousedown',  onStart);
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup',   onEnd);
