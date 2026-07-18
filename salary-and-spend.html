@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Salary & Spend</title>
 
 <!-- PWA / Home Screen -->
@@ -121,6 +121,10 @@
 </script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+button, a, label, select, input[type=date], input[type=number], input[type=text], input[type=file] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 :root {
   /* ── Yellow/Red/Orange Bright Scheme ── */
   --surf:#ffffff;              --page:#fff8e0;             --card:#ffffff;
@@ -519,6 +523,9 @@ tr:hover td { background:var(--page); }
   gap:3px; background:none; border:none; cursor:pointer;
   color:rgba(255,255,255,0.40); transition:color 0.18s, background 0.18s;
   padding:8px 4px; position:relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 .tab-btn:hover { color:rgba(249,194,0,0.80); background:rgba(249,194,0,0.08); }
 .tab-btn.active { color:#F9C200; }
