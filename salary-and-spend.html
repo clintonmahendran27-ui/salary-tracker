@@ -156,7 +156,8 @@
   --warn:#f37a48;   --warnbg:#fdeee8;
   --radius:14px; --shadow:0 2px 16px rgba(0,51,102,0.12);
 }
-body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:#fadadd; color:var(--ink); min-height:100vh; position:relative; overflow-x:hidden; }
+body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:#fadadd; color:var(--ink); min-height:100vh; position:relative; }
+.wrap, .app-header { overflow-x:hidden; }
 
 /* ── Vintage paper grain overlay ── */
 body::before {
@@ -205,7 +206,7 @@ body::before {
 .btn-modal-primary:hover { opacity:0.9; }
 
 /* Layout */
-.wrap { max-width:1100px; margin:0 auto; padding:24px 16px 48px; }
+.wrap { max-width:1100px; margin:0 auto; padding:24px 16px 80px; }
 
 /* Viewing banner */
 .viewing-banner { background:linear-gradient(90deg,#003366,#66cdaa); border-radius:var(--radius); padding:14px 20px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
@@ -518,12 +519,14 @@ tr:hover td { background:var(--page); }
 .tab-panel.active { display:block; }
 
 .bottom-tab-bar {
-  position:fixed; bottom:0; left:0; right:0; z-index:300;
+  position:fixed; bottom:0; left:0; right:0; z-index:9999;
   display:flex; align-items:stretch;
   background:linear-gradient(135deg,#003366 0%,#005599 55%,#66cdaa 100%);
   box-shadow:0 -2px 20px rgba(0,51,102,0.25);
   padding-bottom:env(safe-area-inset-bottom);
   height:64px;
+  transform:translateZ(0);
+  -webkit-transform:translateZ(0);
 }
 .tab-btn {
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -542,7 +545,6 @@ tr:hover td { background:var(--page); }
 .tab-label { font-size:10px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; }
 
 /* Push wrap content above tab bar */
-.wrap { padding-bottom:80px; }
 
 /* ── Digital watch font for all numbers ── */
 .hero-value, .hs-val, .kpi-value, .ds-val, .psv,
