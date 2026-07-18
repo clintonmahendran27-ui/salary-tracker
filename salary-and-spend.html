@@ -362,9 +362,10 @@ tr:hover td { background:var(--page); }
 }
 .celeb-overlay.hidden { display:none !important; }
 .celeb-card {
-  background:#fff; border-radius:24px;
+  background:#111111; border-radius:24px;
   padding:28px 36px; text-align:center;
-  box-shadow:0 16px 60px rgba(0,0,0,0.22);
+  box-shadow:0 16px 60px rgba(0,0,0,0.40);
+  border:3px solid #F9C200;
   pointer-events:auto;
   animation: celebPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
   position:relative; min-width:220px;
@@ -385,9 +386,9 @@ tr:hover td { background:var(--page); }
   from { transform:translateY(0) scale(1); }
   to   { transform:translateY(-8px) scale(1.08); }
 }
-.celeb-cat { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
-.celeb-amt { font-size:32px; font-weight:900; letter-spacing:-1px; margin-bottom:4px; }
-.celeb-msg { font-size:13px; color:#898781; font-weight:600; }
+.celeb-cat { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; color:#F9C200; }
+.celeb-amt { font-size:32px; font-weight:900; letter-spacing:-1px; margin-bottom:4px; color:#ffffff !important; }
+.celeb-msg { font-size:13px; color:rgba(255,255,255,0.65); font-weight:600; }
 .celeb-particles { position:absolute; inset:0; border-radius:24px; overflow:hidden; pointer-events:none; }
 .celeb-p { position:absolute; width:8px; height:8px; border-radius:50%;
   animation:pFly 1s ease-out forwards; }
@@ -2063,9 +2064,14 @@ function importData(event){
 
 // ── Category Celebration ─────────────────────────────────────────────
 const CAT_CELEBS = {
-  grocery:   { emoji:'🛒', gradient:'#2a78d6,#6ab0ff', msgs:['Smart shopping!','Cart filled!','Groceries done ✓','Stock up done!'] },
-  food:      { emoji:'🍱', gradient:'#1baf7a,#6de6b8', msgs:['Yummy! 😋','Food is life!','Well fed!','Bon appétit!'] },
-  transport: { emoji:'🚌', gradient:'#eda100,#ffd166', msgs:['On the move!','Commute logged!','Ride recorded!','Keep rolling!'] },
+  grocery:   { emoji:'🛒', gradient:'#F9C200,#ffdd55', msgs:['Smart shopping!','Cart filled!','Groceries done ✓','Stock up done!'] },
+  food:      { emoji:'🍱', gradient:'#F9C200,#FF8C42', msgs:['Yummy! 😋','Food is life!','Well fed!','Bon appétit!'] },
+  transport: { emoji:'🚌', gradient:'#F9C200,#ffdd55', msgs:['On the move!','Commute logged!','Ride recorded!','Keep rolling!'] },
+  medical:   { emoji:'💊', gradient:'#FF8C42,#F9C200', msgs:['Health first!','Stay healthy!','Take care!','Wellness logged!'] },
+  bills:     { emoji:'⚡', gradient:'#F9C200,#FF3527', msgs:['Bills paid!','Lights on!','Utility logged!','Paid on time!'] },
+  clothing:  { emoji:'👗', gradient:'#FF8C42,#F9C200', msgs:['Looking sharp!','Style upgrade!','Fashion logged!','Outfit sorted!'] },
+  others:    { emoji:'📦', gradient:'#F9C200,#ffdd55', msgs:['Logged!','Done!','Entry added!','Noted!'] },
+};
   medical:   { emoji:'💊', gradient:'#e34948,#ff9e9e', msgs:['Health first!','Stay healthy!','Take care!','Wellness logged!'] },
   bills:     { emoji:'⚡', gradient:'#4a3aa7,#9b8de8', msgs:['Bills paid!','Lights on!','Utility logged!','Paid on time!'] },
   clothing:  { emoji:'👗', gradient:'#e87ba4,#ffb3cf', msgs:['Looking sharp!','Style upgrade!','Fashion logged!','Outfit sorted!'] },
@@ -2084,15 +2090,15 @@ function showCelebration(cat, amt, reduce){
   document.getElementById('celebEmoji').textContent = cfg.emoji;
   document.getElementById('celebCat').textContent   = catLabel(cat).replace(/^\S+\s/,'');
   document.getElementById('celebAmt').textContent   = '₹ ' + fmtK(amt);
-  document.getElementById('celebAmt').style.color   = cfg.gradient.split(',')[0];
-  document.getElementById('celebCat').style.color   = cfg.gradient.split(',')[0];
+  document.getElementById('celebAmt').style.color   = '#ffffff';
+  document.getElementById('celebCat').style.color   = '#F9C200';
   document.getElementById('celebMsg').textContent   = cfg.msgs[Math.floor(cfg.msgs.length * (amt % 1 === 0 ? (amt/100)%1 : 0.5)) % cfg.msgs.length] || cfg.msgs[0];
-  document.getElementById('celebBg').style.background = `linear-gradient(135deg,${cfg.gradient})`;
+  document.getElementById('celebBg').style.background = `linear-gradient(135deg,#F9C200,#FF8C42)`;
 
   // Particles
   const pWrap = document.getElementById('celebParticles');
   pWrap.innerHTML = '';
-  const colors = cfg.gradient.split(',').concat(['#fff','#ffd700','#ff6b6b']);
+  const colors = ['#F9C200','#FF8C42','#FF3527','#ffffff','#ffdd55','#111111'];
   for(let i=0;i<18;i++){
     const p = document.createElement('div');
     p.className = 'celeb-p';
