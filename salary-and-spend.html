@@ -1651,15 +1651,26 @@ function calcNetSavings(){
   const [y,mm]     = viewMK.split('-').map(Number);
   const todayDay   = parseInt(TODAY().split('-')[2]);
 
-  // Always count from day 1 up to today (or full month for past months)
-  // Date range only affects the daily budget amount — not which days are counted
-  const lastDay = viewMK === CURRENT_MK() ? todayDay : daysInMonth(viewMK);
+  // Date range: only count days within the given range
+  // If no range set → count day 1 to today (original behaviour)
+  const rangeStart = m.startDate ? parseInt(m.startDate.split('-')[2]) : 1;
+  const rangeEnd   = m.endDate   ? parseInt(m.endDate.split('-')[2])   : daysInMonth(viewMK);
+
+  // For current month: cap at today; for past months: cap at rangeEnd
+  const countUpTo = viewMK === CURRENT_MK()
+    ? Math.min(todayDay, rangeEnd)
+    : rangeEnd;
+
+  // Start counting from rangeStart
+  const countFrom = rangeStart;
+
+  // If today is before the range starts, nothing to count yet
+  if(countUpTo < countFrom) return 0;
 
   let net = 0;
-  for(let d = 1; d <= lastDay; d++){
+  for(let d = countFrom; d <= countUpTo; d++){
     const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const spent   = (days[dateStr]||[]).reduce((s,e)=>s+e.amt, 0);
-    // Use adjusted budget from the day it was applied, otherwise original
     const budget  = (adjB && d >= adjFromDay) ? adjB : origB;
     net += budget - spent;
   }
