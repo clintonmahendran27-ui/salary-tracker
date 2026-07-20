@@ -1500,6 +1500,19 @@ function addEntry(reduce){
   if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
   const raw = parseFloat(document.getElementById('entryAmt').value);
   if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
+
+  // ── Date range validation ──────────────────────────────────────
+  const m = store.months[CURRENT_MK()]||{};
+  if(m.startDate && m.endDate){
+    const start   = m.startDate;  // "YYYY-MM-DD"
+    const end     = m.endDate;
+    if(selDate < start || selDate > end){
+      const fmt = s => s.split('-').reverse().join('/');
+      alert(`⚠️ Outside your expense range!\n\nYou can only add spending between:\n${fmt(start)} → ${fmt(end)}\n\nSelected date: ${fmt(selDate)}`);
+      return;
+    }
+  }
+
   const note = '';
   const amt  = reduce ? -Math.abs(raw) : Math.abs(raw);
   if(!store.months[CURRENT_MK()].days[selDate]) store.months[CURRENT_MK()].days[selDate]=[];
