@@ -876,6 +876,14 @@ tr:hover td { background:var(--page); }
           <input type="number" id="salaryInput" placeholder="e.g. 30000" min="1"/>
         </div>
         <div class="field">
+          <label>Start Date</label>
+          <input type="date" id="expenseStartDate"/>
+        </div>
+        <div class="field">
+          <label>End Date</label>
+          <input type="date" id="expenseEndDate"/>
+        </div>
+        <div class="field">
           <label>Month</label>
           <input type="text" id="monthDisp" readonly/>
         </div>
@@ -1332,11 +1340,18 @@ function switchMonth(mk, doRender=true){
   document.getElementById('addBtns').style.pointerEvents = isCurrent ? 'auto' : 'none';
   document.getElementById('dayPicker').disabled      = !isCurrent;
   // Hero month display
-  const DIM = daysInMonth(mk);
-  document.getElementById('monthDisp').value         = monthName(mk);
-  document.getElementById('kpiDaysTotal').textContent= DIM;
-  document.getElementById('heroDays').textContent    = DIM;
-  document.getElementById('salaryInput').value       = (store.months[mk]||{}).origSalary || (store.months[mk]||{}).salary || '';
+  const DIM  = daysInMonth(mk);
+  const mData = store.months[mk]||{};
+  const effDays = mData.effectiveDays || DIM;
+  document.getElementById('monthDisp').value          = monthName(mk);
+  document.getElementById('kpiDaysTotal').textContent = effDays;
+  document.getElementById('heroDays').textContent     = effDays;
+  document.getElementById('salaryInput').value        = mData.origSalary || mData.salary || '';
+  // Restore date fields if previously set
+  const sdf = document.getElementById('expenseStartDate');
+  const edf = document.getElementById('expenseEndDate');
+  if(sdf) sdf.value = mData.startDate || '';
+  if(edf) edf.value = mData.endDate   || '';
   document.getElementById('btnSetSalary').style.display = isCurrent ? '' : 'none';
   // Sync switcher
   document.getElementById('monthSwitcher').value = mk;
@@ -1347,11 +1362,40 @@ function switchMonth(mk, doRender=true){
 function setSalary(){
   if(viewMK !== CURRENT_MK()){ alert('You can only change salary for the current month.'); return; }
   const v = parseFloat(document.getElementById('salaryInput').value);
-  if(!v||v<=0){ alert('Please enter a valid salary.'); return; }
-  const DIM = daysInMonth(CURRENT_MK());
+  if(!v||v<=0){ alert('Please enter a valid expense amount.'); return; }
+
+  const startVal = document.getElementById('expenseStartDate').value;
+  const endVal   = document.getElementById('expenseEndDate').value;
+
+  let effectiveDays;
+  let startDate = null;
+  let endDate   = null;
+
+  if(startVal && endVal){
+    startDate = new Date(startVal + 'T00:00:00');
+    endDate   = new Date(endVal   + 'T00:00:00');
+    if(endDate < startDate){ alert('End date must be after start date.'); return; }
+    // Count inclusive days
+    effectiveDays = Math.round((endDate - startDate) / (1000*60*60*24)) + 1;
+    if(effectiveDays <= 0){ alert('Invalid date range.'); return; }
+  } else {
+    // No date range given — use full days in month
+    effectiveDays = daysInMonth(CURRENT_MK());
+  }
+
+  const dailyBdgt = v / effectiveDays;
+
   // Preserve existing days — never overwrite
   const existingDays = (store.months[CURRENT_MK()]||{}).days || {};
-  store.months[CURRENT_MK()] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
+  store.months[CURRENT_MK()] = {
+    salary:        v,
+    origSalary:    v,
+    dailyBdgt:     dailyBdgt,
+    effectiveDays: effectiveDays,
+    startDate:     startVal || null,
+    endDate:       endVal   || null,
+    days:          existingDays
+  };
   persist();
   populateMonthSwitcher();
   render();
@@ -1558,14 +1602,17 @@ function applyHero(){
   const DIM   = daysInMonth(viewMK);
   const mk    = monthName(viewMK);
   const isAdj = viewMK === CURRENT_MK() && m.adjustedDailyBdgt;
+  const effDays = m.effectiveDays || DIM;
+  const dateRangeLabel = (m.startDate && m.endDate)
+    ? m.startDate.slice(8)+'/'+m.startDate.slice(5,7)+' – '+m.endDate.slice(8)+'/'+m.endDate.slice(5,7)+' · '+effDays+' days'
+    : mk+' · '+effDays+' days';
 
   document.getElementById('heroSalary').textContent      = sal ? '₹ '+fmtK(sal) : '₹ —';
   document.getElementById('heroSub').textContent         = isAdj
     ? mk+' · Remaining Balance'
-    : mk+' · '+DIM+' days';
+    : dateRangeLabel;
   document.getElementById('heroDailyBudget').textContent = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
-  document.getElementById('heroDays').textContent        = DIM;
-  // KPI monthly expense tile — show adjusted salary (remaining balance) or original
+  document.getElementById('heroDays').textContent        = effDays;
   document.getElementById('kpiSalary').textContent       = sal ? '₹ '+fmtK(sal) : '₹ —';
   document.getElementById('kpiSalarySub').textContent    = isAdj ? '🔄 Remaining Balance' : mk;
   document.getElementById('kpiBudget').textContent       = bdgt ? '₹ '+fmt(bdgt) : '₹ —';
@@ -1603,11 +1650,16 @@ function calcNetSavings(){
   const days       = curDays();
   const [y,mm]     = viewMK.split('-').map(Number);
   const todayDay   = parseInt(TODAY().split('-')[2]);
-  const lastDay    = viewMK === CURRENT_MK() ? todayDay : daysInMonth(viewMK);
+
+  // Use custom start/end date range if set, otherwise full month
+  const rangeStart = m.startDate ? parseInt(m.startDate.split('-')[2]) : 1;
+  const rangeEnd   = m.endDate   ? parseInt(m.endDate.split('-')[2])   : daysInMonth(viewMK);
+  const lastDay    = viewMK === CURRENT_MK()
+    ? Math.min(todayDay, rangeEnd)
+    : rangeEnd;
 
   let net = 0;
-  // When adjusted: only calculate net savings from adjustedFromDay onwards
-  const startDay = adjB ? adjFromDay : 1;
+  const startDay = adjB ? Math.max(adjFromDay, rangeStart) : rangeStart;
   for(let d = startDay; d <= lastDay; d++){
     const dateStr = y+'-'+String(mm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const spent   = (days[dateStr]||[]).reduce((s,e)=>s+e.amt, 0);
