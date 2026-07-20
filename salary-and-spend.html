@@ -626,6 +626,28 @@ tr:hover td { background:var(--page); }
   </div>
 </div>
 
+<!-- Out of Range Modal -->
+<div class="modal-bg hidden" id="outOfRangeModal">
+  <div class="modal-box" style="max-width:360px;text-align:center;background:linear-gradient(135deg,#1a1a00,#2a2000);border:2px solid #F9C200;">
+    <div style="font-size:52px;margin-bottom:8px;">🚫</div>
+    <div style="font-size:20px;font-weight:900;color:#F9C200;margin-bottom:6px;letter-spacing:-0.5px;">Out of Range!</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.75);margin-bottom:16px;line-height:1.6;">You can only add spending within your set expense range</div>
+    <div style="background:rgba(249,194,0,0.12);border:1px solid rgba(249,194,0,0.3);border-radius:12px;padding:14px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Allowed Range</div>
+      <div style="font-size:22px;font-weight:900;color:#F9C200;" id="oorRangeLabel">— → —</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;" id="oorDaysLabel"></div>
+    </div>
+    <div style="background:rgba(255,85,85,0.12);border:1px solid rgba(255,85,85,0.3);border-radius:10px;padding:10px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Selected Date</div>
+      <div style="font-size:18px;font-weight:800;color:#ff6b6b;" id="oorSelectedDate">—</div>
+    </div>
+    <button onclick="document.getElementById('outOfRangeModal').classList.add('hidden')"
+      style="width:100%;height:46px;background:linear-gradient(90deg,#F9C200,#FF8C42);color:#111;border:none;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:0.3px;">
+      Got it ✓
+    </button>
+  </div>
+</div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal-bg hidden" id="deleteModal">
   <div class="modal-box" style="max-width:360px;text-align:center;">
@@ -1508,7 +1530,10 @@ function addEntry(reduce){
     const end     = m.endDate;
     if(selDate < start || selDate > end){
       const fmt = s => s.split('-').reverse().join('/');
-      alert(`⚠️ Outside your expense range!\n\nYou can only add spending between:\n${fmt(start)} → ${fmt(end)}\n\nSelected date: ${fmt(selDate)}`);
+      document.getElementById('oorRangeLabel').textContent   = fmt(start) + ' → ' + fmt(end);
+      document.getElementById('oorDaysLabel').textContent    = m.effectiveDays + ' days total';
+      document.getElementById('oorSelectedDate').textContent = fmt(selDate);
+      document.getElementById('outOfRangeModal').classList.remove('hidden');
       return;
     }
   }
