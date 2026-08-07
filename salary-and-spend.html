@@ -622,6 +622,11 @@ tr:hover td { background:var(--page); }
       <input type="number" class="otp-box" id="otp5" maxlength="1" oninput="otpInput(this,5)"/>
     </div>
     <div style="font-size:13px;color:var(--danger);font-weight:700;min-height:20px;margin-bottom:12px;" id="otpError"></div>
+    <!-- OTP display (shown when SMS cannot be sent) -->
+    <div id="otpDisplayRow" style="display:none;background:#fff8d0;border:2px solid #F9C200;border-radius:12px;padding:12px 16px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Your OTP (SMS unavailable)</div>
+      <div id="otpDisplayCode" style="font-size:32px;font-weight:900;color:#111;letter-spacing:8px;font-family:'Bebas Neue',monospace;"></div>
+    </div>
     <button class="btn-modal-primary" onclick="verifyOTP()" id="otpVerifyBtn">✓ Verify &amp; Reset</button>
     <div style="margin-top:14px;">
       <button onclick="resendOTP()" id="otpResendBtn"
@@ -1172,27 +1177,35 @@ function generateOTP(){
 }
 
 async function sendOTPviaSMS(mobile, otp){
-  // Fast2SMS DLT-route quick SMS
+  if(FAST2SMS_API_KEY === 'YOUR_FAST2SMS_API_KEY_HERE') throw new Error('no_key');
   const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=q&message=Your+PocketPilot+reset+OTP+is+${otp}.+Valid+for+5+minutes.+Do+not+share.&language=english&flash=0&numbers=${mobile}`;
   const resp = await fetch(url);
   const json = await resp.json();
   if(!json.return) throw new Error(json.message || 'SMS failed');
 }
 
+function showOtpOnScreen(otp){
+  document.getElementById('otpDisplayRow').style.display = 'block';
+  document.getElementById('otpDisplayCode').textContent = otp;
+}
+
+function hideOtpOnScreen(){
+  document.getElementById('otpDisplayRow').style.display = 'none';
+  document.getElementById('otpDisplayCode').textContent = '';
+}
+
 async function openResetAll(){
   const mobile = getRegisteredMobile();
   if(!mobile){ alert('No registered mobile found. Please re-open the app.'); return; }
 
-  // Generate & send OTP
   _currentOTP = generateOTP();
-  _otpExpiry  = Date.now() + 5 * 60 * 1000; // 5 min
+  _otpExpiry  = Date.now() + 5 * 60 * 1000;
 
-  // Update sub-text
   const masked = '+91 ' + mobile.slice(0,2) + 'XXXXXX' + mobile.slice(-2);
   document.getElementById('otpSubText').textContent = `OTP sent to ${masked}`;
   document.getElementById('otpError').textContent   = '';
+  hideOtpOnScreen();
 
-  // Clear boxes
   for(let i=0;i<6;i++){
     const b = document.getElementById('otp'+i);
     b.value=''; b.classList.remove('filled');
@@ -1205,14 +1218,16 @@ async function openResetAll(){
   try{
     await sendOTPviaSMS(mobile, _currentOTP);
   } catch(e){
-    // Show OTP in console during development (remove in production)
-    console.log('[PocketPilot DEV] OTP:', _currentOTP);
-    document.getElementById('otpError').textContent = '⚠ SMS failed. Check API key. (OTP in console)';
+    showOtpOnScreen(_currentOTP);
+    if(e.message !== 'no_key'){
+      document.getElementById('otpError').textContent = '⚠ SMS failed — use the OTP shown below.';
+    }
   }
 }
 
 function closeOtpModal(){
   document.getElementById('otpModal').classList.add('hidden');
+  hideOtpOnScreen();
   clearOtpTimer();
   _currentOTP = '';
 }
@@ -1265,12 +1280,15 @@ async function resendOTP(){
   _currentOTP = generateOTP();
   _otpExpiry  = Date.now() + 5 * 60 * 1000;
   document.getElementById('otpError').textContent = '';
+  hideOtpOnScreen();
   startOtpTimer();
   try{
     await sendOTPviaSMS(mobile, _currentOTP);
   } catch(e){
-    console.log('[PocketPilot DEV] OTP:', _currentOTP);
-    document.getElementById('otpError').textContent = '⚠ SMS failed. Check API key. (OTP in console)';
+    showOtpOnScreen(_currentOTP);
+    if(e.message !== 'no_key'){
+      document.getElementById('otpError').textContent = '⚠ SMS failed — use the OTP shown below.';
+    }
   }
 }
 
