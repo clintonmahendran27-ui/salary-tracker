@@ -1329,14 +1329,14 @@ const CATS = [
 // ── Helpers ────────────────────────────────────────────────────────
 // All date helpers use IST (UTC+5:30) so date is always correct in India
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+// nowIST() returns a Date whose UTC fields equal current IST time
 function nowIST(){ return new Date(Date.now() + IST_OFFSET_MS); }
+// toDateStr / monthKey receive a date already shifted by nowIST() — read UTC fields directly, no second shift
 function toDateStr(d){
-  const ist = new Date(d.getTime() + IST_OFFSET_MS);
-  return ist.toISOString().split('T')[0];
+  return d.toISOString().split('T')[0];
 }
 function monthKey(d){
-  const ist = new Date(d.getTime() + IST_OFFSET_MS);
-  return ist.getUTCFullYear()+'-'+String(ist.getUTCMonth()+1).padStart(2,'0');
+  return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0');
 }
 function daysInMonth(mk){ const [y,m]=mk.split('-').map(Number); return new Date(y,m,0).getDate(); }
 function monthName(mk){ const [y,m]=mk.split('-').map(Number); return new Date(y,m-1,1).toLocaleString('en-IN',{month:'long',year:'numeric'}); }
