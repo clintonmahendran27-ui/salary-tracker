@@ -1410,6 +1410,7 @@ window.addEventListener('DOMContentLoaded', function(){
     // rest of boot still runs, welcome splash is shown after mobile is saved
     switchMonth(CURRENT_MK(), false);
     document.getElementById('dayPicker').value = TODAY();
+    document.getElementById('dayPicker').max   = TODAY();
     updateDateLabel();
     render();
     return;
@@ -1418,6 +1419,7 @@ window.addEventListener('DOMContentLoaded', function(){
   checkNewMonth();
   switchMonth(CURRENT_MK(), false);
   document.getElementById('dayPicker').value = TODAY();
+  document.getElementById('dayPicker').max   = TODAY();
   updateDateLabel();
   render();
 
@@ -1433,6 +1435,7 @@ window.addEventListener('DOMContentLoaded', function(){
       selDate = TODAY();
       viewMK  = CURRENT_MK();
       document.getElementById('dayPicker').value = TODAY();
+      document.getElementById('dayPicker').max   = TODAY();
       updateDateLabel();
       // Show new month modal only when it just turned the 1st
       if(nowIST().getUTCDate() === 1) checkNewMonth();
@@ -1453,6 +1456,7 @@ window.addEventListener('DOMContentLoaded', function(){
         selDate = liveDate;
         viewMK  = liveMK;
         document.getElementById('dayPicker').value = liveDate;
+        document.getElementById('dayPicker').max   = liveDate;
         updateDateLabel();
         // Only show new month modal if it just became the 1st of a new month
         const dayOfMonth = nowIST().getUTCDate();
