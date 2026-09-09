@@ -660,6 +660,69 @@ tr:hover td { background:var(--page); }
 .kpi-value  { color:#111111 !important; }
 .kpi-tile.good .kpi-value  { color:var(--good) !important; }
 .kpi-tile.danger .kpi-value{ color:var(--danger) !important; }
+
+/* ── Dark Mode ─────────────────────────────────────────────────────── */
+body.dark-mode {
+  background:#1a1a1a;
+  --surf:#1e1e1e; --page:#252525; --card:#1e1e1e;
+  --border:rgba(255,255,255,0.08); --ink:#f0f0f0; --ink2:#d0d0d0;
+  --muted:#777; --grid:#2a2a2a; --base:#533483;
+}
+body.dark-mode::before { opacity:0.2; }
+body.dark-mode #money-canvas { opacity:0.12; }
+body.dark-mode .app-header { background:#0a0a0a; border-bottom-color:#F9C200; }
+body.dark-mode .bottom-tab-bar { background:#0a0a0a; }
+body.dark-mode .kpi-tile,
+body.dark-mode .card,
+body.dark-mode .pm-card { background:#1e1e1e; border-color:rgba(255,255,255,0.08); }
+body.dark-mode .modal-box { background:#1e1e1e; color:#f0f0f0; }
+body.dark-mode .modal-prev { background:#252525; }
+body.dark-mode .modal-field input,
+body.dark-mode .otp-box { background:#252525; color:#f0f0f0; border-color:#533483; }
+body.dark-mode .entry-item { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); }
+body.dark-mode .entry-input-row input[type=number] { background:#252525; color:#f0f0f0; }
+body.dark-mode .day-summary { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); }
+body.dark-mode .progress-track { background:#2a2a2a; }
+body.dark-mode .salary-row input { color:#f0f0f0; }
+body.dark-mode .month-sel, body.dark-mode select { background:#1e1e1e; color:#f0f0f0; }
+body.dark-mode .filter-chip { background:#1e1e1e; color:#d0d0d0; border-color:rgba(255,255,255,0.15); }
+body.dark-mode .filter-chip:hover { background:#252525; border-color:#F9C200; }
+body.dark-mode .filter-chip.active { background:linear-gradient(90deg,#FF3527,#FF8C42); color:#fff; border-color:transparent; }
+body.dark-mode table tr:hover td { background:#252525; }
+body.dark-mode .viewing-banner { background:#0a0a0a; }
+body.dark-mode .week-stat { background:#252525; }
+body.dark-mode .day-picker,
+body.dark-mode input[type=date],
+body.dark-mode input[type=number],
+body.dark-mode input[type=text] { background:#1e1e1e; color:#f0f0f0; }
+body.dark-mode .kpi-tile.good .kpi-value  { color:var(--good) !important; }
+body.dark-mode .kpi-tile.danger .kpi-value { color:var(--danger) !important; }
+body.dark-mode .quick-amt-btn { background:#252525; color:#d0d0d0; border-color:rgba(255,255,255,0.15); }
+body.dark-mode .quick-amt-btn:hover,
+body.dark-mode .quick-amt-btn:active { background:#F9C200; color:#111; border-color:#F9C200; }
+
+/* ── Quick Amount Buttons ─────────────────────────────────────────── */
+.quick-amt-btn {
+  height:32px; padding:0 14px; background:var(--page);
+  color:var(--ink); border:1.5px solid var(--base);
+  border-radius:20px; font-size:13px; font-weight:700;
+  cursor:pointer; transition:all 0.15s;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.quick-amt-btn:hover,.quick-amt-btn:active { background:#F9C200; color:#111; border-color:#F9C200; transform:translateY(-1px); }
+
+/* ── Savings Goal Bar ────────────────────────────────────────────── */
+.goal-track { flex:1; height:10px; background:var(--grid); border-radius:5px; overflow:hidden; }
+.goal-fill  { height:100%; border-radius:5px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); background:linear-gradient(90deg,#2a8a50,#6ee26e); }
+
+/* ── Weekly Summary ──────────────────────────────────────────────── */
+.week-stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-top:10px; }
+.week-stat { background:var(--page); border-radius:12px; padding:12px 14px; border:1px solid var(--border); }
+.week-stat-val { font-size:20px; font-weight:800; font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em; }
+.week-stat-lbl { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
+
+/* ── Tab Alert Badge ─────────────────────────────────────────────── */
+.tab-badge { position:absolute; top:7px; right:calc(50% - 20px); width:9px; height:9px; border-radius:50%; border:2px solid #111111; z-index:1; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -999,6 +1062,21 @@ tr:hover td { background:var(--page); }
           <div class="hero-stat"><div class="hs-lbl">Remaining Balance</div><div class="hs-val" id="heroRemaining" style="color:#ffd580">₹ —</div></div>
         </div>
       </div>
+      <!-- Month vs Budget Progress -->
+      <div id="monthProgressWrap" style="display:none;margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.75);font-weight:700;margin-bottom:4px;">
+          <span>Month Progress</span><span id="monthProgressLabel"></span>
+        </div>
+        <div style="background:rgba(255,255,255,0.18);border-radius:5px;height:7px;overflow:hidden;">
+          <div id="monthProgressFill" style="height:100%;border-radius:5px;background:rgba(255,255,255,0.85);width:0%;transition:width 0.5s ease;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.75);font-weight:700;margin-bottom:4px;margin-top:8px;">
+          <span>Budget Used</span><span id="budgetUsedLabel"></span>
+        </div>
+        <div style="background:rgba(255,255,255,0.18);border-radius:5px;height:7px;overflow:hidden;">
+          <div id="budgetUsedFill" style="height:100%;border-radius:5px;background:#6ee26e;width:0%;transition:width 0.5s ease;"></div>
+        </div>
+      </div>
       <div class="salary-row" id="salaryRowWrap" style="margin-top:48px;">
         <div class="field">
           <label>Monthly Expense (₹)</label>
@@ -1027,6 +1105,8 @@ tr:hover td { background:var(--page); }
       <div class="kpi-tile" data-icon="🏦" id="kpiSavingsTile"><div class="kpi-label">Net Savings</div><div class="kpi-value" id="kpiSavings">₹ 0</div><div class="kpi-sub" id="kpiSavingsSub">Running</div></div>
       <div class="kpi-tile" data-icon="💳" id="kpiRemainingTile"><div class="kpi-label">Remaining Balance</div><div class="kpi-value" id="kpiRemaining">₹ —</div><div class="kpi-sub" id="kpiRemainingSub">Salary − Spent</div></div>
       <div class="kpi-tile" data-icon="📆"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpiDays">0</div><div class="kpi-sub">of <span id="kpiDaysTotal">—</span></div></div>
+      <div class="kpi-tile" data-icon="🔥" id="kpiStreakTile"><div class="kpi-label">Spending Streak</div><div class="kpi-value" id="kpiStreak">0</div><div class="kpi-sub" id="kpiStreakSub">days under budget</div></div>
+      <div class="kpi-tile" data-icon="🎯" id="kpiGoalTile" style="display:none"><div class="kpi-label">Savings Goal</div><div class="kpi-value" id="kpiGoalVal">₹ 0</div><div class="kpi-sub" id="kpiGoalSub">of ₹ —</div></div>
     </div>
   </div>
 
@@ -1045,6 +1125,13 @@ tr:hover td { background:var(--page); }
       <div class="entry-input-row">
         <input type="number" id="entryAmt" placeholder="₹ Amount" min="0" step="0.01" style="flex:1;"/>
         <button class="btn-add" onclick="addEntry(false)" style="flex:1;height:52px;font-size:16px;font-weight:900;border-radius:12px;">＋ Add</button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+        <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;align-self:center;">Quick:</span>
+        <button class="quick-amt-btn" onclick="setQuickAmt(50)">₹50</button>
+        <button class="quick-amt-btn" onclick="setQuickAmt(100)">₹100</button>
+        <button class="quick-amt-btn" onclick="setQuickAmt(200)">₹200</button>
+        <button class="quick-amt-btn" onclick="setQuickAmt(500)">₹500</button>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="addBtns">
         <button class="btn-reduce" onclick="addEntry(true)">－ Reduce</button>
@@ -1084,6 +1171,11 @@ tr:hover td { background:var(--page); }
 
   <!-- ── TAB: HISTORY ── -->
   <div class="tab-panel" id="tab-history">
+    <!-- Weekly Summary -->
+    <div class="card" id="weeklySummaryCard" style="margin-top:16px;margin-bottom:16px;display:none;">
+      <div class="card-title"><span>📅</span> This Week</div>
+      <div class="week-stat-grid" id="weekStatGrid"></div>
+    </div>
     <div class="card" style="margin-top:16px;margin-bottom:20px">
       <div class="card-title"><span>📋</span> Spending Log</div>
 
@@ -1141,6 +1233,33 @@ tr:hover td { background:var(--page); }
   <div class="tab-panel" id="tab-settings">
     <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px;">
 
+      <!-- Dark Mode -->
+      <div class="card">
+        <div class="card-title"><span>🌙</span> Appearance</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--ink);">Dark Mode</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Easier on the eyes at night</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:48px;height:26px;flex-shrink:0;">
+            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
+            <span id="darkModeSlider" style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:26px;transition:.3s;"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Savings Goal -->
+      <div class="card">
+        <div class="card-title"><span>🎯</span> Savings Goal</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Set a monthly savings target to track your progress.</div>
+        <div style="display:flex;gap:8px;">
+          <input type="number" id="goalInput" placeholder="Amount (₹)" min="0"
+            style="flex:1;height:44px;border:2px solid var(--base);border-radius:10px;padding:0 12px;font-size:14px;font-weight:700;background:var(--surf);color:var(--ink);outline:none;">
+          <button onclick="saveGoal()" style="height:44px;padding:0 18px;background:linear-gradient(90deg,#FF3527,#FF8C42);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">Save</button>
+        </div>
+        <div id="goalStatus" style="margin-top:10px;font-size:13px;color:var(--muted);"></div>
+      </div>
+
       <!-- Month Switcher -->
       <div class="card">
         <div class="card-title"><span>📅</span> Select Month</div>
@@ -1153,8 +1272,11 @@ tr:hover td { background:var(--page); }
       <!-- Export -->
       <div class="card">
         <div class="card-title"><span>⬇</span> Export Data</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Download all your spending data as a JSON file for backup.</div>
-        <button onclick="exportData()" style="width:100%;height:46px;background:linear-gradient(90deg,#FF3527,#FF8C42);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">⬇ Export Data</button>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Download your spending data as JSON (backup) or CSV (spreadsheet).</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="exportData()" style="flex:1;height:46px;background:linear-gradient(90deg,#FF3527,#FF8C42);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">⬇ JSON</button>
+          <button onclick="exportCSV()" style="flex:1;height:46px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">📊 CSV</button>
+        </div>
       </div>
 
       <!-- Import -->
@@ -1181,7 +1303,7 @@ tr:hover td { background:var(--page); }
 <!-- ── Bottom Tab Bar ── -->
 <nav class="bottom-tab-bar">
   <button class="tab-btn active" onclick="switchTab('home')" id="tabbtn-home">
-    <span class="tab-icon">🏠</span>
+    <span class="tab-icon" style="position:relative;">🏠<span class="tab-badge" id="homeBudgetBadge" style="display:none;position:absolute;top:-4px;right:-8px;background:#e53935;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:900;line-height:16px;text-align:center;">!</span></span>
     <span class="tab-label">Home</span>
   </button>
   <button class="tab-btn" onclick="switchTab('add')" id="tabbtn-add">
@@ -1483,6 +1605,7 @@ window.addEventListener('DOMContentLoaded', function(){
   viewMK = CURRENT_MK();
   selDate = TODAY();
   populateMonthSwitcher();
+  initDarkMode();
 
   // Check mobile registration first — if not registered, show that modal and skip welcome splash
   if(!checkMobileRegistration()){
@@ -1842,6 +1965,12 @@ function render(){
   renderCatBreakdown();
   renderTable();
   renderPrevMonths();
+  renderMonthProgress();
+  renderStreakKPI();
+  renderGoalKPI();
+  renderGoalStatus();
+  renderWeeklySummary();
+  renderBudgetAlertBadge();
 }
 
 function applyHero(){
@@ -2300,6 +2429,172 @@ function importData(event){
   };
   reader.readAsText(file); event.target.value='';
 }
+
+// ── CSV Export ────────────────────────────────────────────────────────
+function exportCSV(){
+  const rows = [['Month','Date','Category','Amount','Note']];
+  Object.keys(store.months).sort().forEach(mk => {
+    const days = (store.months[mk]||{}).days || {};
+    Object.keys(days).sort().forEach(date => {
+      (days[date]||[]).forEach(e => {
+        rows.push([mk, date, e.cat||'', e.amt||0, (e.note||'').replace(/"/g,'""')]);
+      });
+    });
+  });
+  const csv = rows.map(r => r.map(v => '"'+v+'"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = 'pocketpilot-export.csv'; a.click(); URL.revokeObjectURL(url);
+}
+
+// ── Dark Mode ─────────────────────────────────────────────────────────
+function initDarkMode(){
+  const dark = localStorage.getItem('darkMode') === '1';
+  document.body.classList.toggle('dark-mode', dark);
+  const toggle = document.getElementById('darkModeToggle');
+  const slider = document.getElementById('darkModeSlider');
+  if(toggle) toggle.checked = dark;
+  if(slider) slider.style.background = dark ? '#FF3527' : '#ccc';
+}
+function toggleDarkMode(on){
+  document.body.classList.toggle('dark-mode', on);
+  localStorage.setItem('darkMode', on ? '1' : '0');
+  const slider = document.getElementById('darkModeSlider');
+  if(slider) slider.style.background = on ? '#FF3527' : '#ccc';
+}
+
+// ── Quick Amount Shortcuts ────────────────────────────────────────────
+function setQuickAmt(val){
+  const inp = document.getElementById('amtInput');
+  if(inp){ inp.value = val; inp.focus(); }
+}
+
+// ── Savings Goal ──────────────────────────────────────────────────────
+function saveGoal(){
+  const inp = document.getElementById('goalInput');
+  const val = parseFloat(inp.value);
+  if(!val || val <= 0){ alert('Enter a valid goal amount.'); return; }
+  store.savingsGoal = val; persist();
+  renderGoalStatus();
+  renderGoalKPI();
+  inp.value = '';
+}
+function renderGoalStatus(){
+  const el = document.getElementById('goalStatus'); if(!el) return;
+  const goal = store.savingsGoal || 0;
+  if(!goal){ el.textContent = 'No goal set yet.'; return; }
+  const net = calcNetSavings();
+  const pct = Math.min(100, Math.round(net / goal * 100));
+  el.innerHTML = 'Goal: ₹'+fmtK(goal)+' · Saved: ₹'+fmtK(Math.max(0,net))+' ('+pct+'%)';
+}
+function renderGoalKPI(){
+  const tile = document.getElementById('kpiGoalTile'); if(!tile) return;
+  const goal = store.savingsGoal || 0;
+  if(!goal){ tile.style.display='none'; return; }
+  tile.style.display = '';
+  const net  = Math.max(0, calcNetSavings());
+  const pct  = Math.min(100, Math.round(net / goal * 100));
+  const lbl  = document.getElementById('kpiGoalVal');
+  const sub  = document.getElementById('kpiGoalSub');
+  if(lbl)  lbl.textContent = pct+'%';
+  if(sub)  sub.textContent = '₹'+fmtK(Math.max(0,net))+' of ₹'+fmtK(goal);
+  const goalInput = document.getElementById('goalInput');
+  if(goalInput && !goalInput.value) goalInput.placeholder = 'Current: ₹'+fmtK(goal);
+}
+
+// ── Spending Streak ───────────────────────────────────────────────────
+function calcStreak(){
+  const days = curDays();
+  let streak = 0;
+  let d = new Date(TODAY()+'T00:00:00');
+  while(true){
+    const dk = d.toISOString().slice(0,10);
+    const spent = (days[dk]||[]).reduce((s,e)=>s+parseFloat(e.amt||0),0);
+    const bdgt  = curBudget();
+    if(bdgt > 0 && spent <= bdgt) streak++;
+    else break;
+    d.setDate(d.getDate() - 1);
+    if(d < new Date(viewMK+'-01T00:00:00')) break;
+  }
+  return streak;
+}
+function renderStreakKPI(){
+  const tile = document.getElementById('kpiStreakTile'); if(!tile) return;
+  const streak = calcStreak();
+  const val = document.getElementById('kpiStreak');
+  const lbl = document.getElementById('kpiStreakSub');
+  if(val) val.textContent = streak;
+  if(lbl) lbl.textContent = streak >= 7 ? '🔥 On fire!' : streak >= 3 ? '💪 Keep going' : 'days under budget';
+}
+
+// ── Month Progress Bar ─────────────────────────────────────────────────
+function renderMonthProgress(){
+  const wrap = document.getElementById('monthProgressWrap'); if(!wrap) return;
+  const m = store.months[viewMK]||{};
+  if(!m.salary){ wrap.style.display='none'; return; }
+  wrap.style.display = '';
+  const DIM = daysInMonth(viewMK);
+  const ist = nowIST();
+  const todayDay = (viewMK === CURRENT_MK()) ? ist.getUTCDate() : DIM;
+  const monthPct = Math.round(todayDay / DIM * 100);
+  const fill = document.getElementById('monthProgressFill');
+  const lbl  = document.getElementById('monthProgressLabel');
+  if(fill) fill.style.width = monthPct+'%';
+  if(lbl)  lbl.textContent  = 'Day '+todayDay+' of '+DIM+' ('+monthPct+'%)';
+  // Budget used bar
+  const totalSpent = Object.values(m.days||{}).flat().reduce((s,e)=>s+parseFloat(e.amt||0),0);
+  const budget = m.salary || 0;
+  const budgetPct = budget > 0 ? Math.min(100, Math.round(totalSpent / budget * 100)) : 0;
+  const bFill = document.getElementById('budgetUsedFill');
+  const bLbl  = document.getElementById('budgetUsedLabel');
+  if(bFill){ bFill.style.width = budgetPct+'%'; bFill.style.background = budgetPct>=90?'#e53935':budgetPct>=70?'#FF8C42':'#1baf7a'; }
+  if(bLbl)  bLbl.textContent   = 'Spent ₹'+fmtK(totalSpent)+' of ₹'+fmtK(budget)+' ('+budgetPct+'%)';
+}
+
+// ── Weekly Summary ────────────────────────────────────────────────────
+function renderWeeklySummary(){
+  const card = document.getElementById('weeklySummaryCard'); if(!card) return;
+  const days = curDays();
+  const bdgt = curBudget();
+  if(!bdgt){ card.style.display='none'; return; }
+  card.style.display = '';
+  // Build last 7 days
+  const stats = [];
+  let d = new Date(TODAY()+'T00:00:00');
+  for(let i=0;i<7;i++){
+    const dk = d.toISOString().slice(0,10);
+    const spent = (days[dk]||[]).reduce((s,e)=>s+parseFloat(e.amt||0),0);
+    const day = d.toLocaleDateString('en-IN',{weekday:'short'});
+    stats.push({day, spent, ok: spent <= bdgt && spent > 0, over: spent > bdgt, zero: spent === 0});
+    d.setDate(d.getDate()-1);
+  }
+  stats.reverse();
+  const grid = document.getElementById('weekStatGrid'); if(!grid) return;
+  grid.innerHTML = stats.map(s => {
+    const color = s.over ? '#e53935' : s.ok ? '#1baf7a' : '#aaa';
+    const label = s.zero ? '—' : '₹'+fmtK(s.spent);
+    return '<div class="week-stat"><div class="week-day">'+s.day+'</div>'
+      +'<div class="week-amt" style="color:'+color+'">'+label+'</div>'
+      +(s.ok?'<div class="week-badge">✓</div>':s.over?'<div class="week-badge" style="color:#e53935">!</div>':'<div class="week-badge"></div>')
+      +'</div>';
+  }).join('');
+}
+
+// ── Daily Budget Alert Badge ──────────────────────────────────────────
+function renderBudgetAlertBadge(){
+  const badge = document.getElementById('homeBudgetBadge');
+  if(!badge) return;
+  const bdgt = curBudget();
+  const todayEntries = (curDays()[TODAY()]||[]);
+  const spent = todayEntries.reduce((s,e)=>s+parseFloat(e.amt||0),0);
+  if(bdgt > 0 && spent > bdgt){
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+
 
 // ── Category Celebration ─────────────────────────────────────────────
 const CAT_CELEBS = {
