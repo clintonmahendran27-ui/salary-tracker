@@ -238,7 +238,7 @@ body::before {
 
 /* Cards */
 .card { background:#ffffff; border:2px solid rgba(0,0,0,0.06); border-radius:var(--radius); padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.10); }
-.card-title { font-size:17px; font-weight:800; color:#111111; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+.card-title { font-size:17px; font-weight:800; color:var(--ink); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
 .card-title span { font-size:20px; }
 
 /* Day log */
@@ -328,7 +328,7 @@ svg.cs { overflow:visible; display:block; width:100%; }
 /* Filter chips */
 .filter-chip {
   height:30px; padding:0 12px; border-radius:20px; font-size:12px; font-weight:700;
-  border:2px solid rgba(0,0,0,0.12); background:#fff; color:#111111;
+  border:2px solid rgba(0,0,0,0.12); background:#fff; color:var(--ink);
   cursor:pointer; transition:all 0.15s; white-space:nowrap;
 }
 .filter-chip:hover { background:#fff8d0; border-color:#F9C200; }
@@ -657,7 +657,7 @@ tr:hover td { background:var(--page); }
 
 /* Fallback glow effect for the Bebas Neue numbers */
 .hero-value { text-shadow: 2px 2px 0px rgba(0,0,0,0.15); color:#fff !important; }
-.kpi-value  { color:#111111 !important; }
+.kpi-value  { color:var(--ink) !important; }
 .kpi-tile.good .kpi-value  { color:var(--good) !important; }
 .kpi-tile.danger .kpi-value{ color:var(--danger) !important; }
 
@@ -697,6 +697,26 @@ body.dark-mode input[type=number],
 body.dark-mode input[type=text] { background:#1e1e1e; color:#f0f0f0; }
 body.dark-mode .kpi-tile.good .kpi-value  { color:var(--good) !important; }
 body.dark-mode .kpi-tile.danger .kpi-value { color:var(--danger) !important; }
+body.dark-mode .kpi-value { color:#f0f0f0 !important; }
+body.dark-mode .kpi-label { color:#aaa !important; }
+body.dark-mode .kpi-sub   { color:#888 !important; }
+body.dark-mode .card-title { color:#f0f0f0 !important; }
+body.dark-mode .pm-title   { color:#f0f0f0 !important; }
+body.dark-mode .pm-sub     { color:#aaa !important; }
+body.dark-mode .pm-val     { color:#f0f0f0 !important; }
+body.dark-mode .entry-cat  { color:#f0f0f0 !important; }
+body.dark-mode .entry-note { color:#bbb !important; }
+body.dark-mode .entry-amt  { color:#f0f0f0 !important; }
+body.dark-mode table th    { color:#aaa !important; }
+body.dark-mode table td    { color:#d0d0d0 !important; }
+body.dark-mode .day-summary-label { color:#bbb !important; }
+body.dark-mode .day-summary-val   { color:#f0f0f0 !important; }
+body.dark-mode [style*="color:#111"] { color:#f0f0f0 !important; }
+body.dark-mode [style*="color: #111"] { color:#f0f0f0 !important; }
+body.dark-mode [style*="color:#222"] { color:#f0f0f0 !important; }
+body.dark-mode [style*="color:#333"] { color:#d0d0d0 !important; }
+body.dark-mode [style*="color:#444"] { color:#c0c0c0 !important; }
+body.dark-mode #otpDisplayCode       { color:#F9C200 !important; }
 body.dark-mode .quick-amt-btn { background:#252525; color:#d0d0d0; border-color:rgba(255,255,255,0.15); }
 body.dark-mode .quick-amt-btn:hover,
 body.dark-mode .quick-amt-btn:active { background:#F9C200; color:#111; border-color:#F9C200; }
