@@ -1545,7 +1545,7 @@ function confirmNewMonth(){
   const DIM = daysInMonth(CURRENT_MK());
   // Preserve existing days if already present — never wipe entries
   const existingDays = (store.months[CURRENT_MK()]||{}).days || {};
-  store.months[CURRENT_MK()] = { salary:v, dailyBdgt:v/DIM, days:existingDays };
+  store.months[CURRENT_MK()] = { salary:v, dailyBdgt:v/DIM, trackingStart:TODAY(), days:existingDays };
   persist();
   document.getElementById('newMonthModal').classList.add('hidden');
   populateMonthSwitcher();
@@ -1628,6 +1628,7 @@ function setSalary(){
     effectiveDays: effectiveDays,
     startDate:     startVal || null,
     endDate:       endVal   || null,
+    trackingStart: startVal || TODAY(),
     days:          existingDays
   };
   persist();
@@ -1799,7 +1800,12 @@ function calcNetSavings(){
   const todayDay   = parseInt(TODAY().split('-')[2]);
 
   // Date range: only count days within the given range
-  const rangeStart = m.startDate ? parseInt(m.startDate.split('-')[2]) : 1;
+  // If no explicit startDate, count from the day salary was set (trackingStart) so
+  // phantom budget-days before setup don't inflate net savings
+  const trackingDay = (!m.startDate && m.trackingStart && m.trackingStart.startsWith(viewMK))
+    ? parseInt(m.trackingStart.split('-')[2])
+    : 1;
+  const rangeStart = m.startDate ? parseInt(m.startDate.split('-')[2]) : trackingDay;
   const rangeEnd   = m.endDate   ? parseInt(m.endDate.split('-')[2])   : daysInMonth(viewMK);
 
   // For current month: cap at today; for past months: cap at rangeEnd
