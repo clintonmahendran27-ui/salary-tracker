@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <title>PocketPilot</title>
 
 <!-- PWA / Home Screen -->
@@ -190,7 +190,7 @@ body::before {
 .btn-modal-primary:hover { opacity:0.9; }
 
 /* Layout */
-.wrap { max-width:1100px; margin:0 auto; padding:24px 16px 80px; }
+.wrap { max-width:1100px; margin:0 auto; padding:24px 16px calc(80px + env(safe-area-inset-bottom, 0px)); }
 
 /* Viewing banner */
 .viewing-banner { background:#111111; border:none; border-radius:var(--radius); padding:14px 20px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
@@ -524,14 +524,93 @@ tr:hover td { background:var(--page); }
 .otp-box:focus { border-color:var(--c1); box-shadow:0 0 0 3px rgba(255,53,39,0.12); }
 .otp-box.filled { border-color:var(--good); background:var(--goodbg); }
 
-@media(max-width:600px){ .hero-value{font-size:30px;} .hero-divider{display:none;} }
+@media(max-width:600px){
+  /* ── Hero Banner — stacked mobile layout ── */
+  .hero-banner { padding:18px 14px 16px; margin-top:12px; margin-bottom:20px; }
+  .hero-top { flex-direction:column; gap:10px; margin-bottom:10px; }
+  .hero-left { width:100%; }
+  .hero-divider { display:none; }
+  .hero-sub { font-size:12px; margin-top:2px; }
+
+  /* Hero stats — 2×2 grid on mobile */
+  .hero-stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    width:100%; background:rgba(0,0,0,0.18);
+    border-radius:12px; padding:12px 14px;
+  }
+  .hero-stat { display:flex; flex-direction:column; gap:2px; }
+  .hs-val { font-size:22px !important; }
+  .hs-lbl { font-size:10px; letter-spacing:0.3px; }
+
+  /* Salary setup form — stack fields vertically */
+  .salary-row { flex-direction:column; gap:8px; }
+  .salary-row .field { min-width:unset; width:100%; }
+  .btn-set { width:100%; height:44px; margin-top:2px; }
+  #salaryRowWrap { margin-top:14px !important; }
+
+  /* ── KPI Tiles — 2 columns ── */
+  .kpi-row { grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+  .kpi-tile { padding:13px 12px; }
+  .kpi-value { font-size:26px !important; }
+  .kpi-label { font-size:10px; letter-spacing:0.3px; }
+  .kpi-sub { font-size:11px; }
+  .kpi-tile::before { font-size:22px; right:8px; top:7px; }
+
+  /* ── Add Tab — category chips horizontal scroll ── */
+  .cat-chips {
+    flex-wrap:nowrap; overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; padding-bottom:4px; gap:8px;
+  }
+  .cat-chips::-webkit-scrollbar { display:none; }
+  .cat-chip { flex-shrink:0; font-size:13px; padding:6px 12px; }
+
+  /* Amount input + Add button — stack on mobile */
+  .entry-input-row { flex-direction:column; gap:8px; }
+  .entry-input-row input[type=number] { min-width:unset; width:100%; flex:unset; }
+  .btn-add { width:100%; height:50px; font-size:16px !important; border-radius:12px !important; }
+
+  /* Reduce button full width */
+  #addBtns { flex-direction:column; }
+  #addBtns .btn-reduce { width:100%; height:42px; }
+
+  /* Day summary */
+  .day-summary { padding:10px 10px; gap:6px; }
+  .ds-val { font-size:22px !important; }
+  .ds-lbl { font-size:9px; }
+
+  /* ── Cards ── */
+  .card { padding:14px 12px; }
+  .card-title { font-size:15px; margin-bottom:12px; }
+
+  /* ── History — compact table ── */
+  table { font-size:11px; }
+  th { padding:7px 5px; font-size:10px; letter-spacing:0.2px; }
+  td { padding:9px 5px; }
+  .tag { font-size:10px; padding:2px 6px; }
+
+  /* ── Previous months — single column ── */
+  .prev-months-grid { grid-template-columns:1fr; }
+  .pm-stat .psv { font-size:20px !important; }
+
+  /* ── Tab bar icons — slightly smaller ── */
+  .tab-icon { font-size:26px; }
+
+  /* ── Filter chips — scroll row ── */
+  div:has(> .filter-chip) { flex-wrap:nowrap !important; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  div:has(> .filter-chip)::-webkit-scrollbar { display:none; }
+  .filter-chip { flex-shrink:0; }
+
+  /* ── Settings cards ── */
+  .modal-box { padding:24px 18px; }
+}
 
 /* ── Bottom Tab Navigation ── */
 .tab-panel { display:none; }
 .tab-panel.active { display:block; }
 
 .bottom-tab-bar {
-  position:fixed; bottom:16px; left:16px; right:16px; z-index:9999;
+  position:fixed; bottom:max(16px, calc(env(safe-area-inset-bottom, 0px) + 8px)); left:16px; right:16px; z-index:9999;
   display:flex; align-items:stretch;
   background:#111111;
   border:2px solid #F9C200;
@@ -569,7 +648,7 @@ tr:hover td { background:var(--page); }
   font-family: 'Bebas Neue', 'Inter', sans-serif !important;
   letter-spacing: 0.04em;
 }
-.hero-value { font-size: 64px !important; letter-spacing: 0.02em; }
+.hero-value { font-size: clamp(30px, 9.5vw, 64px) !important; letter-spacing: 0.02em; }
 .kpi-value  { font-size: 36px !important; letter-spacing: 0.02em; }
 .hs-val     { font-size: 34px !important; }
 .ds-val     { font-size: 28px !important; }
