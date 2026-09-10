@@ -1881,7 +1881,7 @@ function loadStore(){
 // ── State ──────────────────────────────────────────────────────────
 let store        = { months: {} };
 let viewMK       = monthKey(new Date());
-let selCat       = 'grocery';
+let selCat       = 'food';
 let selDate      = toDateStr(nowIST());
 
 // Always returns live IST-based current values
@@ -3153,7 +3153,7 @@ function renderTodaySummary(){
 }
 
 // ── Bottom Sheet ─────────────────────────────────────────────────────
-let sheetSelCat = 'grocery';
+let sheetSelCat = 'food';
 let sheetSelDate = '';
 
 function buildSheetCatChips(){
