@@ -3006,15 +3006,15 @@ function renderWeeklySummary(){
   const bdgt = curBudget();
   if(!bdgt){ card.style.display='none'; return; }
   card.style.display = '';
-  // Build last 7 days
+  // Build last 7 days using IST offset (same as TODAY() / nowIST())
   const stats = [];
-  let d = new Date(TODAY()+'T00:00:00');
   for(let i=0;i<7;i++){
-    const dk = d.toISOString().slice(0,10);
+    const dk = toDateStr(new Date(Date.now() + IST_OFFSET_MS - i * 86400000));
     const spent = (days[dk]||[]).reduce((s,e)=>s+parseFloat(e.amt||0),0);
-    const day = d.toLocaleDateString('en-IN',{weekday:'short'});
+    // Build Date at local noon so weekday name is always correct regardless of timezone
+    const [yr,mo,dy] = dk.split('-').map(Number);
+    const day = new Date(yr,mo-1,dy).toLocaleDateString('en-IN',{weekday:'short'});
     stats.push({day, spent, ok: spent <= bdgt && spent > 0, over: spent > bdgt, zero: spent === 0});
-    d.setDate(d.getDate()-1);
   }
   stats.reverse();
   const grid = document.getElementById('weekStatGrid'); if(!grid) return;
