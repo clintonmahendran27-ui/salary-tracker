@@ -727,6 +727,86 @@ body.dark-mode .quick-amt-btn:active { background:#F9C200; color:#111; border-co
 
 /* ── Quick Amount Buttons ─────────────────────────────────────────── */
 
+/* ── Mood Anime Character ─────────────────────────────────────────── */
+.mood-section {
+  display:none; margin:0 0 8px; padding:0 4px;
+}
+.mood-card {
+  border-radius:20px; padding:16px 12px 12px;
+  display:flex; flex-direction:column; align-items:center;
+  gap:4px; position:relative; overflow:hidden;
+  border:2px solid transparent;
+  transition:background 0.4s, border-color 0.4s;
+}
+.mood-card.sad  { background:linear-gradient(135deg,#fff0f0,#ffe5e5); border-color:rgba(255,53,39,0.2); }
+.mood-card.cool { background:linear-gradient(135deg,#e8fff4,#dff5ff); border-color:rgba(27,175,122,0.2); }
+body.dark-mode .mood-card.sad  { background:linear-gradient(135deg,#2a1515,#1e1e1e); border-color:rgba(255,53,39,0.3); }
+body.dark-mode .mood-card.cool { background:linear-gradient(135deg,#0d2018,#1e1e1e); border-color:rgba(27,175,122,0.3); }
+
+.mood-face {
+  font-size:56px; line-height:1;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+.mood-body {
+  font-size:22px; letter-spacing:2px; line-height:1.3;
+  font-family:monospace;
+}
+.mood-feet {
+  font-size:16px; letter-spacing:4px; line-height:1;
+  font-family:monospace;
+}
+.mood-label {
+  font-size:13px; font-weight:800; margin-top:4px;
+  letter-spacing:0.3px;
+}
+.mood-sublabel {
+  font-size:11px; color:var(--muted); font-weight:600;
+}
+.mood-amt-badge {
+  font-size:18px; font-weight:900;
+  font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em;
+  padding:4px 14px; border-radius:20px; margin-top:4px;
+}
+.mood-card.sad  .mood-amt-badge { background:rgba(255,53,39,0.12); color:#FF3527; }
+.mood-card.cool .mood-amt-badge { background:rgba(27,175,122,0.12); color:#1baf7a; }
+.mood-card.sad  .mood-label     { color:#FF3527; }
+.mood-card.cool .mood-label     { color:#1baf7a; }
+
+/* Sad dancing animation */
+@keyframes sadDance {
+  0%   { transform:rotate(-14deg) translateY(0px) translateX(-2px); }
+  15%  { transform:rotate(10deg)  translateY(-6px) translateX(3px); }
+  30%  { transform:rotate(-12deg) translateY(2px)  translateX(-4px); }
+  45%  { transform:rotate(8deg)   translateY(-4px) translateX(2px); }
+  60%  { transform:rotate(-10deg) translateY(1px)  translateX(-3px); }
+  80%  { transform:rotate(6deg)   translateY(-3px) translateX(2px); }
+  100% { transform:rotate(-14deg) translateY(0px) translateX(-2px); }
+}
+/* Sad tear drip */
+@keyframes tearDrop {
+  0%,100% { transform:translateY(0); opacity:1; }
+  80%     { transform:translateY(12px); opacity:0; }
+}
+/* Cool chill animation — very smooth lazy sway */
+@keyframes coolChill {
+  0%,100% { transform:rotate(-4deg) translateY(0); }
+  30%     { transform:rotate(3deg)  translateY(-4px); }
+  60%     { transform:rotate(-2deg) translateY(-2px); }
+}
+/* Chill sunglasses glint */
+@keyframes glint {
+  0%,90%,100% { opacity:1; }
+  92%         { opacity:0.3; }
+  96%         { opacity:1; }
+}
+.sad-char  { animation:sadDance 1.1s ease-in-out infinite; display:inline-block; }
+.cool-char { animation:coolChill 2.8s ease-in-out infinite; display:inline-block; }
+.tear-l, .tear-r { display:inline-block; animation:tearDrop 1.2s ease-in infinite; font-size:14px; }
+.tear-r { animation-delay:0.4s; }
+.glint-char { animation:glint 3s ease-in-out infinite; }
+
+
+
 
 
 .quick-amt-btn {
@@ -1135,6 +1215,19 @@ body.dark-mode .quick-amt-btn:active { background:#F9C200; color:#111; border-co
       <div class="kpi-tile" data-icon="🔥" id="kpiStreakTile"><div class="kpi-label">Spending Streak</div><div class="kpi-value" id="kpiStreak">0</div><div class="kpi-sub" id="kpiStreakSub">days under budget</div></div>
       <div class="kpi-tile" data-icon="🎯" id="kpiGoalTile" style="display:none"><div class="kpi-label">Savings Goal</div><div class="kpi-value" id="kpiGoalVal">₹ 0</div><div class="kpi-sub" id="kpiGoalSub">of ₹ —</div></div>
     </div>
+
+    <!-- Mood Anime Character -->
+    <div class="mood-section" id="moodSection">
+      <div class="mood-card" id="moodCard">
+        <div class="mood-face" id="moodFace"></div>
+        <div class="mood-body" id="moodBody"></div>
+        <div class="mood-feet" id="moodFeet"></div>
+        <div class="mood-label" id="moodLabel"></div>
+        <div class="mood-sublabel" id="moodSublabel"></div>
+        <div class="mood-amt-badge" id="moodAmt"></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ── TAB: ADD ── -->
@@ -2000,6 +2093,7 @@ function render(){
   renderGoalStatus();
   renderWeeklySummary();
   renderBudgetAlertBadge();
+  renderMoodCharacter();
 }
 
 function applyHero(){
@@ -2556,7 +2650,40 @@ function renderStreakKPI(){
   if(lbl) lbl.textContent = streak >= 7 ? '🔥 On fire!' : streak >= 3 ? '💪 Keep going' : 'days under budget';
 }
 
-// ── Month Progress Bar ─────────────────────────────────────────────────
+// ── Mood Anime Character ──────────────────────────────────────────────
+function renderMoodCharacter(){
+  const section  = document.getElementById('moodSection');  if(!section) return;
+  const bdgt     = curBudget();
+  if(!bdgt || viewMK !== CURRENT_MK()){ section.style.display='none'; return; }
+  const today    = TODAY();
+  const spent    = (curDays()[today]||[]).reduce((s,e)=>s+parseFloat(e.amt||0),0);
+  if(spent === 0){ section.style.display='none'; return; }
+
+  section.style.display = 'block';
+  const card    = document.getElementById('moodCard');
+  const isOver  = spent > bdgt;
+  const diff    = Math.abs(spent - bdgt);
+
+  card.className = 'mood-card ' + (isOver ? 'sad' : 'cool');
+
+  if(isOver){
+    document.getElementById('moodFace').innerHTML     = '<span class="sad-char">😭</span>';
+    document.getElementById('moodBody').innerHTML     = '<span class="tear-l">💧</span>(╥﹏╥)<span class="tear-r">💧</span>';
+    document.getElementById('moodFeet').innerHTML     = 'ﾉ|ヽ';
+    document.getElementById('moodLabel').textContent  = 'Budget busted! 😩';
+    document.getElementById('moodSublabel').textContent = 'Spent ₹'+fmt(diff)+' more than planned';
+    document.getElementById('moodAmt').textContent   = '+₹'+fmt(diff)+' over';
+  } else {
+    document.getElementById('moodFace').innerHTML     = '<span class="cool-char"><span class="glint-char">😎</span></span>';
+    document.getElementById('moodBody').innerHTML     = '(≧◡≦)ノ♪';
+    document.getElementById('moodFeet').innerHTML     = ' ∫  ∫ ';
+    document.getElementById('moodLabel').textContent  = 'Chilling! Budget safe 🎉';
+    document.getElementById('moodSublabel').textContent = '₹'+fmt(diff)+' still remaining today';
+    document.getElementById('moodAmt').textContent   = '₹'+fmt(diff)+' saved';
+  }
+}
+
+
 function renderMonthProgress(){
   const wrap = document.getElementById('monthProgressWrap'); if(!wrap) return;
   const m = store.months[viewMK]||{};
