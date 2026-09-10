@@ -254,7 +254,8 @@ body::before {
 
 /* KPI */
 .kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:14px; margin-bottom:32px; }
-.kpi-tile { background:#ffffff; border:2px solid rgba(0,0,0,0.06); border-radius:var(--radius); padding:16px 18px; box-shadow:0 4px 16px rgba(0,0,0,0.10); position:relative; overflow:hidden; }
+.kpi-tile { background:rgba(255,255,255,0.68); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1.5px solid rgba(255,255,255,0.55); border-radius:var(--radius); padding:16px 18px; box-shadow:0 8px 32px rgba(14,165,233,0.10),0 2px 8px rgba(0,0,0,0.06); position:relative; overflow:hidden; transition:transform 0.18s,box-shadow 0.18s; }
+.kpi-tile:hover { transform:translateY(-2px); box-shadow:0 12px 36px rgba(14,165,233,0.16),0 4px 12px rgba(0,0,0,0.08); }
 .kpi-tile::before { content:attr(data-icon); position:absolute; right:10px; top:8px; font-size:28px; opacity:0.12; pointer-events:none; }
 .kpi-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
 .kpi-value { font-size:21px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; }
@@ -267,7 +268,7 @@ body::before {
 @media(max-width:700px){ .two-col { grid-template-columns:1fr; } }
 
 /* Cards */
-.card { background:#ffffff; border:2px solid rgba(0,0,0,0.06); border-radius:var(--radius); padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.10); }
+.card { background:rgba(255,255,255,0.72); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1.5px solid rgba(255,255,255,0.55); border-radius:var(--radius); padding:20px; box-shadow:0 8px 32px rgba(14,165,233,0.10),0 2px 8px rgba(0,0,0,0.06); }
 .card-title { font-size:17px; font-weight:800; color:var(--ink); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
 .card-title span { font-size:20px; }
 
@@ -279,7 +280,7 @@ body::before {
 .cat-section { margin-bottom:12px; }
 .cat-label-sm { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
 .cat-chips { display:flex; gap:6px; flex-wrap:wrap; }
-.cat-chip { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:700; border:2px solid transparent; cursor:pointer; transition:all 0.15s; user-select:none; }
+.cat-chip { display:flex; align-items:center; gap:5px; padding:8px 13px; border-radius:22px; font-size:13px; font-weight:700; border:2px solid transparent; cursor:pointer; transition:all 0.15s; user-select:none; }
 .cat-chip.selected { border-color:currentColor; }
 .entry-input-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
 .entry-input-row input[type=number] {
@@ -637,7 +638,86 @@ tr:hover td { background:var(--page); }
 
 /* ── Bottom Tab Navigation ── */
 .tab-panel { display:none; }
-.tab-panel.active { display:block; }
+.tab-panel.active { display:block; animation:tabFadeSlide 0.22s ease both; }
+@keyframes tabFadeSlide { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── FAB (Floating Add Button) ── */
+.fab-add {
+  position:fixed;
+  bottom: calc(max(16px, env(safe-area-inset-bottom, 0px) + 8px) + 76px);
+  right:22px; z-index:9800;
+  width:58px; height:58px; border-radius:50%;
+  background:linear-gradient(135deg,#0EA5E9,#06B6D4);
+  color:#fff; font-size:30px; line-height:1;
+  border:none; cursor:pointer;
+  box-shadow:0 6px 24px rgba(14,165,233,0.50),0 2px 8px rgba(0,0,0,0.15);
+  display:flex; align-items:center; justify-content:center;
+  transition:transform 0.18s,box-shadow 0.18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.fab-add:active { transform:scale(0.90); box-shadow:0 3px 12px rgba(14,165,233,0.40); }
+.fab-add.fab-open { transform:rotate(45deg); }
+
+/* ── Bottom Sheet ── */
+.bottom-sheet { position:fixed; inset:0; z-index:9600; pointer-events:none; }
+.bottom-sheet.open { pointer-events:all; }
+.sheet-backdrop { position:absolute; inset:0; background:rgba(0,0,0,0.45); opacity:0; transition:opacity 0.28s; }
+.bottom-sheet.open .sheet-backdrop { opacity:1; }
+.sheet-panel {
+  position:absolute; bottom:0; left:0; right:0;
+  background:var(--surf);
+  border-radius:24px 24px 0 0;
+  padding:12px 20px calc(env(safe-area-inset-bottom, 0px) + 28px);
+  transform:translateY(100%);
+  transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
+  max-height:90vh; overflow-y:auto;
+}
+.bottom-sheet.open .sheet-panel { transform:translateY(0); }
+.sheet-handle { width:44px; height:5px; background:var(--border); border-radius:3px; margin:0 auto 14px; opacity:0.5; }
+.sheet-title { font-size:18px; font-weight:800; color:var(--ink); margin-bottom:16px; }
+.sheet-cat-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.sheet-cat-chip {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:10px 14px; border-radius:16px; border:2px solid transparent;
+  cursor:pointer; transition:all 0.14s; user-select:none; min-width:60px;
+}
+.sheet-cat-chip .scc-icon { font-size:22px; line-height:1; }
+.sheet-cat-chip .scc-lbl  { font-size:10px; font-weight:700; }
+.sheet-cat-chip.selected  { border-color:currentColor; transform:scale(1.06); }
+
+/* ── Today Summary Card ── */
+.today-card {
+  display:flex; align-items:center; gap:0;
+  background:rgba(255,255,255,0.72); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  border:1.5px solid rgba(255,255,255,0.55);
+  border-radius:var(--radius); padding:14px 20px;
+  margin-bottom:20px;
+  box-shadow:0 4px 20px rgba(14,165,233,0.10);
+}
+.tc-item { flex:1; text-align:center; }
+.tc-val  { font-size:18px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; }
+.tc-lbl  { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
+.tc-divider { width:1px; background:var(--border); align-self:stretch; margin:0 8px; }
+.tc-pct-wrap { flex:1.2; text-align:center; }
+.tc-pct  { font-size:18px; font-weight:800; letter-spacing:-0.5px; }
+.tc-bar  { height:6px; background:var(--grid); border-radius:4px; overflow:hidden; margin:4px 0; }
+.tc-bar-fill { height:100%; border-radius:4px; transition:width 0.4s ease,background 0.3s; }
+
+/* ── Skeleton Shimmer ── */
+@keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+.skel {
+  border-radius:8px;
+  background:linear-gradient(90deg,#e0f2fe 0%,#f8fdff 45%,#e0f2fe 100%);
+  background-size:400px 100%;
+  animation:shimmer 1.4s ease-in-out infinite;
+}
+body.dark-mode .skel {
+  background:linear-gradient(90deg,#1a2a3a 0%,#243040 45%,#1a2a3a 100%);
+  background-size:400px 100%;
+}
+
+/* ── Milestone Confetti Canvas ── */
+#milestoneCanvas { position:fixed; inset:0; z-index:10000; pointer-events:none; }
 
 .bottom-tab-bar {
   position:fixed; bottom:max(16px, calc(env(safe-area-inset-bottom, 0px) + 8px)); left:16px; right:16px; z-index:9999;
@@ -704,7 +784,7 @@ body.dark-mode .app-header { background:#0a0a0a; border-bottom-color:#0EA5E9; }
 body.dark-mode .bottom-tab-bar { background:#0a0a0a; }
 body.dark-mode .kpi-tile,
 body.dark-mode .card,
-body.dark-mode .pm-card { background:#1e1e1e; border-color:rgba(255,255,255,0.08); }
+body.dark-mode .pm-card { background:rgba(30,30,30,0.85); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-color:rgba(255,255,255,0.08); }
 body.dark-mode .modal-box { background:#1e1e1e; color:#f0f0f0; }
 body.dark-mode .modal-prev { background:#252525; }
 body.dark-mode .modal-field input,
@@ -1225,6 +1305,25 @@ body.dark-mode .mood-card.cool { background:linear-gradient(135deg,#0d2018,#0d18
         <button class="btn-set" id="btnSetSalary" onclick="setSalary()">✓ Set Expense</button>
       </div>
     </div>
+    <!-- Today Summary Card -->
+    <div class="today-card" id="todayCard" style="display:none">
+      <div class="tc-item">
+        <div class="tc-val" id="tcSpent">₹0</div>
+        <div class="tc-lbl">Spent Today</div>
+      </div>
+      <div class="tc-divider"></div>
+      <div class="tc-item">
+        <div class="tc-val" id="tcRemaining">₹0</div>
+        <div class="tc-lbl">Remaining</div>
+      </div>
+      <div class="tc-divider"></div>
+      <div class="tc-pct-wrap">
+        <div class="tc-pct" id="tcPct">0%</div>
+        <div class="tc-bar"><div class="tc-bar-fill" id="tcBarFill" style="width:0%"></div></div>
+        <div class="tc-lbl">of daily budget</div>
+      </div>
+    </div>
+
     <!-- KPI -->
     <div class="kpi-row">
       <div class="kpi-tile" data-icon="💰"><div class="kpi-label">Monthly Expense</div><div class="kpi-value" id="kpiSalary">₹ —</div><div class="kpi-sub" id="kpiSalarySub">Not set</div></div>
@@ -1389,6 +1488,16 @@ body.dark-mode .mood-card.cool { background:linear-gradient(135deg,#0d2018,#0d18
             <span id="darkModeSlider" style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:26px;transition:.3s;"></span>
           </label>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--ink);">🔊 Sound Effects</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Coin sound when adding expense</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:48px;height:26px;flex-shrink:0;">
+            <input type="checkbox" id="soundToggle" onchange="toggleSound(this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
+            <span id="soundSlider" style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:26px;transition:.3s;"></span>
+          </label>
+        </div>
       </div>
 
       <!-- Savings Goal -->
@@ -1466,6 +1575,42 @@ body.dark-mode .mood-card.cool { background:linear-gradient(135deg,#0d2018,#0d18
     <span class="tab-label">Settings</span>
   </button>
 </nav>
+
+<!-- ── Floating Add Button ── -->
+<button class="fab-add" id="fabAdd" onclick="toggleAddSheet()" title="Quick Add Expense">＋</button>
+
+<!-- ── Add Expense Bottom Sheet ── -->
+<div id="addSheet" class="bottom-sheet">
+  <div class="sheet-backdrop" onclick="closeAddSheet()"></div>
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚡ Quick Add Expense</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;color:var(--ink)" id="sheetDateLabel">Today</div>
+      <input type="date" class="day-picker" id="sheetDatePicker" onchange="onSheetDateChange()" style="height:30px;font-size:12px;"/>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Category</div>
+    <div class="sheet-cat-chips" id="sheetCatChips"></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="number" id="sheetAmt" placeholder="₹ Amount" min="0" step="0.01"
+        style="flex:1;height:52px;padding:0 14px;border:2px solid var(--base);border-radius:14px;font-size:20px;font-weight:700;background:var(--surf);color:var(--ink);outline:none;"/>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;">Quick:</span>
+      <button class="quick-amt-btn" onclick="setSheetAmt(50)">₹50</button>
+      <button class="quick-amt-btn" onclick="setSheetAmt(100)">₹100</button>
+      <button class="quick-amt-btn" onclick="setSheetAmt(200)">₹200</button>
+      <button class="quick-amt-btn" onclick="setSheetAmt(500)">₹500</button>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-add" style="flex:2;" onclick="addSheetEntry(false)">＋ Add Expense</button>
+      <button class="btn-reduce" style="flex:1;" onclick="addSheetEntry(true)">－ Reduce</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Milestone Confetti Canvas ── -->
+<canvas id="milestoneCanvas" style="display:none"></canvas>
 </nav>
 <div class="tip" id="tip"></div>
 
@@ -1751,6 +1896,15 @@ window.addEventListener('DOMContentLoaded', function(){
   selDate = TODAY();
   populateMonthSwitcher();
   initDarkMode();
+  // Init sound toggle state
+  const soundSlider = document.getElementById('soundSlider');
+  if(soundSlider) soundSlider.style.background = store.settings?.sound ? '#0EA5E9' : '#ccc';
+  const soundToggleEl = document.getElementById('soundToggle');
+  if(soundToggleEl) soundToggleEl.checked = !!store.settings?.sound;
+  // Init sheet date
+  sheetSelDate = TODAY();
+  // Show skeletons on first load
+  showSkeletons();
 
   // Check mobile registration first — if not registered, show that modal and skip welcome splash
   if(!checkMobileRegistration()){
@@ -2027,6 +2181,7 @@ function addEntry(reduce){
   render();
   showCelebration(selCat, Math.abs(raw), reduce);
   if(navigator.vibrate) navigator.vibrate(reduce ? [30,20,30] : [60]);
+  playCoinSound();
 }
 
 let _pendingDelete = null;  // { date, id }
@@ -2118,6 +2273,8 @@ function render(){
   renderWeeklySummary();
   renderBudgetAlertBadge();
   renderMoodCharacter();
+  renderTodaySummary();
+  checkMilestoneConfetti();
 }
 
 function applyHero(){
@@ -2967,11 +3124,222 @@ function switchTab(name){
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   document.getElementById('tabbtn-'+name).classList.add('active');
-  // Re-render chart when charts tab becomes visible (SVG needs visible container)
   if(name === 'charts') { renderChart(); renderCatBreakdown(); }
-  // Scroll to top of content on tab switch
   window.scrollTo({top:0, behavior:'smooth'});
 }
+
+// ── Today Summary Card ───────────────────────────────────────────────
+function renderTodaySummary(){
+  const card = document.getElementById('todayCard');
+  if(!card) return;
+  const bdgt = curBudget();
+  if(!bdgt || viewMK !== CURRENT_MK()){ card.style.display='none'; return; }
+  const today = TODAY();
+  const spent = (curDays()[today]||[]).reduce((s,e)=>s+parseFloat(e.amt||0),0);
+  if(spent === 0 && !curBudget()){ card.style.display='none'; return; }
+  card.style.display = 'flex';
+  const remaining = bdgt - spent;
+  const pct = Math.min(200, (spent/bdgt)*100);
+  const color = pct<=80?'var(--good)':pct<=100?'var(--warn)':'var(--danger)';
+  document.getElementById('tcSpent').textContent = '₹'+fmt(spent);
+  document.getElementById('tcSpent').style.color = color;
+  document.getElementById('tcRemaining').textContent = (remaining>=0?'':'−')+'₹'+fmt(Math.abs(remaining));
+  document.getElementById('tcRemaining').style.color = remaining>=0?'var(--good)':'var(--danger)';
+  document.getElementById('tcPct').textContent = Math.round(pct)+'%';
+  document.getElementById('tcPct').style.color = color;
+  const fill = document.getElementById('tcBarFill');
+  fill.style.width = Math.min(100,pct)+'%';
+  fill.style.background = color;
+}
+
+// ── Bottom Sheet ─────────────────────────────────────────────────────
+let sheetSelCat = 'grocery';
+let sheetSelDate = '';
+
+function buildSheetCatChips(){
+  const wrap = document.getElementById('sheetCatChips');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  CATS.forEach(c=>{
+    const el = document.createElement('div');
+    el.className = 'sheet-cat-chip'+(c.key===sheetSelCat?' selected':'');
+    el.style.background = c.bg; el.style.color = c.color;
+    const parts = c.label.split(' ');
+    const icon = parts[0], lbl = parts.slice(1).join(' ');
+    el.innerHTML = `<span class="scc-icon">${icon}</span><span class="scc-lbl">${lbl}</span>`;
+    el.dataset.key = c.key;
+    el.onclick = ()=>{
+      sheetSelCat = c.key;
+      wrap.querySelectorAll('.sheet-cat-chip').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+    };
+    wrap.appendChild(el);
+  });
+}
+
+function openAddSheet(){
+  const sheet = document.getElementById('addSheet');
+  sheetSelDate = TODAY();
+  const dp = document.getElementById('sheetDatePicker');
+  if(dp) dp.value = sheetSelDate;
+  const lbl = document.getElementById('sheetDateLabel');
+  if(lbl) lbl.textContent = new Date(sheetSelDate+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  buildSheetCatChips();
+  sheet.classList.add('open');
+  document.getElementById('fabAdd').classList.add('fab-open');
+  setTimeout(()=>{ const inp=document.getElementById('sheetAmt'); if(inp) inp.focus(); },350);
+}
+
+function closeAddSheet(){
+  document.getElementById('addSheet').classList.remove('open');
+  document.getElementById('fabAdd').classList.remove('fab-open');
+}
+
+function toggleAddSheet(){
+  const sheet = document.getElementById('addSheet');
+  if(sheet.classList.contains('open')) closeAddSheet();
+  else openAddSheet();
+}
+
+function onSheetDateChange(){
+  const dp = document.getElementById('sheetDatePicker');
+  if(dp) sheetSelDate = dp.value;
+}
+
+function setSheetAmt(val){
+  const inp = document.getElementById('sheetAmt');
+  if(inp){ inp.value = val; inp.focus(); }
+}
+
+function addSheetEntry(reduce){
+  if(viewMK!==CURRENT_MK()){ alert('You can only add entries for the current month.'); return; }
+  if(!curSalary()){ alert('Please set your Monthly Expense first.'); return; }
+  const raw = parseFloat(document.getElementById('sheetAmt').value);
+  if(isNaN(raw)||raw<=0){ alert('Enter a valid amount.'); return; }
+  const date = sheetSelDate || TODAY();
+  const m = store.months[CURRENT_MK()]||{};
+  if(m.startDate && m.endDate && (date<m.startDate||date>m.endDate)){
+    alert('Selected date is out of the expense range.'); return;
+  }
+  if(!store.months[CURRENT_MK()].days[date]) store.months[CURRENT_MK()].days[date]=[];
+  const amt = reduce ? -Math.abs(raw) : Math.abs(raw);
+  store.months[CURRENT_MK()].days[date].push({id:Date.now(),cat:sheetSelCat,amt,note:''});
+  document.getElementById('sheetAmt').value = '';
+  persist(); render();
+  showCelebration(sheetSelCat, Math.abs(raw), reduce);
+  if(navigator.vibrate) navigator.vibrate(reduce?[30,20,30]:[60]);
+  playCoinSound();
+  closeAddSheet();
+}
+
+// ── Sound Effects ────────────────────────────────────────────────────
+function playCoinSound(){
+  if(!store.settings?.sound) return;
+  try{
+    const ac = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type='sine';
+    osc.frequency.setValueAtTime(1046, ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(698, ac.currentTime+0.08);
+    osc.frequency.exponentialRampToValueAtTime(880, ac.currentTime+0.18);
+    gain.gain.setValueAtTime(0.25, ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.35);
+    osc.start(ac.currentTime); osc.stop(ac.currentTime+0.35);
+  }catch(e){}
+}
+
+function toggleSound(on){
+  if(!store.settings) store.settings={};
+  store.settings.sound = on;
+  persist();
+  const slider = document.getElementById('soundSlider');
+  if(slider) slider.style.background = on ? '#0EA5E9' : '#ccc';
+}
+
+// ── Skeleton Loading (first paint only) ──────────────────────────────
+function showSkeletons(){
+  const tiles = document.querySelectorAll('.kpi-tile');
+  tiles.forEach(t=>{
+    t._html = t.innerHTML;
+    t.innerHTML = `<div class="skel" style="height:12px;width:55%;margin-bottom:10px;"></div><div class="skel" style="height:22px;width:75%;margin-bottom:8px;"></div><div class="skel" style="height:10px;width:45%;"></div>`;
+  });
+  setTimeout(()=>{
+    tiles.forEach(t=>{ if(t._html) t.innerHTML=t._html; });
+    render();
+  },420);
+}
+
+// ── Milestone Confetti ───────────────────────────────────────────────
+const _shownConfetti = new Set();
+function checkMilestoneConfetti(){
+  if(viewMK === CURRENT_MK()) return;
+  const m = store.months[viewMK];
+  if(!m || !m.salary) return;
+  if(_shownConfetti.has(viewMK)) return;
+  const totalSpent = Object.values(m.days||{}).flat().filter(e=>e.amt>0).reduce((s,e)=>s+e.amt,0);
+  const savings = m.salary - totalSpent;
+  if(savings > 0){
+    _shownConfetti.add(viewMK);
+    launchMilestoneConfetti(savings);
+  }
+}
+
+function launchMilestoneConfetti(savings){
+  const canvas = document.getElementById('milestoneCanvas');
+  if(!canvas) return;
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['#0EA5E9','#06B6D4','#38BDF8','#059669','#6ee26e','#F59E0B','#ffffff'];
+  const particles = Array.from({length:160},()=>({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height - canvas.height,
+    r: 4+Math.random()*6,
+    color: COLORS[Math.floor(Math.random()*COLORS.length)],
+    vx:(Math.random()-0.5)*3,
+    vy:2+Math.random()*4,
+    spin:Math.random()*360,
+    spinV:(Math.random()-0.5)*8,
+    shape: Math.random()>0.5?'rect':'circle',
+    w:6+Math.random()*10, h:4+Math.random()*8,
+  }));
+  let frame=0, raf;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(frame===0){
+      ctx.fillStyle='rgba(0,0,0,0.35)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#ffffff';
+      ctx.font='bold 28px Inter,system-ui,sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('🎉 Great Month! Saved ₹'+fmt(savings), canvas.width/2, canvas.height*0.38);
+      ctx.font='16px Inter,system-ui,sans-serif';
+      ctx.fillStyle='rgba(255,255,255,0.8)';
+      ctx.fillText('Tap anywhere to dismiss', canvas.width/2, canvas.height*0.38+38);
+    }
+    particles.forEach(p=>{
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.spin*Math.PI/180);
+      ctx.fillStyle=p.color;
+      ctx.globalAlpha=0.85;
+      if(p.shape==='circle'){ ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill(); }
+      else { ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); }
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.spin+=p.spinV;
+      if(p.y>canvas.height) p.y=-20;
+    });
+    frame++;
+    if(frame<200) raf=requestAnimationFrame(draw);
+    else { canvas.style.display='none'; }
+  }
+  draw();
+  canvas.onclick=()=>{ cancelAnimationFrame(raf); ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; };
+}
+
 
 // ── Scroll-triggered zoom via Intersection Observer ──────────────
 function initScrollZoom(){
