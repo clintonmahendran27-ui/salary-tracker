@@ -45,45 +45,66 @@
     ctx.closePath();
     ctx.clip();
 
-    // ── Dark teal background
-    ctx.fillStyle = '#0c4a6e';
-    ctx.fillRect(0,0,size,size);
+    // ── Ocean gradient background
+    const bg = ctx.createLinearGradient(0, 0, size, size);
+    bg.addColorStop(0, '#0a2744');
+    bg.addColorStop(0.55, '#0c4a6e');
+    bg.addColorStop(1, '#0891b2');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, size, size);
 
-    // ── Cyan circle behind ₹
-    const cx = size * 0.50, cy = size * 0.50;
-    const circR = size * 0.34;
+    // ── Central glow overlay
+    const glow = ctx.createRadialGradient(size*0.5, size*0.44, 0, size*0.5, size*0.44, size*0.52);
+    glow.addColorStop(0, 'rgba(56,189,248,0.32)');
+    glow.addColorStop(1, 'rgba(14,165,233,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, size, size);
+
+    // ── White card panel in center
+    const cx = size * 0.5, cy = size * 0.48;
+    const cw = size * 0.60, ch = size * 0.52;
+    const cr = size * 0.10;
     ctx.beginPath();
-    ctx.arc(cx, cy, circR, 0, Math.PI*2);
-    ctx.fillStyle = '#0EA5E9';
+    ctx.moveTo(cx-cw/2+cr, cy-ch/2);
+    ctx.lineTo(cx+cw/2-cr, cy-ch/2);
+    ctx.quadraticCurveTo(cx+cw/2, cy-ch/2, cx+cw/2, cy-ch/2+cr);
+    ctx.lineTo(cx+cw/2, cy+ch/2-cr);
+    ctx.quadraticCurveTo(cx+cw/2, cy+ch/2, cx+cw/2-cr, cy+ch/2);
+    ctx.lineTo(cx-cw/2+cr, cy+ch/2);
+    ctx.quadraticCurveTo(cx-cw/2, cy+ch/2, cx-cw/2, cy+ch/2-cr);
+    ctx.lineTo(cx-cw/2, cy-ch/2+cr);
+    ctx.quadraticCurveTo(cx-cw/2, cy-ch/2, cx-cw/2+cr, cy-ch/2);
+    ctx.closePath();
+    ctx.shadowColor = 'rgba(0,0,0,0.30)';
+    ctx.shadowBlur  = size * 0.06;
+    ctx.fillStyle   = 'rgba(255,255,255,0.96)';
     ctx.fill();
+    ctx.shadowBlur  = 0;
 
-    // ── Subtle inner ring
-    ctx.beginPath();
-    ctx.arc(cx, cy, circR - size*0.025, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
-    ctx.lineWidth = size * 0.018;
-    ctx.stroke();
-
-    // ── ₹ symbol centered, black on yellow
-    const fontSize = Math.round(size * 0.38);
+    // ── Teal ₹ on white card
+    const fontSize = Math.round(size * 0.32);
     ctx.font = `900 ${fontSize}px system-ui,sans-serif`;
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle    = '#ffffff';
-    ctx.fillText('₹', cx, cy + size*0.02);
+    ctx.fillStyle    = '#0284C7';
+    ctx.fillText('₹', cx, cy + size*0.01);
 
-    // ── Four corner teal dots for decoration
-    const dp = size * 0.10;
-    const dotR = size * 0.04;
-    [
-      [dp, dp], [size-dp, dp],
-      [dp, size-dp], [size-dp, size-dp]
-    ].forEach(([x,y]) => {
-      ctx.beginPath();
-      ctx.arc(x, y, dotR, 0, Math.PI*2);
-      ctx.fillStyle = '#06B6D4';
-      ctx.fill();
-    });
+    // ── Cyan accent bar at bottom
+    const bw = size * 0.42, bh = size * 0.048;
+    const bx = cx - bw/2, by = size * 0.798;
+    const bRad = bh / 2;
+    ctx.beginPath();
+    ctx.moveTo(bx+bRad, by);
+    ctx.lineTo(bx+bw-bRad, by);
+    ctx.arc(bx+bw-bRad, by+bRad, bRad, -Math.PI/2, Math.PI/2);
+    ctx.lineTo(bx+bRad, by+bh);
+    ctx.arc(bx+bRad, by+bRad, bRad, Math.PI/2, -Math.PI/2);
+    ctx.closePath();
+    const barG = ctx.createLinearGradient(bx, 0, bx+bw, 0);
+    barG.addColorStop(0, '#0EA5E9');
+    barG.addColorStop(1, '#06B6D4');
+    ctx.fillStyle = barG;
+    ctx.fill();
 
     return c.toDataURL('image/png');
   }
@@ -104,8 +125,8 @@
       description: "Smart Daily Budget & Expense Tracker",
       start_url: "./salary-and-spend.html",
       display: "standalone",
-      background_color: "#4a3aa7",
-      theme_color: "#4a3aa7",
+      background_color: "#0c4a6e",
+      theme_color: "#0EA5E9",
       orientation: "portrait",
       icons: [
         { src: png192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
