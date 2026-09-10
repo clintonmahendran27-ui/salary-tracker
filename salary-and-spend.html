@@ -566,13 +566,13 @@ tr:hover td { background:var(--page); }
   .cat-chip { flex-shrink:0; font-size:13px; padding:6px 12px; }
 
   /* Amount input + Add button — stack on mobile */
-  .entry-input-row { flex-direction:column; gap:8px; }
-  .entry-input-row input[type=number] { min-width:unset; width:100%; flex:unset; }
-  .btn-add { width:100%; height:50px; font-size:16px !important; border-radius:12px !important; }
+  .entry-input-row { flex-direction:column; gap:10px; }
+  .entry-input-row input[type=number] { min-width:unset; width:100%; flex:unset; height:54px; font-size:18px !important; }
+  .btn-add { width:100%; height:62px !important; font-size:20px !important; border-radius:16px !important; letter-spacing:0.5px; box-shadow:0 6px 20px rgba(255,53,39,0.4) !important; }
 
   /* Reduce button full width */
   #addBtns { flex-direction:column; }
-  #addBtns .btn-reduce { width:100%; height:42px; }
+  #addBtns .btn-reduce { width:100%; height:50px; font-size:16px !important; border-radius:12px !important; }
 
   /* Day summary */
   .day-summary { padding:10px 10px; gap:6px; }
@@ -726,6 +726,51 @@ body.dark-mode .quick-amt-btn:hover,
 body.dark-mode .quick-amt-btn:active { background:#F9C200; color:#111; border-color:#F9C200; }
 
 /* ── Quick Amount Buttons ─────────────────────────────────────────── */
+
+/* ── Budget Exceeded Popup ─────────────────────────────────────────── */
+.budget-exceeded-overlay {
+  position:fixed; inset:0; z-index:800; pointer-events:none;
+  display:flex; align-items:flex-end; justify-content:center;
+  padding-bottom:100px;
+}
+.budget-exceeded-overlay.hidden { display:none !important; }
+.budget-exceeded-popup {
+  pointer-events:auto;
+  background:#fff;
+  border-radius:24px;
+  padding:24px 28px 20px;
+  text-align:center;
+  box-shadow:0 16px 60px rgba(0,0,0,0.28), 0 0 0 3px #FF3527;
+  animation:bePop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  max-width:320px; width:90%;
+  position:relative;
+}
+body.dark-mode .budget-exceeded-popup { background:#1e1e1e; }
+@keyframes bePop {
+  from { transform:scale(0.6) translateY(60px); opacity:0; }
+  to   { transform:scale(1)   translateY(0);    opacity:1; }
+}
+.budget-exceeded-popup.slide-out {
+  animation:beSlide 0.35s ease forwards;
+}
+@keyframes beSlide {
+  to { transform:translateY(120px); opacity:0; }
+}
+.be-funny-img { font-size:72px; line-height:1; margin-bottom:6px; display:block;
+  animation:beWiggle 0.5s ease infinite alternate; }
+@keyframes beWiggle {
+  from { transform:rotate(-8deg) scale(1); }
+  to   { transform:rotate(8deg)  scale(1.1); }
+}
+.be-title {
+  font-size:18px; font-weight:900; color:#FF3527; margin-bottom:4px;
+  text-transform:uppercase; letter-spacing:0.5px;
+}
+.be-sub   { font-size:13px; color:var(--muted); font-weight:600; margin-bottom:14px; }
+.be-over  { font-size:22px; font-weight:900; color:#FF3527; margin-bottom:4px; font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em; }
+.be-close { height:40px; width:100%; background:#FF3527; color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; }
+
+
 .quick-amt-btn {
   height:32px; padding:0 14px; background:var(--page);
   color:var(--ink); border:1.5px solid var(--base);
@@ -1148,7 +1193,7 @@ body.dark-mode .quick-amt-btn:active { background:#F9C200; color:#111; border-co
       </div>
       <div class="entry-input-row">
         <input type="number" id="entryAmt" placeholder="₹ Amount" min="0" step="0.01" style="flex:1;"/>
-        <button class="btn-add" onclick="addEntry(false)" style="flex:1;height:52px;font-size:16px;font-weight:900;border-radius:12px;">＋ Add</button>
+        <button class="btn-add" onclick="addEntry(false)" style="flex:1;height:58px;font-size:18px;font-weight:900;border-radius:14px;letter-spacing:0.5px;">＋ Add Expense</button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
         <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;align-self:center;">Quick:</span>
@@ -1349,6 +1394,18 @@ body.dark-mode .quick-amt-btn:active { background:#F9C200; color:#111; border-co
 </nav>
 </nav>
 <div class="tip" id="tip"></div>
+
+<!-- ── Budget Exceeded Popup ── -->
+<div class="budget-exceeded-overlay hidden" id="budgetExceededOverlay">
+  <div class="budget-exceeded-popup" id="budgetExceededPopup">
+    <span class="be-funny-img" id="beFunnyImg">😱</span>
+    <div class="be-title" id="beTitle">Budget Busted!</div>
+    <div class="be-over" id="beOver"></div>
+    <div class="be-sub" id="beSub">Your wallet is crying 😢</div>
+    <button class="be-close" onclick="closeBudgetAlert()">Ok ok, I'll be careful! 🙏</button>
+  </div>
+</div>
+
 <div class="celeb-overlay hidden" id="celebOverlay">
   <div class="celeb-card" id="celebCard" onclick="closeCelebration()" style="cursor:pointer;" title="Tap to dismiss">
     <div class="celeb-bg" id="celebBg"></div>
@@ -1905,6 +1962,7 @@ function addEntry(reduce){
   persist();
   render();
   showCelebration(selCat, Math.abs(raw), reduce);
+  if(!reduce) setTimeout(checkBudgetExceeded, 600); // show after celebration
 }
 
 let _pendingDelete = null;  // { date, id }
@@ -2679,6 +2737,52 @@ function closeCelebration(){
   setTimeout(()=>overlay.classList.add('hidden'),400);
   if(_celebTimer) clearTimeout(_celebTimer);
 }
+
+// ── Budget Exceeded Popup ─────────────────────────────────────────────
+const BE_MSGS = [
+  { img:'🤑', title:'Money Gone!',      sub:'You spent more than planned today 💸' },
+  { img:'😭', title:'Budget Busted!',   sub:'Your wallet is crying right now 😢' },
+  { img:'🙈', title:'Don\'t Look!',     sub:'The budget doesn\'t want to see this 🙅' },
+  { img:'🔥', title:'On Fire!',         sub:'Your spending is literally burning 🔥' },
+  { img:'😅', title:'Oops!',            sub:'Small mistake... or was it? 🤭' },
+  { img:'🫙', title:'Jar is Empty!',    sub:'Nothing left in the piggy bank 🐷' },
+  { img:'💀', title:'RIP Budget',       sub:'Budget has left the chat 👻' },
+  { img:'🤦', title:'Seriously?!',      sub:'Even your calculator is judging you 🧮' },
+];
+let _beShownToday = null;
+let _beTimer = null;
+
+function checkBudgetExceeded(){
+  const today = TODAY();
+  if(_beShownToday === today) return; // show only once per day
+  const bdgt  = curBudget();
+  if(!bdgt) return;
+  const spent = (curDays()[today]||[]).reduce((s,e)=>s+parseFloat(e.amt||0),0);
+  if(spent <= bdgt) return;
+  const over  = spent - bdgt;
+  const pick  = BE_MSGS[Math.floor(Math.random() * BE_MSGS.length)];
+  document.getElementById('beFunnyImg').textContent = pick.img;
+  document.getElementById('beTitle').textContent    = pick.title;
+  document.getElementById('beSub').textContent      = pick.sub;
+  document.getElementById('beOver').textContent     = '₹' + fmt(over) + ' over budget!';
+  const overlay = document.getElementById('budgetExceededOverlay');
+  const popup   = document.getElementById('budgetExceededPopup');
+  popup.classList.remove('slide-out');
+  overlay.classList.remove('hidden');
+  _beShownToday = today;
+  if(_beTimer) clearTimeout(_beTimer);
+  _beTimer = setTimeout(closeBudgetAlert, 6000);
+}
+
+function closeBudgetAlert(){
+  const overlay = document.getElementById('budgetExceededOverlay');
+  const popup   = document.getElementById('budgetExceededPopup');
+  popup.classList.add('slide-out');
+  if(_beTimer) clearTimeout(_beTimer);
+  setTimeout(()=>overlay.classList.add('hidden'), 380);
+}
+
+
 
 // ── Tooltip ──────────────────────────────────────────────────────────
 function showTip(e,el){
